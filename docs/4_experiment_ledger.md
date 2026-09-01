@@ -133,3 +133,35 @@ not benchmarks. Total run ≈ 2 h 46 m.
 - Per the execution directive, E02 onward runs on Kaggle; these E01 rows
   are the last local ones.
 
+
+## E02 — Champion Improvement Candidates (predeclared 2026-09-02, before execution)
+
+Runs on Kaggle (execution rule, `docs/0_coding_standards.md`), notebook v3.
+Baseline for every comparison: `e01_cat_2000x05` re-fit **in the same
+kernel run** (cross-environment OOF deltas are 5th-decimal noise, so the
+gate always compares within-run vectors). Folds stay F1 — the fold seed
+(42) never varies; only model seeds do where stated.
+
+**Candidates (frozen; nothing added or dropped afterwards):**
+
+| Candidate | Config | Hypothesis |
+| --- | --- | --- |
+| `e02_cat_interactions` | champion config + 3 subsidy crosses | explicit gate features improve split allocation beyond what CatBoost finds natively (EDA §5) |
+| `e02_cat_avg3seeds` | champion config averaged over model seeds {42, 7, 2026} (components `e02_cat_s7`, `e02_cat_s2026`; seed-42 member is the champion re-fit) | seed-variance reduction lifts OOF AUC; plan's multi-seed condition is met (fold std ~0.0007 >> candidate gaps ~0.0002) |
+| `e02_cat_3000x035` | CatBoost `iterations=3000, learning_rate=0.035` | E01's winning direction (more budget, lower lr) has remaining headroom |
+| `e02_lgbm_1000x05_interactions` | LightGBM 1000×0.05 + the same 3 crosses | cheap family check of the interaction hypothesis |
+
+**Interaction features (frozen, target-free, identical on train/test):**
+with `sub = 1[Subsidy_Available = Yes]`, `hc = 1[Home_Charging_Possible = Yes]`:
+`Subsidy_x_EnvConcern = sub × Environmental_Concern_Level`,
+`Subsidy_x_Income = sub × Annual_Income_USD`,
+`Subsidy_x_HomeCharging = sub × hc`.
+
+**Promotion criteria:** the standing paired gate vs. the in-run champion
+re-fit (fold wins ≥ 3/5; paired stratified bootstrap B=1000, seed 42, 95%
+CI of ΔAUC entirely > 0; P(Δ>0) ≥ 0.95). Bootstrap only for candidates
+above the champion point estimate; seed components (`e02_cat_s*`) are not
+candidates themselves. **Submission only if something promotes** — a
+non-promotion is recorded here and produces no submission.
+
+*(results pending — notebook v3 kernel run)*
