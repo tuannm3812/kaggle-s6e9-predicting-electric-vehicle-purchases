@@ -91,3 +91,33 @@ Consequence: notebooks must write every artifact needed downstream (OOF
 matrices included) to the kernel working directory so `kaggle kernels
 output` can fetch them — the local-only `../predictions` path is a
 fallback, not the primary channel.
+
+## GPU execution (user directive, 2026-09-02)
+
+GPU is available for Kaggle runs when it pays. CatBoost dominates this
+project's runtime (~3400 s per full-data 5-fold fit on the CPU worker), so
+GPU is the lever that makes wider experiments affordable.
+
+**The comparability rule — this is the part that bites.** CatBoost's GPU
+implementation is not numerically identical to its CPU one (notably
+`border_count` defaults to 128 on GPU vs. 254 on CPU, and some split
+algorithms differ). A GPU OOF score therefore **does not share a
+comparability class with a CPU OOF score**, exactly like the subsample /
+full-data rule above:
+
+- A GPU result and a CPU result **never share a ledger row**, and a GPU
+  candidate is never gated against a CPU champion number.
+- Every ledger row states its device.
+- This project's gate design already absorbs this: the champion is
+  **re-fit in-run** before every comparison, so a GPU run gates
+  GPU-vs-GPU and stays valid without re-running history.
+- The first GPU run must include a champion re-fit, giving both the
+  timing gain and the numerical GPU-vs-CPU delta as *measured* facts
+  rather than assumptions.
+
+**Mechanics:** set `enable_gpu: true` in the kernel metadata and pass
+`task_type="GPU"` in the CatBoost config — metadata alone does nothing,
+the model must select GPU computation. GPU quota is limited and mutable;
+check it live rather than recalling a number. LightGBM/HGB configurations
+here stay CPU: they already fit in 200–300 s, so GPU would add
+comparability risk for no meaningful gain.

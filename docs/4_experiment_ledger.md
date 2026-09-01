@@ -5,6 +5,14 @@ Every experiment's hypothesis and promotion criteria are written here
 edited to fit outcomes; rejected runs stay recorded. A subsample result and
 a full-data result never share a row.
 
+## Device comparability
+
+Every run row states its device. **CPU and GPU results never share a
+comparability class** (CatBoost GPU differs numerically from CPU — see
+`docs/0_coding_standards.md`). Gates stay valid across the boundary only
+because the champion is re-fit in-run; a GPU candidate is never compared
+to a CPU champion number. All rows through E03 are **CPU**.
+
 ## Fold definition
 
 **F1** (defined 2026-09-01, before any model run):
