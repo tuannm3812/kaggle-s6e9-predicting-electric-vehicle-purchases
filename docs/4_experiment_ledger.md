@@ -60,17 +60,37 @@ Reproducibility Snapshot cell.
   ready; submission waits for the kernel-push flow per
   `docs/3_implementation_plan.md` Phase 4.
 
-## E01 — Budget-Matched GBDT Configurations (predeclared, not yet run)
+## E01 — Budget-Matched GBDT Configurations (predeclared 2026-09-01, before execution)
 
 **Hypothesis:** LightGBM given a boosting budget comparable to CatBoost's
 defaults (more estimators, lower learning rate) closes or reverses the
 +0.00042 gap at a fraction of the runtime; HGB and CatBoost get their own
-comparable-budget configs so this is a three-family search, not
-LightGBM chasing a frozen number.
+comparable-budget configs so this is a three-family search, not LightGBM
+chasing a frozen number.
 
-**Search space:** a handful of hand-designed configurations per family,
-listed in full in the notebook before running; no automated sweeps.
+**Configurations (frozen before any E01 run; nothing added or dropped
+afterwards):**
 
-**Promotion criteria:** the predeclared paired gate above, against
-`v2b_catboost_default` on aligned F1 OOF predictions. Rejected configs are
-recorded here with their numbers.
+| Config | Family | Parameters (beyond family defaults + seed 42) |
+| --- | --- | --- |
+| `e01_hgb_1000x05` | HGB | `max_iter=1000, learning_rate=0.05, early_stopping=False` |
+| `e01_hgb_2000x03_63l` | HGB | `max_iter=2000, learning_rate=0.03, max_leaf_nodes=63, early_stopping=False` |
+| `e01_lgbm_1000x05` | LightGBM | `n_estimators=1000, learning_rate=0.05` |
+| `e01_lgbm_2000x03_63l` | LightGBM | `n_estimators=2000, learning_rate=0.03, num_leaves=63, min_child_samples=50` |
+| `e01_lgbm_1000x05_127l` | LightGBM | `n_estimators=1000, learning_rate=0.05, num_leaves=127, min_child_samples=100, colsample_bytree=0.8` |
+| `e01_cat_2000x05` | CatBoost | `iterations=2000, learning_rate=0.05` |
+| `e01_cat_1000x10_d8` | CatBoost | `iterations=1000, learning_rate=0.1, depth=8` |
+
+All on full data, folds F1, ANX ordinal, native categoricals — identical to
+the v2 pipeline.
+
+**Promotion criteria (the predeclared paired gate above, applied against
+`v2b_catboost_default` on aligned F1 OOF predictions):** fold wins ≥ 3/5,
+paired stratified bootstrap (B = 1000, resampling within class, seed 42)
+95% CI of ΔAUC entirely > 0, and P(Δ>0) ≥ 0.95. The bootstrap is computed
+for every config whose overall OOF AUC exceeds the champion's point
+estimate; configs below it are recorded as not-promoted on the point
+estimate alone (running a bootstrap that cannot promote is waste). Every
+config's numbers are recorded here either way.
+
+*(results pending — notebook v2 execution)*
