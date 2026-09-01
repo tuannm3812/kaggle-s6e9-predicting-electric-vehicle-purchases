@@ -18,6 +18,10 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 | --- | --- | --- |
 | `e01_cat_2000x05` | **0.94176 ± 0.00074** | paired gate: 5/5 folds, 95% CI (+0.000145, +0.000239), P(Δ>0)=1.0 |
 
+Public leaderboard: **0.94169** (submission 1, kernel v2, 2026-09-01) —
+CV↔LB gap −0.00008, confirming the no-drift EDA verdict. Manifest:
+[`docs/5_submission_manifest.md`](docs/5_submission_manifest.md).
+
 All five baseline runs, decisions, and the predeclared promotion gates:
 [`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md). EDA findings:
 [`docs/2_eda_insights.md`](docs/2_eda_insights.md) — top-heavy signal, one
