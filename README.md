@@ -12,14 +12,15 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**Baselines + E01 tuning done; first submission scored (2026-09-01).**
+**E02 interactions promoted and scored (2026-09-02).**
 
 | Champion | OOF AUC (F1: 5-fold strat., seed 42) | Promotion |
 | --- | --- | --- |
-| `e01_cat_2000x05` | **0.94176 ± 0.00074** | paired gate: 5/5 folds, 95% CI (+0.000145, +0.000239), P(Δ>0)=1.0 |
+| `e02_cat_interactions` | **0.94204 ± 0.00074** | paired gate: 5/5 folds, 95% CI (+0.000209, +0.000317), P(Δ>0)=1.0 |
 
-Public leaderboard: **0.94169** (submission 1, kernel v2, 2026-09-01) —
-CV↔LB gap −0.00008, confirming the no-drift EDA verdict. Manifest:
+Public leaderboard: **0.94198** (submission 2, kernel v3, 2026-09-02) —
+LB moved +0.00029 for an OOF gain of +0.00027; CV↔LB tracking confirmed
+twice. Manifest:
 [`docs/5_submission_manifest.md`](docs/5_submission_manifest.md).
 
 All five baseline runs, decisions, and the predeclared promotion gates:

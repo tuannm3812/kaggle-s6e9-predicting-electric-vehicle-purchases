@@ -111,3 +111,21 @@ its ledger rows will say "local". Recorded in
   157 at submission time.
 - Open: E-next experiment TBD (blend closed by diversity bar; Optuna
   closed by no-headroom); source dataset still unidentified.
+
+## 2026-09-02 — E02 on Kaggle: interactions promoted, LB 0.94198
+
+- Kernel v3 (first Kaggle-only experiment run, ~5.5 h) COMPLETE.
+  **Checked:** in-run champion re-fit matched v2 to the 5th decimal
+  (0.94177), validating within-run gate comparisons.
+- **`e02_cat_interactions` promoted** (OOF 0.94204; 5/5 folds, CI
+  (+0.000209, +0.000317)). Interaction effect replicated on LightGBM
+  (0.94155 → 0.94182) though that variant was itself rejected by the gate
+  (CI spanning zero) — the gate separating a real feature effect from an
+  unpromotable candidate in the same run. Seed-averaging also promoted
+  (0.94193) but superseded. Budget direction closed (3000×0.035 tied).
+- Submitted `-v 3`: **public 0.94198** vs. OOF 0.94204 — LB gain
+  (+0.00029) matched OOF gain (+0.00027). Manifest row 2.
+- Notebook v3 refactor in effect: historical sections behind flags;
+  committed output-free; the executed record is the kernel version page.
+- Open: E03 (interactions + seed-average combo) flagged in the ledger,
+  **not yet predeclared**; source dataset still unidentified.

@@ -47,7 +47,7 @@ Any claim about model behaviour should trace to a row in the ledger.
   public discussion to calibrate against. Mutable facts — leaderboard
   standing, public notebook approaches, quotas — must be re-checked live,
   never recalled.
-- Model-behaviour claims trace to `docs/4_experiment_ledger.md`. The OOF
-  plateau is leaderboard-calibrated (public 0.94169 vs. OOF 0.94177,
-  2026-09-01): margins near the plateau are ~0.0002 — the paired gate is
+- Model-behaviour claims trace to `docs/4_experiment_ledger.md`. CV↔LB
+  tracking is confirmed twice (latest: OOF 0.94204 → public 0.94198,
+  2026-09-02). Margins are ~0.0002 per accepted step — the paired gate is
   the only defence against promoting noise.

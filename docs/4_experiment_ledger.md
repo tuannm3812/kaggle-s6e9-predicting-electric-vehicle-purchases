@@ -164,4 +164,42 @@ above the champion point estimate; seed components (`e02_cat_s*`) are not
 candidates themselves. **Submission only if something promotes** — a
 non-promotion is recorded here and produces no submission.
 
-*(results pending — notebook v3 kernel run)*
+### E02 results (Kaggle kernel v3, COMPLETE 2026-09-02 ~05:26 local)
+
+First experiment fully under the Kaggle-only rule — wall-clocks are clean
+worker numbers. Champion re-fit in-run: `e01_cat_2000x05` OOF 0.94177
+± 0.00073 (3352 s), matching the v2 run to the 5th decimal.
+
+| Run | OOF AUC (mean ± fold std) | Wall-clock | Note |
+| --- | --- | --- | --- |
+| `e02_cat_interactions` | **0.94204 ± 0.00074** | 3419 s | **promoted — new champion** |
+| `e02_cat_avg3seeds` | 0.94193 ± 0.00075 | 10078 s (3 members) | promoted, superseded by higher-OOF promotion |
+| `e02_lgbm_1000x05_interactions` | 0.94182 ± 0.00089 | 201 s | **rejected** by gate |
+| `e02_cat_s2026` | 0.94181 ± 0.00072 | 3368 s | seed component, not a candidate |
+| `e02_cat_s7` | 0.94180 ± 0.00076 | 3358 s | seed component, not a candidate |
+| `e02_cat_3000x035` | 0.94177 ± 0.00074 | 5026 s | tied champion — budget direction exhausted |
+
+**Paired gate** (three point-estimate challengers):
+
+| Candidate | Fold wins | 95% CI (ΔAUC) | P(Δ>0) | Verdict |
+| --- | --- | --- | --- | --- |
+| `e02_cat_interactions` | 5/5 | (+0.000209, +0.000317) | 1.000 | **promoted** |
+| `e02_cat_avg3seeds` | 5/5 | (+0.000122, +0.000182) | 1.000 | promoted |
+| `e02_lgbm_1000x05_interactions` | 3/5 | (−0.000032, +0.000132) | 0.894 | rejected |
+
+### Decisions (2026-09-02, post-E02)
+
+- **Champion: `e02_cat_interactions`** (OOF AUC 0.94204) — highest-OOF
+  promotion per the predeclared selection rule. The interaction effect
+  **replicated on LightGBM** (0.94155 → 0.94182), evidence it is the
+  features, not seed noise — even though the LightGBM variant itself did
+  not clear the gate.
+- **Budget direction closed:** 3000×0.035 tied the champion exactly.
+- **Diversity vs. new champion** (aligned OOF Pearson, kernel-v3
+  matrices): `e02_cat_avg3seeds` 0.9986, `e02_lgbm_1000x05_interactions`
+  0.9963, `e01_cat_2000x05` 0.9985 — all above the 0.995 bar →
+  **blending stays closed**.
+- **E03 candidate flagged (not yet predeclared):** interactions + 3-seed
+  averaging of the interaction config; hypothesis of approximately
+  additive gains. Requires its own frozen predeclaration before any run.
+
