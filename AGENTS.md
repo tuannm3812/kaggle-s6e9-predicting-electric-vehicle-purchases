@@ -14,10 +14,10 @@ Project-specific rules and deliberate overrides: @docs/0_coding_standards.md
 
 ## Read before changing anything
 
-@docs/1_instructions.md — and note that most of it is still unfilled. The
-competition has not been joined, so the **evaluation metric, target column and
-submission format are all unknown**. Do not infer them. Do not write a metric
-name into code or docs until it has been read off the Evaluation tab.
+@docs/1_instructions.md — the competition was joined and the data verified on
+2026-09-01: metric is **ROC AUC**, target is `Will_Buy_EV` (binary Yes/No,
+17.46% positive), submission is one probability per test `id`. Quantitative
+claims about the data trace to that doc or to `notebooks/01_eda.ipynb`.
 
 ## Deltas from the master
 
@@ -29,15 +29,23 @@ name into code or docs until it has been read off the Evaluation tab.
 ## Evidence locations
 
 - `docs/1_instructions.md` — task, metric, deadline, submission mechanism
-- `docs/N_experiment_ledger.md` — every run and its numbers *(not created yet)*
-- `docs/N_submission_manifest.md` — every submission and its decision *(not created yet)*
+- `docs/2_eda_insights.md` — executed EDA findings
+- `docs/3_implementation_plan.md` — phased plan and gates
+- `docs/4_experiment_ledger.md` — fold definition (F1), predeclared gates, every run
+- `docs/5_submission_manifest.md` — every submission and its decision *(not created yet)*
 
 Any claim about model behaviour should trace to a row in the ledger.
 
 ## Open risks
 
-- **Nothing has been verified against the data yet.** No file in this repo has
-  seen `train.csv`. Treat every quantitative statement as absent, not implied.
-- The competition is new (57 teams as of 2026-09-01), so there is little public
-  discussion to calibrate against. Mutable facts — leaderboard standing, public
-  notebook approaches, quotas — must be re-checked live, never recalled.
+- **The original source dataset is unidentified.** The Data tab prose is not
+  fetchable by URL and a column-name web search (2026-09-01) found nothing.
+  If identified, it may be usable as extra training data — check before the
+  final ensemble, not after.
+- The competition is new (92 teams as of 2026-09-01), so there is little
+  public discussion to calibrate against. Mutable facts — leaderboard
+  standing, public notebook approaches, quotas — must be re-checked live,
+  never recalled.
+- Model-behaviour claims trace to `docs/4_experiment_ledger.md` (baselines
+  fit 2026-09-01). No leaderboard submission has been made yet, so there is
+  no external calibration of the 0.9416 OOF plateau.

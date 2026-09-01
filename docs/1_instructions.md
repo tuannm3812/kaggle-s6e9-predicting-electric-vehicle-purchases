@@ -4,8 +4,9 @@
 
 ## Verified facts
 
-Read from the Kaggle API on **2026-09-01**. Anything here that can move is
-timestamped; re-check before relying on it.
+First read from the Kaggle API on **2026-09-01** (scaffold session); data-level
+facts verified against the downloaded files on **2026-09-01** after joining.
+Anything that can move is timestamped; re-check before relying on it.
 
 | Item | Value | Source |
 |---|---|---|
@@ -13,49 +14,106 @@ timestamped; re-check before relying on it.
 | Title | Predicting Electric Vehicle Purchases | competition page |
 | Category | Playground | `kaggle competitions list` |
 | Reward | Swag | `kaggle competitions list` |
-| **Deadline** | **2026-09-30 23:59 UTC** | `kaggle competitions list`, 2026-09-01 |
-| Teams entered | 57 | as of 2026-09-01 — early, will move |
+| **Deadline** | **2026-09-30 23:59 UTC** | Kaggle API, re-confirmed 2026-09-01 |
+| Entry / merger deadline | same as final deadline | Kaggle API, 2026-09-01 |
+| Teams entered | 92 | as of 2026-09-01 (was 57 at scaffold time) — early, will move |
+| Joined | **Yes** (`userHasEntered: True`) | Kaggle API, 2026-09-01 |
+| **Evaluation metric** | **ROC AUC** (`evaluation_metric = "Roc Auc Score"`) | Kaggle API competition object, 2026-09-01 |
+| Max daily submissions | 10 | Kaggle API, 2026-09-01 |
+| Max team size | 3 | Kaggle API, 2026-09-01 |
+| Kernels-only submissions | `False` — file upload permitted | Kaggle API, 2026-09-01 |
 | Data published | 2026-08-12 | file creation dates |
 
-**Data files** (`kaggle competitions files playground-series-s6e9`):
+Note on sources: the competition page itself is client-rendered and not
+fetchable by URL, so the Evaluation/Data tab *prose* has not been read
+verbatim. The metric above comes from the Kaggle API's competition object,
+which is authoritative. If the Overview/Data prose is ever pasted in, quote
+it here (S6E8 did exactly that).
 
-| File | Size |
+## Task
+
+**Binary classification.** Predict the probability that `Will_Buy_EV = "Yes"`
+for each test row; submissions are scored with ROC AUC against the observed
+target. Confirmed against the data (target values are `Yes`/`No` strings;
+`sample_submission.csv` carries a constant *probability*, not a label — and
+that constant, `0.174645`, is exactly the train positive rate
+116,779 / 668,665).
+
+## Data (verified against downloaded files, 2026-09-01)
+
+| File | Shape | Notes |
+|---|---|---|
+| `train.csv` | 668,665 × 15 | `id` + 13 features + `Will_Buy_EV` |
+| `test.csv` | 286,571 × 14 | `id` + 13 features |
+| `sample_submission.csv` | 286,571 × 2 | `id`, `Will_Buy_EV` (float) |
+
+- **Target:** `Will_Buy_EV` — `No` 551,886 (82.54%) / `Yes` 116,779 (17.46%).
+- **IDs:** train `0..668664`, test `668665..955235`, both contiguous.
+- **No missing values** in train or test, in any column (unlike S6E8, where
+  missingness handling was a whole workstream).
+- **No duplicate feature rows** in train (0 duplicates excluding `id`).
+
+**Numeric features (7):**
+
+| Feature | dtype | Train range | Notes |
+|---|---|---|---|
+| `Age` | int | 25–69 | |
+| `Annual_Income_USD` | float | 30,000–188,549 | test max 186,936 |
+| `Daily_Commute_km` | float | 5.0–98.7 | **test max 103.9 — exceeds train range** |
+| `Number_of_Cars_Owned` | int | 1–4 | |
+| `Charging_Stations_Near_Home` | int | 0–14 | |
+| `Charging_Stations_Near_Work` | int | 0–19 | |
+| `Environmental_Concern_Level` | float | 1–5 | discrete 1.0–5.0 — ordinal stored as float |
+
+**Categorical features (6)** — train and test vocabularies match exactly:
+
+| Feature | Levels (train counts) |
 |---|---|
-| `train.csv` | 44,707,646 B (~44.7 MB) |
-| `test.csv` | 18,298,347 B (~18.3 MB) |
-| `sample_submission.csv` | 7,737,432 B (~7.7 MB) |
+| `Gender` | Male 367,954 / Female 295,427 / Other 5,284 |
+| `City_Type` | Urban 289,305 / Suburban 255,377 / Rural 123,983 |
+| `Current_Car_Type` | Sedan 303,459 / SUV 246,545 / Hatchback 79,438 / Truck 39,223 |
+| `Home_Charging_Possible` | Yes 462,677 / No 205,988 |
+| `Subsidy_Available` | Yes 419,909 / No 248,756 |
+| `Range_Anxiety_Level` | Low 603,972 / Medium 62,499 / High 2,194 — **High is rare (0.33%)** |
 
-A 7.7 MB sample submission implies a large test set — order 10^6 rows, not the
-10^4–10^5 typical of earlier Season 6 episodes. Worth confirming once the data
-is downloadable, because it changes what is affordable per experiment.
+## Submission format
 
-## Not yet verified — fill these in first
+From `sample_submission.csv`: header `id,Will_Buy_EV`, 286,571 rows, `id`
+ascending from 668,665, one probability per row.
 
-**The competition has not been joined yet.** `userHasEntered` is `False`, and
-`kaggle competitions download` returns `403 Forbidden`. Accept the rules on the
-competition page before anything else; nothing below can be settled until then.
+```
+id,Will_Buy_EV
+668665,0.174645
+668666,0.174645
+668667,0.174645
+```
 
-- [ ] **Evaluation metric.** Unknown. Not stated on the fetchable part of the
-      page and not yet indexed by search — the competition is three weeks old.
-      Do **not** assume ROC AUC because the title sounds binary. Read the
-      Evaluation tab and record the exact metric name here.
-- [ ] **Target column.** Unknown — needs `sample_submission.csv`.
-- [ ] **Submission format.** Unknown — column names and dtypes from
-      `sample_submission.csv`.
-- [ ] **Task type.** The title implies binary classification (purchase / no
-      purchase), but this is an inference from the title, not a read fact.
-      Confirm against the Evaluation tab and the target's actual values.
-- [ ] **Original source dataset.** Playground data is normally generated from a
-      real dataset, and the original is usually permitted as extra training
-      data. Find whether one is named, and record it in a provenance doc if so.
-- [ ] **Submission mechanism.** Confirm whether this is a Code Competition
-      (notebook re-executed by Kaggle) or file-upload. Master standard §11
-      requires notebook-based submission where supported.
+Run `scripts/verify_submission.py` against every artifact before submitting
+(`docs/0_coding_standards.md`).
 
-## First steps
+## Submission mechanism
 
-1. Join the competition on Kaggle.
-2. `kaggle competitions download -c playground-series-s6e9 -p data/`
-   (`data/` is gitignored — see master standard §8).
-3. Fill in every unchecked item above from the Evaluation and Data tabs.
-4. Then start `notebooks/01_eda.ipynb`.
+Not a Code Competition (`is_kernels_submissions_only = False`), so file upload
+works — but master standard §11 still applies: submit via a completed Kaggle
+kernel version (`kaggle competitions submit -k <user>/<kernel> -v <version>
+-f submission.csv`) so every score is tied to code Kaggle actually has.
+Playground Series accepts this; verified in practice on earlier episodes.
+
+## Still open
+
+- [ ] **Original source dataset.** Playground data is normally generated from
+      a real dataset, usually named on the Data tab. The page prose is not
+      fetchable by URL, and a web search on the distinctive column names
+      (2026-09-01) found no public dataset with this schema. If the Data tab
+      names one, record it in a provenance doc and check whether the original
+      is usable as extra training data.
+- [ ] **Overview/Evaluation prose verbatim.** Nice-to-have for the record;
+      the operative facts (metric, format) are already verified via API +
+      files above.
+
+## First steps — status
+
+1. ~~Join the competition~~ — **done** (2026-09-01).
+2. ~~Download data~~ — **done** (2026-09-01, `data/`, gitignored).
+3. ~~Fill in metric / target / format / task type~~ — **done**, above.
+4. `notebooks/01_eda.ipynb` — next.

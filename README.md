@@ -1,7 +1,7 @@
 # Predicting Electric Vehicle Purchases
 
 [![Kaggle Competition](https://img.shields.io/badge/Kaggle-Playground%20Series%20S6E9-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/playground-series-s6e9)
-[![Status](https://img.shields.io/badge/Status-Scaffold-lightgrey)](docs/1_instructions.md)
+[![Status](https://img.shields.io/badge/Status-Baseline-blue)](docs/4_experiment_ledger.md)
 [![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)](requirements.txt)
 
 Kaggle Playground Series S6E9:
@@ -12,12 +12,22 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**Scaffold only — no data, no analysis, no results.** The competition has not
-been joined yet, so the evaluation metric, target column, and submission format
-are all still unknown. See [`docs/1_instructions.md`](docs/1_instructions.md)
-for the checklist that has to be filled in first.
+**Baseline modeling done (2026-09-01). No leaderboard submission yet.**
 
-Deadline: **2026-09-30 23:59 UTC** (read from the Kaggle API, 2026-09-01).
+| Working champion | OOF AUC (F1: 5-fold strat., seed 42) | Runtime |
+| --- | --- | --- |
+| `v2b_catboost_default` | **0.94157 ± 0.00072** | 551 s |
+
+All five baseline runs, decisions, and the predeclared promotion gates:
+[`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md). EDA findings:
+[`docs/2_eda_insights.md`](docs/2_eda_insights.md) — top-heavy signal, one
+big interaction (the subsidy gate), no missingness, no drift.
+
+- Task: binary classification — probability that `Will_Buy_EV = "Yes"`.
+- Metric: **ROC AUC** (verified via the Kaggle API, 2026-09-01).
+- Train 668,665 rows x 13 features; test 286,571 rows.
+
+Deadline: **2026-09-30 23:59 UTC** (Kaggle API, re-confirmed 2026-09-01).
 
 ## Getting started
 
