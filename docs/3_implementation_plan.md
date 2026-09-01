@@ -115,4 +115,5 @@ decided by the Phase 2 measurement, not assumed.
 | `3_implementation_plan.md` | — | this file |
 | `4_experiment_ledger.md` | 2–5 | fold definition, every run, promotion decisions |
 | `5_submission_manifest.md` | 4 | every submission, score, decision |
-| `6_source_dataset_provenance.md` | open | only if the source dataset is identified |
+| `6_agent_log.md` | — | append-only agent collaboration log (master §13) |
+| `7_source_dataset_provenance.md` | open | only if the source dataset is identified |

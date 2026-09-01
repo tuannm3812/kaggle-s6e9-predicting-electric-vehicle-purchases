@@ -33,6 +33,7 @@ claims about the data trace to that doc or to `notebooks/01_eda.ipynb`.
 - `docs/3_implementation_plan.md` — phased plan and gates
 - `docs/4_experiment_ledger.md` — fold definition (F1), predeclared gates, every run
 - `docs/5_submission_manifest.md` — every submission and its decision *(not created yet)*
+- `docs/6_agent_log.md` — append-only session log; start here to catch up
 
 Any claim about model behaviour should trace to a row in the ledger.
 

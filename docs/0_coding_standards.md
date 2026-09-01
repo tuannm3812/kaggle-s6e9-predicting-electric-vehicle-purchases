@@ -76,3 +76,18 @@ Carried forward from S6E7 and S6E8, which both used it to stop wasted work:
   every submission: column names, row count, dtypes, and value range.
 - Record every submission in the submission manifest with its notebook version
   and the decision it supported. Never let a scored submission go unrecorded.
+
+## Execution environment (user directive, 2026-09-01)
+
+Notebooks are authored and edited locally, but **executed on Kaggle, not
+locally**: `scripts/push_kaggle_kernel.sh <target>` → poll `kaggle kernels
+status` (match `COMPLETE`/`ERROR` case-insensitively) → retrieve artifacts
+with `kaggle kernels output`. The trusted run behind any committed output
+or ledger row is the Kaggle kernel run; ledger rows cite the kernel
+version, and rows from the pre-directive local runs are marked "local".
+Local execution is reserved for cheap syntax/smoke checks, not full runs.
+
+Consequence: notebooks must write every artifact needed downstream (OOF
+matrices included) to the kernel working directory so `kaggle kernels
+output` can fetch them — the local-only `../predictions` path is a
+fallback, not the primary channel.
