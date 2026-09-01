@@ -203,3 +203,40 @@ worker numbers. Champion re-fit in-run: `e01_cat_2000x05` OOF 0.94177
   averaging of the interaction config; hypothesis of approximately
   additive gains. Requires its own frozen predeclaration before any run.
 
+
+## E03 — Combining the Two Promoted Effects (predeclared 2026-09-02, before execution)
+
+Kaggle kernel v4, notebook v4. Baseline for the gate: the standing champion
+`e02_cat_interactions` **re-fit in the same run** (its seed-42 fit doubles
+as a seed-average member, so no fit is wasted).
+
+**Hypothesis:** E02 promoted interactions (+0.00027) and 3-seed averaging
+(+0.00016) *independently* against the same baseline. They act on different
+error sources — features vs. seed variance — so their gains should be
+approximately additive: predicted OOF ≈ 0.94220 (champion 0.94204 +
+~0.00016), i.e. beating the champion by roughly the averaging effect alone.
+A materially smaller gain means the two effects overlap; a null means
+averaging does not transfer to the interaction config.
+
+**Candidates (frozen; nothing added or dropped afterwards):**
+
+| Candidate | Config | Members |
+| --- | --- | --- |
+| `e03_cat_int_avg3seeds` | interaction features, champion config, averaged over model seeds {42, 7, 2026} | `e02_cat_interactions` (re-fit, seed 42) + `e03_cat_int_s7` + `e03_cat_int_s2026` |
+| `e03_cat_int_avg5seeds` | same, seeds {42, 7, 2026, 13, 99} | the three above + `e03_cat_int_s13` + `e03_cat_int_s99` |
+
+The 5-seed variant tests whether averaging gains keep accruing past three
+seeds or plateau; both are evaluated against the same re-fit champion.
+Seed components (`e03_cat_int_s*`) are **not** candidates themselves.
+
+**Promotion criteria:** the standing paired gate vs. the in-run champion
+re-fit (fold wins ≥ 3/5; paired stratified bootstrap B=1000, seed 42, 95%
+CI of ΔAUC entirely > 0; P(Δ>0) ≥ 0.95). Bootstrap only for candidates
+above the champion point estimate. **Submission only on promotion**, and if
+both promote, the predeclared highest-OOF rule selects between them.
+
+**Cost note:** each CatBoost fit is ~3400 s on the Kaggle worker, so this
+run is ~5 fits ≈ 4.7 h plus the re-fit. Predeclared as acceptable for a
+run that decides whether seed-averaging enters the final champion.
+
+*(results pending — notebook v4 kernel run)*
