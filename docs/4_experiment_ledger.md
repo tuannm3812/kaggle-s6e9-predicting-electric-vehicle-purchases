@@ -94,3 +94,42 @@ estimate alone (running a bootstrap that cannot promote is waste). Every
 config's numbers are recorded here either way.
 
 *(results pending — notebook v2 execution)*
+
+### E01 results (executed locally 2026-09-01, pre-directive; notebook v2)
+
+Full data, folds F1, kernel `s6e8-py39`. **Wall-clocks are
+contention-inflated** (concurrent jobs shared the machine) — upper bounds,
+not benchmarks. Total run ≈ 2 h 46 m.
+
+| Run | OOF AUC (mean ± fold std) | Wall-clock | Note |
+| --- | --- | --- | --- |
+| `e01_cat_2000x05` | **0.94176 ± 0.00074** | 1152 s | **promoted — new champion** |
+| `e01_lgbm_1000x05` | 0.94155 ± 0.00079 | 2825 s | best LightGBM; below champion point estimate |
+| `e01_hgb_1000x05` | 0.94145 ± 0.00069 | 280 s | best HGB |
+| `e01_cat_1000x10_d8` | 0.94113 ± 0.00071 | 3979 s | deeper+faster lr hurt |
+| `e01_lgbm_2000x03_63l` | 0.94109 ± 0.00071 | 218 s | |
+| `e01_hgb_2000x03_63l` | 0.94100 ± 0.00067 | 496 s | |
+| `e01_lgbm_1000x05_127l` | 0.94071 ± 0.00071 | 220 s | most capacity, worst E01 score |
+
+**Paired gate** (only config above the champion point estimate):
+`e01_cat_2000x05` vs. `v2b_catboost_default` — fold wins **5/5**
+(per-fold Δ +0.000133…+0.000243), paired bootstrap 95% CI
+**(+0.000145, +0.000239)** entirely positive, P(Δ>0) **1.000** →
+**promoted** under the predeclared gate.
+
+### Decisions (2026-09-01, post-E01)
+
+- **Champion: `e01_cat_2000x05`** (OOF AUC 0.94176). First promotion to
+  clear the paired gate; provably predeclared (config freeze commit
+  `3acae15` precedes this results commit).
+- **Optuna: skipped** per the plan's predeclared condition — the seven
+  hand-designed configs span 0.94071–0.94176 and every capacity increase
+  scored worse than its smaller sibling; no evidenced headroom.
+- **Diversity (aligned OOF Pearson vs. new champion):**
+  `e01_lgbm_1000x05` **0.9964**, `e01_hgb_1000x05` **0.9963**,
+  `v2a_lightgbm_default` **0.9961** — all above the 0.995 bar, so **no
+  blend is attempted** (predeclared; S6E8 precedent). The earlier 0.9940
+  reading was against the superseded default-CatBoost champion.
+- Per the execution directive, E02 onward runs on Kaggle; these E01 rows
+  are the last local ones.
+

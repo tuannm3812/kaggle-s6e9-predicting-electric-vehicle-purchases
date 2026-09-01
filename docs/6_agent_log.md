@@ -76,3 +76,22 @@ its ledger rows will say "local". Recorded in
 - First leaderboard submission pending kernel v2 COMPLETE
   (`-v 2` flow); `docs/5_submission_manifest.md` created then.
 - Original source dataset still unidentified (`docs/1_instructions.md`).
+
+## 2026-09-01 — E01 results, first paired-gate promotion
+
+- Local E01 run finished (2 h 46 m wall, contention-inflated; last
+  pre-directive local run). **Checked:** all 12 runs pass sanity; no error
+  outputs; totals match the notebook snapshot cell.
+- **`e01_cat_2000x05` promoted** — 5/5 folds, 95% CI (+0.000145,
+  +0.000239), P(Δ>0)=1.000. Gate criteria were committed before results
+  (`3acae15`), so the ordering is auditable.
+- Optuna skipped per predeclared condition (capacity increases all hurt).
+- Diversity vs. new champion: LightGBM 0.9964, HGB 0.9963 — above the
+  ≤ 0.995 bar → **blend skipped by predeclaration** (the earlier 0.9940
+  reading was against the superseded champion). Recorded in the ledger.
+- Notebook patched post-run: §12 data-dir resolver (same fix as EDA,
+  validated by EDA kernel v2 COMPLETE) and artifact writes to the kernel
+  working dir. These two cells changed without a local rerun — the
+  validating run is baseline kernel v2 on Kaggle, per the execution rule.
+- Next: push baseline kernel v2 → COMPLETE → submit `-v 2` → create
+  `docs/5_submission_manifest.md`.

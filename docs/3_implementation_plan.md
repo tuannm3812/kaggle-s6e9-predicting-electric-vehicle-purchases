@@ -60,6 +60,11 @@ Executed end-to-end locally (kernel `s6e8-py39`, ~10 min wall-clock, dominated b
 
 ## Phase 3 — Optimization & Ensemble (evidence-gated, by ~2026-09-20)
 
+Status 2026-09-01: step 1 done (E01 — `e01_cat_2000x05` promoted via
+the paired gate, `docs/4_experiment_ledger.md`); step 4 resolved as
+**skip Optuna** (predeclared no-headroom condition met). Steps 2/3/5/6
+remain gated as written; E02 blend is eligible on diversity.
+
 1. Hand-designed configuration search first (a handful of configs per
    family, comparable boosting budgets), no automated sweeps by default.
 2. Explicit interaction features (`Subsidy × Environmental_Concern`,

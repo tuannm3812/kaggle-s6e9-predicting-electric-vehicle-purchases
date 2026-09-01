@@ -12,11 +12,11 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**Baseline modeling done (2026-09-01). No leaderboard submission yet.**
+**Baselines + E01 budget-matched tuning done (2026-09-01). First submission in progress.**
 
-| Working champion | OOF AUC (F1: 5-fold strat., seed 42) | Runtime |
+| Champion | OOF AUC (F1: 5-fold strat., seed 42) | Promotion |
 | --- | --- | --- |
-| `v2b_catboost_default` | **0.94157 ± 0.00072** | 551 s |
+| `e01_cat_2000x05` | **0.94176 ± 0.00074** | paired gate: 5/5 folds, 95% CI (+0.000145, +0.000239), P(Δ>0)=1.0 |
 
 All five baseline runs, decisions, and the predeclared promotion gates:
 [`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md). EDA findings:
