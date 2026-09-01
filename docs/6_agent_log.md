@@ -95,3 +95,19 @@ its ledger rows will say "local". Recorded in
   validating run is baseline kernel v2 on Kaggle, per the execution rule.
 - Next: push baseline kernel v2 → COMPLETE → submit `-v 2` → create
   `docs/5_submission_manifest.md`.
+
+## 2026-09-01 — Kernel v2 COMPLETE on Kaggle; first submission scored
+
+- Kernel v2 ran end-to-end on Kaggle (~3 h): resolver landed on
+  `/kaggle/input/competitions/playground-series-s6e9` — the root-cause
+  fix confirmed in production. **Checked:** Kaggle's own gate re-run gave
+  the same verdict (champion `e01_cat_2000x05`, OOF 0.94177 there) and
+  additionally gate-tested `e01_lgbm_1000x05` (3/5 folds, CI spanning 0)
+  → correctly rejected. Cross-environment numbers differ only in the 5th
+  decimal (library versions), as expected.
+- Submitted via `-k ... -v 2` (§11 flow). **Public LB 0.94169** vs. OOF
+  0.94177 — gap −0.00008, the CV↔LB hypothesis confirmed. Recorded in
+  `docs/5_submission_manifest.md`. Quota 1/10; standing 79 of
+  157 at submission time.
+- Open: E-next experiment TBD (blend closed by diversity bar; Optuna
+  closed by no-headroom); source dataset still unidentified.

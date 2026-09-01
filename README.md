@@ -12,7 +12,7 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**Baselines + E01 budget-matched tuning done (2026-09-01). First submission in progress.**
+**Baselines + E01 tuning done; first submission scored (2026-09-01).**
 
 | Champion | OOF AUC (F1: 5-fold strat., seed 42) | Promotion |
 | --- | --- | --- |

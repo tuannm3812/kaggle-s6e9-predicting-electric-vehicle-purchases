@@ -32,7 +32,7 @@ claims about the data trace to that doc or to `notebooks/01_eda.ipynb`.
 - `docs/2_eda_insights.md` — executed EDA findings
 - `docs/3_implementation_plan.md` — phased plan and gates
 - `docs/4_experiment_ledger.md` — fold definition (F1), predeclared gates, every run
-- `docs/5_submission_manifest.md` — every submission and its decision *(not created yet)*
+- `docs/5_submission_manifest.md` — every submission and its decision
 - `docs/6_agent_log.md` — append-only session log; start here to catch up
 
 Any claim about model behaviour should trace to a row in the ledger.
@@ -47,6 +47,7 @@ Any claim about model behaviour should trace to a row in the ledger.
   public discussion to calibrate against. Mutable facts — leaderboard
   standing, public notebook approaches, quotas — must be re-checked live,
   never recalled.
-- Model-behaviour claims trace to `docs/4_experiment_ledger.md` (baselines
-  fit 2026-09-01). No leaderboard submission has been made yet, so there is
-  no external calibration of the 0.9416 OOF plateau.
+- Model-behaviour claims trace to `docs/4_experiment_ledger.md`. The OOF
+  plateau is leaderboard-calibrated (public 0.94169 vs. OOF 0.94177,
+  2026-09-01): margins near the plateau are ~0.0002 — the paired gate is
+  the only defence against promoting noise.
