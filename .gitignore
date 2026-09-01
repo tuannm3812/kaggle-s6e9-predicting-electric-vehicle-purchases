@@ -1,0 +1,36 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+
+# Kaggle data (includes partial-download temp files, e.g. .*.zip.XXXXXX
+# left behind by an interrupted `kaggle competitions download`)
+data/*
+!data/README.md
+
+# Generated artifacts
+predictions/*
+!predictions/README.md
+submission.csv
+scratch/
+catboost_info/
+
+# Staged notebook copies for `scripts/push_kaggle_kernel.sh` (notebooks/*.ipynb
+# are the single source of truth; these are regenerated at push time so the
+# Kaggle CLI has a notebook file alongside each kernel's own metadata)
+notebooks/kernels/*/*.ipynb
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

@@ -1,0 +1,78 @@
+# Coding Standards
+
+## Baseline
+
+This project follows the shared
+`coding-standards/coding_standards.md` at the GitHub root
+(`/Users/tuannm3812/Documents/GitHub/coding-standards`) as its baseline. That
+file is the fallback for anything not overridden below — commit message
+convention, pre-commit/pre-push workflow, notebook style, feature-engineering
+and leakage-prevention rules, and documentation style all live there.
+
+Everything in this file is either a project-specific addition or an explicit
+override. **Do not copy the shared standard into this file.** If a rule here
+duplicates it, delete the copy and keep the reference.
+
+## Repository Scope
+
+Notebook-first Kaggle workflow, matching
+`kaggle-s6e7-predicting-student-health-risk` and
+`kaggle-s6e8-predicting-smartphone-addiction`:
+
+- `notebooks/` — EDA, baseline modeling, tuning, ensembling. Plus
+  `notebooks/kernels/<name>/` holding each notebook's Kaggle
+  `kernel-metadata.json`.
+- `docs/` — durable findings and decisions, numbered per master standard §2.
+- `scripts/` — small CLI helpers only (`push_kaggle_kernel.sh`,
+  `verify_submission.py`), never core logic.
+- `data/` — local Kaggle files. **Gitignored.**
+- `predictions/` — OOF and test prediction matrices. **Gitignored.**
+
+`data/` and `predictions/` are intentional additions on top of the shared
+baseline's minimal root, because this project uses the Kaggle CLI locally.
+Both stay out of git.
+
+## Scale override
+
+The test set is large enough (7.7 MB sample submission) that the usual
+"just rerun it" habits from earlier Season 6 episodes may not hold. Two
+consequences:
+
+- **Measure before scaling an experiment.** Record wall-clock and memory for
+  the first full-data fit, and put the numbers in the experiment ledger before
+  launching a sweep.
+- **Prefer a fixed subsample for exploratory work**, with a stated fraction and
+  seed, and promote to full data only for candidate runs. Say which was used in
+  every recorded result — a subsample score and a full-data score are not
+  comparable and must not share a row.
+
+## Validation
+
+- Fixed folds, defined once and reused by every comparable model, so OOF
+  predictions align across candidates.
+- Any transform that touches the target — target encoding, calibration —
+  fits **inside** the fold, never globally (master standard §5).
+- Record the fold definition (n_splits, seed, stratification key) in the
+  experiment ledger the first time it is used.
+
+## Promotion gate
+
+Carried forward from S6E7 and S6E8, which both used it to stop wasted work:
+
+- A new champion needs a **paired comparison on aligned OOF predictions**, not
+  a better single-split number.
+- State the promotion criterion **before** running the comparison.
+- Record non-promotions too, with their numbers. A model that failed to promote
+  is evidence about the problem, and re-running it later is pure waste.
+- Before spending budget on an ensemble, check candidate correlation against a
+  predeclared diversity bar. S6E8 correctly skipped ensembling on a `0.9976`
+  correlation — that decision is the standard, not the exception.
+
+## Submissions
+
+- Notebook-based submission where the competition supports it (master
+  standard §11). Confirm which applies — see `docs/1_instructions.md`.
+- Run `scripts/verify_submission.py` against `sample_submission.csv` before
+  every submission: column names, row count, dtypes, and value range.
+- Record every submission in the submission manifest with its notebook version
+  and the decision it supported. Never let a scored submission go unrecorded.
