@@ -184,3 +184,30 @@ and whether an artifact is written. This practice caught the mislabeled
 re-fit twice, a `StopIteration` on a carried-over champion, and a
 submission that would have been written from predictions the run never
 produced.
+
+## A run name is a primary key; a printed warning is not a control (2026-09-02)
+
+Two defects found by a multi-agent audit, both from the same habit of
+letting *prose* or a *moving pointer* stand in for a mechanism:
+
+1. **A printed warning is not a guard.** The E04 champion-selection branch
+   printed "do not submit this run's artifact" and then set
+   `CHAMPION_NAME` anyway, so the submission cell wrote the file. On
+   Kaggle that file *is* the competition submission — a model measured
+   0.00070 AUC worse would have been submitted against an explicit
+   instruction not to. A decision that must stop something has to be a
+   variable the code reads (`SUBMIT_OK`), never a message a human reads.
+2. **Historical sections must use literal run names, never a moving
+   pointer.** `BASELINE_CHAMPION` is repointed on every promotion, but
+   frozen sections referenced it, so after E03 was promoted the E03
+   section wrote one name twice (single-seed row *and* the average that
+   contained it) and the E02 section referenced a run it never fits.
+   Lookups are `next(r for r in results if r["run"] == name)` — first
+   match wins — so a duplicated name silently splits one identity across
+   two different vectors, and the gate could screen against one baseline
+   while bootstrapping against another.
+
+Enforcement: `_register` now asserts the name is unused, so any future
+collision fails loudly instead of silently. Prefer a mechanism that makes
+the bad state unrepresentable over a comment asking the reader not to
+enter it.

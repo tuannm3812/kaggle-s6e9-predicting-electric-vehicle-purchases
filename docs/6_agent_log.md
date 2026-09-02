@@ -193,3 +193,40 @@ its ledger rows will say "local". Recorded in
   flip a promotion.
 - No change to the champion or the leaderboard: `e03_cat_int_avg5seeds`,
   public 0.94210, 3 submissions.
+
+## 2026-09-02 — Multi-agent audit: two real defects fixed
+
+Ran a 152-agent audit workflow (six bug lenses, each finding refuted by
+three independent verifiers). The ideation half and ~97 verifier agents
+died on a session limit, so **the idea results are absent, not empty** —
+no score ideas were produced and none should be inferred. The audit half
+returned findings, which I re-verified myself against the code rather
+than trusting partially-voted verdicts.
+
+**Confirmed and fixed:**
+
+1. **CRITICAL — submission written against its own warning.** The E04
+   below-standing branch printed "do not submit this run's artifact" and
+   then wrote `submission.csv`, because `CHAMPION_NAME = best` was set in
+   both arms and the submission cell only checked membership in
+   `test_store`. Real regime: E04 measured GPU at 0.00070 worse, so a GPU
+   winner below the CPU champion is the *expected* case, not an edge
+   case. Fixed with a `SUBMIT_OK` flag the submission cell honours;
+   regression-tested on the exact path (candidate beats in-run baseline,
+   sits below the standing champion) — now writes nothing.
+2. **HIGH — `BASELINE_CHAMPION` collisions in frozen sections.** After
+   E03's promotion the pointer named E03's own average, so §4.5 wrote
+   that name twice (single-seed + average) and §4.4 referenced a run it
+   never fits (KeyError). Fixed with literal names
+   (`e03_cat_int_s42`, `e01_cat_2000x05`) plus an assert in `_register`
+   making duplicate names fail loudly.
+
+**Verified:** all 256 RUN_* flag combinations now execute cleanly — no
+duplicate names, no KeyError, no NameError. An earlier sweep reporting
+128 failures was a gap in my own stub harness (`roc_auc_score` unstubbed),
+not a notebook defect; recorded here because the distinction matters.
+
+**Not yet acted on** — audit findings I have not verified myself and must
+not treat as established: paired-bootstrap construction, family-wise
+error across E01–E05's many 95% gates, `fold_std` using ddof=0,
+unpinned `requirements.txt`, and several docs-consistency claims.
