@@ -107,6 +107,9 @@ full-data *model* fit before any sweep), but the data is lighter than the
 
 ## 9. Next Moves (Baseline Phase Priority Order)
 
+This section is the **only** home for the EDA's forward plan — the
+notebook itself carries findings only (`docs/0_coding_standards.md`).
+
 1. Fixed folds, defined once: `StratifiedKFold(n_splits=5, shuffle=True,
    random_state=42)`; recorded in the experiment ledger at first use.
 2. v1 sanity: constant, logistic (one-hot + scaled), default HGB — with

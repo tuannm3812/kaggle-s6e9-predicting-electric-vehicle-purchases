@@ -136,7 +136,8 @@ comparability risk for no meaningful gain.
 (`is_private: false`), so a notebook is a published artifact, not a
 private worklog. Consequence:
 
-- **No "Next Moves" / roadmap / planning sections in notebooks.** Forward
+- **No "Next Moves" / roadmap / planning sections in any notebook** —
+  EDA included (applied 2026-09-02 to both notebooks). Forward
   strategy — what is closed, what is worth trying next, what the
   remaining levers are — lives in `docs/3_implementation_plan.md` and
   `docs/4_experiment_ledger.md`.
