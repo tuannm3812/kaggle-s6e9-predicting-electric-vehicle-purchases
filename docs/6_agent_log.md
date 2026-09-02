@@ -177,3 +177,19 @@ its ledger rows will say "local". Recorded in
 - **Closed axes:** capacity, regularization, blending, averaging,
   subsidy-gate features, Optuna. Recorded so no later session re-runs
   them. Genuinely open: the unidentified source dataset.
+
+## 2026-09-02 — Notebooks republished; GPU non-determinism observed
+
+- **EDA kernel v3 COMPLETE** (findings-only version) and **baseline
+  kernel v7 COMPLETE** (restructured sections, roadmap removed). Both
+  verified on the Kaggle worker, not just locally.
+- **Checked, and worth recording:** v7 re-ran E04's identical code, seeds
+  and folds. The verdict held (nothing promoted, no submission) but OOF
+  moved in the 5th decimal and the gate's P(Δ>0) swung **0.648 → 0.879**.
+  CatBoost GPU is not deterministic run-to-run; CPU runs in this project
+  have reproduced exactly. Recorded as ledger Finding 4 and in the
+  standards. This is a second independent reason GPU stays
+  screening-only: near a gate boundary, run-to-run noise alone could
+  flip a promotion.
+- No change to the champion or the leaderboard: `e03_cat_int_avg5seeds`,
+  public 0.94210, 3 submissions.

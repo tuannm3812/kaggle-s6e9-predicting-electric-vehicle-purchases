@@ -410,6 +410,33 @@ effect. Given the effect size (+0.00003, ~4× below the noise floor) a CPU
 re-test would cost ~5 h to chase a signal with no positive evidence
 behind it — recorded as an option, not a recommendation.
 
+### Finding 4 — GPU runs are not bit-reproducible (observed on the v7 re-run)
+
+Kernel v7 re-ran E04's identical code, seeds and folds (the republish that
+carried the notebook restructure). The **verdict was stable** — nothing
+promoted, no submission — but the numbers moved in the 5th decimal:
+
+| Quantity | Kernel v5 | Kernel v7 |
+| --- | --- | --- |
+| `e04_gpu_base` OOF | 0.94134 | 0.94133 |
+| `e04_gpu_featv2` OOF | 0.94137 | 0.94138 |
+| Gate 95% CI | (−0.000034, +0.000051) | (−0.000018, +0.000069) |
+| Gate P(Δ>0) | 0.648 | **0.879** |
+
+CatBoost GPU is not deterministic run-to-run even with fixed seeds. Two
+consequences:
+
+- **Reproducibility claims about GPU runs must be qualified.** A CPU run
+  of this project reproduces exactly (kernel v4's champion re-fit matched
+  v3 to the 5th decimal); a GPU run does not.
+- **P(Δ>0) swung 0.648 → 0.879 on identical inputs** — most of the way to
+  the 0.95 threshold. A single GPU run near a gate boundary is not
+  trustworthy evidence on its own; had the point estimate been slightly
+  larger, run-to-run noise alone could have flipped a promotion. This is
+  a second, independent reason GPU stays screening-only, and it is why
+  the gate's *conclusion* (not its intermediate statistics) is what gets
+  recorded as evidence.
+
 ### Decisions (2026-09-02, post-E04)
 
 - **Champion unchanged:** `e03_cat_int_avg5seeds` (OOF 0.94223, public

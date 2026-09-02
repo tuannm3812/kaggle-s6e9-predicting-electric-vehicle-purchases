@@ -123,6 +123,12 @@ So GPU is a **screening tool only**: explore configurations on GPU,
 re-fit anything promising on CPU before it can become a champion or a
 submission artifact. Never submit a GPU-fit model here.
 
+**GPU runs are also not bit-reproducible** (measured on the E04 re-run,
+2026-09-02): identical code, seeds and folds moved OOF in the 5th decimal
+and swung the gate's P(Δ>0) from 0.648 to 0.879. CPU runs here reproduce
+exactly. So a GPU result near a gate boundary is not trustworthy on its
+own, and any reproducibility claim about a GPU run must be qualified.
+
 **Mechanics:** set `enable_gpu: true` in the kernel metadata and pass
 `task_type="GPU"` in the CatBoost config — metadata alone does nothing,
 the model must select GPU computation. GPU quota is limited and mutable;
