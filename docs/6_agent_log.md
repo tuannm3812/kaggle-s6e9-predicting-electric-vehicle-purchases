@@ -230,3 +230,35 @@ not a notebook defect; recorded here because the distinction matters.
 not treat as established: paired-bootstrap construction, family-wise
 error across E01–E05's many 95% gates, `fold_std` using ddof=0,
 unpinned `requirements.txt`, and several docs-consistency claims.
+
+## 2026-09-02 — E05 read: source dataset is a null
+
+Kernel v8 output fetched (the earlier fetch attempt was declined by the
+user; retried on their "retry"). `e05_cpu_plus_source` vs `e05_cpu_base`:
++0.00001 OOF, 3/5 fold wins, 95% CI (−0.000049, +0.000073), P(Δ>0)
+0.627 → not promoted, exactly as the predeclared prediction said. No
+submission written (predeclared; the `SUBMIT_OK` path fired).
+
+Two things worth an independent reviewer's attention:
+
+- **Predeclaration discrepancy, recorded not hidden:** the ledger
+  predeclared 9,478 usable source rows; the kernel measured 9,466. My
+  local count used a different missing-value rule. Immaterial to a
+  0.00001 result, but the predeclared number was wrong and the ledger
+  now says so (E05 Finding 2).
+- **Bit-reproducibility confirmed for CPU:** `e05_cpu_base` (kernel v8)
+  and `e02_cat_interactions` (kernel v4) are the same config and
+  correlate at 1.0000 with identical AUC. That is the property the GPU
+  path failed in E04.
+
+Docs updated: ledger (results + post-E05 decisions), implementation plan
+(closed-axes table now includes the source dataset; "open" list is
+empty by design), provenance (outcome section). E05 matrices copied to
+`predictions/`. The three older "source dataset still unidentified"
+lines above are dated entries and stay as written.
+
+**State:** champion `e03_cat_int_avg5seeds`, public 0.94210, 3
+submissions. Every predeclared lever measured. Nothing predeclared for
+E06 yet — ideation from the audit workflow is still absent (session
+limit), so the next step is generating candidates by another route and
+predeclaring before any run.

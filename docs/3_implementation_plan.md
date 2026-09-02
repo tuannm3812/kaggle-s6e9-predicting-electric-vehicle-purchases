@@ -145,16 +145,14 @@ final week needs compute back.
 | Seed averaging | E03 | plateaus past 3 seeds (+0.00003 for the 4th and 5th) |
 | Subsidy-gate features | E04 | features v2 +0.00003, gate-rejected |
 | GPU for champion fitting | E04 | −0.00070 vs CPU; screening only |
+| Source dataset as extra training rows | E05 | +0.00001, CI spans zero, P(Δ>0) 0.627 |
 
-**Open with real upside:**
-
-1. **The unidentified source dataset.** Extra training data is the only
-   remaining lever that could plausibly move more than 0.0002. The Data
-   tab is client-rendered and not fetchable by URL; needs the Dataset
-   Description pasted in, or a manual read. If found and license-clear,
-   test as extra training rows under the standing paired gate.
-2. **Feature ideas grounded in new evidence** — not re-permutations of
-   the existing 13 columns, which E02/E04 suggest are mined out.
+**Open with real upside:** nothing predeclared. Every lever listed at the
+start of the project has now been measured. Candidates for an E06 must
+come from outside that list — a model family decorrelated enough to
+clear the 0.995 blend bar, or a change to the fitting procedure itself —
+and must be predeclared with a falsifiable prediction in the ledger
+before running.
 
 **If nothing further lands,** the current champion is a defensible final
 answer. Final-week work is then reproducibility, not search: re-run the

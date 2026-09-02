@@ -72,6 +72,15 @@ untested lever and it is cheap; it is not worth optimism.
 - If used as extra training data, source rows go into **training folds
   only** — never into a validation fold, so OOF stays measured purely on
   competition data (master standard §5).
-- Rows with missing values are dropped before use (9,478 remain), so the
+- Rows with missing values are dropped before use (9,466 remain per the
+  kernel v8 count; an earlier local count said 9,478), so the
   training distribution keeps the competition's no-missing regime rather
   than teaching the model a NaN branch that can never fire at test time.
+
+## Outcome (E05, 2026-09-02)
+
+Tested as extra training rows in training folds only, under the standing
+paired gate (`docs/4_experiment_ledger.md`, E05). **Null:** +0.00001 OOF
+AUC, 95% CI (−0.000049, +0.000073), P(Δ>0) = 0.627. The dataset is not
+used by the champion and will not be used in any submission; this file
+remains as provenance only.

@@ -459,8 +459,8 @@ Kaggle kernel v8, notebook v6, **CPU** (GPU is screening-only and
 unreliable near gate boundaries — E04 Findings 1 and 4).
 
 **Context:** the source dataset is identified and CC0
-(`docs/7_source_dataset_provenance.md`). It adds 9,478 usable rows to
-668,665 — **1.5%** — and is itself synthetic, so the usual "real data
+(`docs/7_source_dataset_provenance.md`). It adds ~9.5k usable rows to
+668,665 — **1.4%** — and is itself synthetic, so the usual "real data
 beats generated data" argument does not apply. **The honest prior is that
 this does nothing**; it is tested because it is the last untested lever
 and costs two fits, not because it is expected to win.
@@ -469,12 +469,12 @@ and costs two fits, not because it is expected to win.
 portion of each fold only**. Validation folds stay pure competition data,
 so OOF remains measured on the competition distribution and stays
 comparable to every prior row. Rows with missing values are dropped
-(9,478 of 10,000 remain) to keep the no-missing regime the test set has.
+(predeclared as 9,478 of 10,000; the run measured 9,466 — see Finding 2) to keep the no-missing regime the test set has.
 
 | Run | Description |
 | --- | --- |
 | `e05_cpu_base` | champion config + features v1, seed 42, competition data only — in-run gate baseline (expected ≈ 0.94204, matching `e02_cat_interactions`) |
-| `e05_cpu_plus_source` | identical, with 9,478 source rows added to each training fold |
+| `e05_cpu_plus_source` | identical, with the usable source rows added to each training fold |
 
 **Promotion criteria:** the standing paired gate, `e05_cpu_plus_source`
 vs. `e05_cpu_base`, both single-seed CPU. This is a **screen**, not a
@@ -486,4 +486,49 @@ submission. **No submission from E05 regardless of outcome.**
 below the measured single-seed noise floor of 0.00013, i.e. this fails to
 promote. If it promotes, the prior above was wrong and E06 follows.
 
-*(results pending — notebook v6 kernel run)*
+### Results (Kaggle kernel v8, notebook v6, CPU, full data, F1 folds)
+
+| Run | OOF AUC | fold std | Folds | Wall | Peak RSS |
+| --- | --- | --- | --- | --- | --- |
+| `e05_cpu_base` | 0.94204 | 0.00074 | 0.94087 / 0.94172 / 0.94304 / 0.94257 / 0.94201 | 3,475 s | 1.71 GB |
+| `e05_cpu_plus_source` | 0.94205 | 0.00079 | 0.94077 / 0.94177 / 0.94313 / 0.94252 / 0.94207 | 3,538 s | 1.77 GB |
+
+**Paired gate** (`e05_cpu_plus_source` vs `e05_cpu_base`): fold Δ =
+−0.00010 / +0.00005 / +0.00009 / −0.00005 / +0.00006 → **3/5 fold wins**,
+**95% CI (−0.000049, +0.000073)**, **P(Δ>0) = 0.627** → **not promoted**.
+OOF Pearson between the two runs 0.9977, above the 0.995 diversity bar,
+so there is no blend to consider either.
+
+**Findings**
+
+1. **The prediction held.** Δ = +0.00001, well inside the 0.00013 noise
+   floor. Adding 1.4% synthetic rows from a synthetic source teaches the
+   model nothing it had not already learned from 668k rows. The lever is
+   closed.
+2. **Row count correction.** The run reported **9,466** usable source
+   rows (534 of 10,000 dropped), not the 9,478 predeclared. The
+   predeclared figure came from a local count with a different
+   missing-value rule; the kernel figure is authoritative. Twelve rows
+   cannot change a 0.00001 result, but the discrepancy is recorded rather
+   than silently overwritten.
+3. **Free reproducibility check.** `e05_cpu_base` is the champion config
+   on features v1, seed 42, CPU — the same fit as `e02_cat_interactions`
+   from kernel v4. Their OOF vectors correlate at **1.0000** and the AUC
+   matches to five decimals (0.94204). The CPU pipeline is
+   bit-reproducible across kernel versions, which is the property E04
+   showed the GPU pipeline lacks.
+4. **No submission written**, as predeclared; the run's `SUBMIT_OK`
+   path was exercised by the "champion not fit in this run" branch.
+
+### Decisions (2026-09-02, post-E05)
+
+- **Champion unchanged:** `e03_cat_int_avg5seeds` (OOF 0.94223, public
+  0.94210).
+- **Source dataset closed** as a training lever. It stays useful only as
+  provenance (`docs/7_source_dataset_provenance.md`).
+- **Every predeclared lever is now measured.** What remains is either a
+  genuinely new model family (decorrelated enough to clear the 0.995
+  blend bar — nothing tried so far has been) or a change to *how* the
+  champion is fit rather than *what* it is fit on. Both must be
+  predeclared as E06 with a falsifiable prediction before any run.
+
