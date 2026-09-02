@@ -122,3 +122,41 @@ decided by the Phase 2 measurement, not assumed.
 | `5_submission_manifest.md` | 4 | every submission, score, decision |
 | `6_agent_log.md` | — | append-only agent collaboration log (master §13) |
 | `7_source_dataset_provenance.md` | open | only if the source dataset is identified |
+
+## Current state and next moves (internal — 2026-09-02)
+
+Kept here rather than in the notebooks: `notebooks/` is pushed to a
+**public** Kaggle kernel, so forward strategy stays in `docs/`. See the
+convention in `docs/0_coding_standards.md`.
+
+**Champion:** `e03_cat_int_avg5seeds` — OOF 0.94223, public 0.94210
+(submission 3). 3-seed variant (0.94220) is a sanctioned fallback if the
+final week needs compute back.
+
+**Closed axes** — each measured, each recorded in
+`docs/4_experiment_ledger.md`; re-running any of them is waste:
+
+| Axis | Closed by | Evidence |
+| --- | --- | --- |
+| Capacity (iterations, depth, leaves) | E01, E02 | every increase scored worse |
+| Regularization (l2, random_strength, bagging) | E04 | +0.00001…+0.00002, or −0.00030 |
+| Optuna / automated sweep | E01 | no headroom between hand-designed configs |
+| Blending | E02, E03 | OOF correlations 0.9958–0.9999, all above the 0.995 bar |
+| Seed averaging | E03 | plateaus past 3 seeds (+0.00003 for the 4th and 5th) |
+| Subsidy-gate features | E04 | features v2 +0.00003, gate-rejected |
+| GPU for champion fitting | E04 | −0.00070 vs CPU; screening only |
+
+**Open with real upside:**
+
+1. **The unidentified source dataset.** Extra training data is the only
+   remaining lever that could plausibly move more than 0.0002. The Data
+   tab is client-rendered and not fetchable by URL; needs the Dataset
+   Description pasted in, or a manual read. If found and license-clear,
+   test as extra training rows under the standing paired gate.
+2. **Feature ideas grounded in new evidence** — not re-permutations of
+   the existing 13 columns, which E02/E04 suggest are mined out.
+
+**If nothing further lands,** the current champion is a defensible final
+answer. Final-week work is then reproducibility, not search: re-run the
+champion kernel end-to-end, confirm the artifact, pin versions, and lock
+the final submission by 2026-09-29 (one day of buffer).

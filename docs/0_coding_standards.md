@@ -129,3 +129,20 @@ the model must select GPU computation. GPU quota is limited and mutable;
 check it live rather than recalling a number. LightGBM/HGB configurations
 here stay CPU: they already fit in 200–300 s, so GPU would add
 comparability risk for no meaningful gain.
+
+## Public notebooks carry findings, not forward strategy (2026-09-02)
+
+`notebooks/` is pushed to **public** Kaggle kernels
+(`is_private: false`), so a notebook is a published artifact, not a
+private worklog. Consequence:
+
+- **No "Next Moves" / roadmap / planning sections in notebooks.** Forward
+  strategy — what is closed, what is worth trying next, what the
+  remaining levers are — lives in `docs/3_implementation_plan.md` and
+  `docs/4_experiment_ledger.md`.
+- Notebooks keep **insight cells about results already produced**: what a
+  number means, what a gate decided, what a hypothesis showed. That is
+  the interpretation the master standard requires (§4), and it is
+  finished work rather than intent.
+- A closing summary of *what this notebook established* is fine; a list
+  of what to do next is not.
