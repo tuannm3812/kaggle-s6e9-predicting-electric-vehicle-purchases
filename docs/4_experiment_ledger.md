@@ -293,3 +293,61 @@ average member, so five fits covered both candidates.
   averaging, the one EDA-supported feature idea). Further gains need a
   new feature hypothesis or more compute → E04 goes to GPU.
 
+
+## E04 — GPU Calibration + Regularization & Feature-v2 Search (predeclared 2026-09-02, before execution)
+
+Kaggle kernel v5, notebook v5, **GPU** (`task_type="GPU"`). First GPU run,
+so it is its own comparability class (`docs/0_coding_standards.md`): every
+comparison below is GPU-vs-GPU within this run.
+
+**Why these axes.** E01/E02 searched *capacity* (iterations, learning rate,
+depth, leaves) and every increase scored worse — recorded then as "the
+plateau is regularization-side, not capacity-starved". Regularization
+(`l2_leaf_reg`, `random_strength`, `bagging_temperature`) has never been
+varied: it is the one model axis with a documented reason to expect
+headroom. Separately, EDA §6 observed charging-station counts are flat
+marginally but was never converted into *conditional* features; feature-v2
+tests that directly.
+
+**Feature set v2** (frozen; v1 = the three champion subsidy crosses):
+v1 plus `Anxiety_x_Subsidy = (2 − anx_ordinal) × sub`,
+`EnvConcern_x_Income = Environmental_Concern_Level × Annual_Income_USD`,
+`Total_Stations = home + work stations`, and
+`Stations_x_NoHomeCharging = Total_Stations × (1 − hc)` — the EDA §6
+hypothesis that public charging matters when home charging is absent.
+
+**Stage 1 — single-seed GPU candidates** (baseline
+`e04_gpu_base` = champion config + features v1, seed 42, GPU):
+
+| Candidate | Change from baseline |
+| --- | --- |
+| `e04_gpu_l2_10` | `l2_leaf_reg=10` (default 3) |
+| `e04_gpu_l2_30` | `l2_leaf_reg=30` |
+| `e04_gpu_rs2_bag2` | `random_strength=2, bagging_temperature=2` |
+| `e04_gpu_featv2` | features v2, otherwise baseline |
+
+**Stage 2 — averaging, selection rule predeclared:** the highest-OOF
+stage-1 candidate **that beats `e04_gpu_base`** is averaged over seeds
+{42, 7, 2026} as `e04_gpu_best_avg3`; the baseline is averaged over the
+same seeds as `e04_gpu_base_avg3`. If no stage-1 candidate beats the
+baseline, stage 2 is skipped and E04 records a null result.
+
+**Promotion criteria:** the standing paired gate, `e04_gpu_best_avg3` vs.
+`e04_gpu_base_avg3` (both GPU, both 3-seed). Clearing it makes the new
+config the champion **configuration**; because the standing champion
+(`e03_cat_int_avg5seeds`, 0.94223) is CPU and 5-seed, the submission
+artifact comes from the GPU 3-seed winner only if it also **exceeds the
+standing champion's OOF**, which is recorded as a cross-device
+observation, not a paired-gate claim. Otherwise the CPU champion stands
+and E04 reports configuration evidence only.
+
+**Runtime guard (predeclared):** the calibration fit reports GPU
+wall-clock. If it exceeds **900 s**, stage 2 is skipped automatically
+(kernel time limit protection) and E04 returns stage-1 evidence only.
+
+**Cross-device calibration:** `e04_gpu_base` is the same configuration as
+CPU `e02_cat_interactions` (0.94204). Their difference measures the
+GPU-vs-CPU numerical delta — the first such measurement in this project,
+and the reason the calibration fit exists.
+
+*(results pending — notebook v5 kernel run)*
