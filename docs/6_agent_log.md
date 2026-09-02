@@ -151,3 +151,29 @@ its ledger rows will say "local". Recorded in
 - Next: E04 on GPU (sanctioned 2026-09-02) — must re-fit the champion,
   since GPU/CPU are separate comparability classes. Source dataset still
   unidentified.
+
+## 2026-09-02 — E04 (first GPU run): null result, and a claim of mine falsified
+
+- Kernel v5 COMPLETE on GPU. **No submission** — the predeclared
+  fallback fired exactly as the dry run predicted.
+- **Finding that did not hold up — mine.** An E02 insight cell asserted
+  "the plateau is regularization-side, not capacity-starved". That was
+  speculation written next to real numbers, which is how unverified
+  claims harden into fact. E04 tested it: `l2_leaf_reg` 10/30 moved OOF
+  +0.00001/+0.00002 (noise floor 0.00013) and random_strength/bagging
+  *hurt* by 0.00030. **Falsified.** The notebook cell now says so
+  in place, rather than being quietly deleted.
+- **GPU measured, not assumed:** 8.9× faster (341 s vs 3018 s), and
+  **0.00070 AUC worse** on an identical config — 5.4× the noise floor,
+  and more than every gain this project has won combined. GPU is
+  reclassified in the standards as screening-only, CPU re-fit required
+  before any promotion or submission. Had the cross-device rule not been
+  predeclared before this run, a GPU champion would have looked like
+  progress while losing more than the entire search had gained.
+- Features v2 (EDA §6 conditional charging + anxiety/income crosses):
+  +0.00003, gate-rejected. Caveat recorded in the ledger that GPU's
+  coarser binning could mask a small effect; not chased, because there is
+  no positive signal to chase.
+- **Closed axes:** capacity, regularization, blending, averaging,
+  subsidy-gate features, Optuna. Recorded so no later session re-runs
+  them. Genuinely open: the unidentified source dataset.

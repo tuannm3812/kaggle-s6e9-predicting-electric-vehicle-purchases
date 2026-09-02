@@ -115,6 +115,14 @@ full-data rule above:
   timing gain and the numerical GPU-vs-CPU delta as *measured* facts
   rather than assumptions.
 
+**Measured 2026-09-02 (E04), replacing the assumption above:** GPU is
+**8.9× faster** (341 s vs. 3018 s per 5-fold fit) and **0.00070 AUC
+worse** on the identical configuration — 5.4× this dataset's single-seed
+noise floor, and more than every gain the whole search has won combined.
+So GPU is a **screening tool only**: explore configurations on GPU,
+re-fit anything promising on CPU before it can become a champion or a
+submission artifact. Never submit a GPU-fit model here.
+
 **Mechanics:** set `enable_gpu: true` in the kernel metadata and pass
 `task_type="GPU"` in the CatBoost config — metadata alone does nothing,
 the model must select GPU computation. GPU quota is limited and mutable;

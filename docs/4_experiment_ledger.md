@@ -350,4 +350,78 @@ CPU `e02_cat_interactions` (0.94204). Their difference measures the
 GPU-vs-CPU numerical delta — the first such measurement in this project,
 and the reason the calibration fit exists.
 
-*(results pending — notebook v5 kernel run)*
+### E04 results (Kaggle kernel v5, COMPLETE 2026-09-02 ~14:53 local, **GPU**)
+
+**Null result on both hypotheses, plus two facts worth more than the
+hypotheses were.**
+
+| Run | OOF AUC (mean ± fold std) | Wall-clock | Note |
+| --- | --- | --- | --- |
+| `e04_gpu_best_avg3` (= featv2 ×3 seeds) | 0.94150 ± 0.00074 | 945 s | **rejected by gate** |
+| `e04_gpu_base_avg3` | 0.94149 ± 0.00076 | 969 s | gate baseline |
+| `e04_gpu_featv2` | 0.94137 ± 0.00074 | 315 s | stage-1 winner, +0.00003 over base — below noise |
+| `e04_gpu_l2_30` | 0.94136 ± 0.00078 | 313 s | +0.00002 — null |
+| `e04_gpu_l2_10` | 0.94135 ± 0.00076 | 314 s | +0.00001 — null |
+| `e04_gpu_base` | 0.94134 ± 0.00077 | **341 s** | calibration + gate baseline |
+| `e04_gpu_rs2_bag2` | 0.94104 ± 0.00080 | 314 s | −0.00030 — actively worse |
+
+**Gate:** `e04_gpu_best_avg3` vs. `e04_gpu_base_avg3` — 4/5 folds, 95% CI
+**(−0.000034, +0.000051)** spanning zero, P(Δ>0) = 0.648 → **not
+promoted**. No submission written; `e03_cat_int_avg5seeds` stands.
+
+### Finding 1 — GPU is 8.9× faster and measurably *less accurate*
+
+Same configuration, same folds: **GPU 0.94134 vs. CPU 0.94204 = −0.00070**,
+at 341 s vs. 3018 s. The deficit is **5.4× the single-seed noise floor**
+(0.00013) — not noise, a systematic device difference (GPU
+`border_count` 128 vs. CPU 254, and differing split algorithms).
+
+Operational consequence, now measured rather than assumed:
+
+- **GPU is a screening tool, not a champion-fitting tool** in this
+  project. Use it to explore many configurations cheaply; re-fit anything
+  promising on CPU before it can become a champion or a submission.
+- −0.00070 is larger than every gain this project has won *combined*
+  (E01+E02+E03 ≈ +0.00046 OOF). A GPU champion would have thrown away
+  more than the whole search had earned.
+- The predeclared cross-device rule did its job: the run compared
+  GPU-vs-GPU throughout and refused to submit.
+
+### Finding 2 — the "regularization-side plateau" claim is falsified
+
+E02's insight cell speculated that "the plateau is regularization-side,
+not capacity-starved". E04 tested that directly: `l2_leaf_reg` 10 and 30
+moved OOF by +0.00001/+0.00002 (below the 0.00013 noise floor), and
+`random_strength`/`bagging_temperature` **hurt** by 0.00030. Neither
+capacity (E01/E02) nor regularization (E04) has headroom — **the model
+axis is exhausted**, and the earlier speculation was wrong. It was an
+untested claim in an insight cell; it is now a tested and rejected one.
+
+### Finding 3 — features v2 add nothing
+
+The EDA §6 hypothesis (`Stations_x_NoHomeCharging` — public charging
+should matter when home charging is absent), plus anxiety/income crosses,
+moved OOF +0.00003 and failed the gate. The subsidy-gate feature space
+appears exhausted: E02's three crosses captured what was there.
+
+*Caveat, stated rather than hidden:* these feature results were measured
+on GPU, whose coarser binning could in principle mask a small feature
+effect. Given the effect size (+0.00003, ~4× below the noise floor) a CPU
+re-test would cost ~5 h to chase a signal with no positive evidence
+behind it — recorded as an option, not a recommendation.
+
+### Decisions (2026-09-02, post-E04)
+
+- **Champion unchanged:** `e03_cat_int_avg5seeds` (OOF 0.94223, public
+  0.94210). E04 produced no submission, as predeclared.
+- **GPU reclassified** from "the lever that makes bigger searches
+  affordable" to "screening only, CPU re-fit required" — see
+  `docs/0_coding_standards.md`.
+- **Closed axes now:** capacity, regularization, blending, averaging
+  (past 3 seeds), subsidy-gate features, Optuna. A hyperparameter sweep
+  would be searching an axis measured flat twice.
+- **What remains genuinely open:** the unidentified source dataset (extra
+  training data is the only lever left that could move more than
+  0.0002), and any feature idea grounded in *new* evidence rather than
+  re-permuting the existing columns.
+
