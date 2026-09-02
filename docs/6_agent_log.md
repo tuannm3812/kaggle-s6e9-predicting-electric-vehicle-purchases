@@ -262,3 +262,36 @@ submissions. Every predeclared lever measured. Nothing predeclared for
 E06 yet — ideation from the audit workflow is still absent (session
 limit), so the next step is generating candidates by another route and
 predeclaring before any run.
+
+## 2026-09-03 — E06 found, predeclared, implemented (not yet run)
+
+Both re-launched ideation agents died on the session limit again, so
+the candidate came from a cheap local diagnostic instead: the numeric
+columns are discrete, `Annual_Income_USD` is a *value identity* (97.9%
+of train values are source-dataset incomes), and an out-of-fold
+encoding of the exact value scores AUC 0.7072 vs 0.6812 binned. A CV'd
+logistic stack over the champion's OOF estimated +0.0009 (income alone)
+to +0.0013 (all three features) — 7–10× the noise floor and more than
+every accepted step combined. Details: EDA insights §10, ledger E06.
+
+Order of operations, for a reviewer checking predeclaration: ledger E06
+committed at `b0beece` **before** the notebook change; the notebook v7
+commit follows it.
+
+Notebook v7 changes: `make_features(value_ids=True)` (features v3),
+`load_source_frame` / `build_source_lookup` / `add_source_lookup`
+(source labels only, no fold handling needed), E05 frozen as §4.7 with
+its insight filled, E06 as §6, gate/selection wired for E06, and a new
+same-device rule in §9 — a promoted candidate takes the submission slot
+only if its OOF exceeds `STANDING_CHAMPION_OOF` (0.94223), enforced by
+`SUBMIT_OK`, not by prose. Also moved the stranded E02/E03 insight cells
+back under §4.4/§4.5 and guarded the summary cell against an empty
+`results` (it raised on the all-flags-off path).
+
+Dry-run: 2048/2048 flag combinations execute cleanly; 7 scripted E06
+scenarios assert fit lists, champion choice, `SUBMIT_OK`, and whether
+`submission.csv` exists. Real smoke check of §1–2 on local data: the
+value-id columns and source lookup build correctly (0.58% of test
+incomes unseen; 97.9% train / 97.9% test rows match a source income).
+
+Awaiting the user's go-ahead to push kernel v9 (CPU, est. ~3.5 h).
