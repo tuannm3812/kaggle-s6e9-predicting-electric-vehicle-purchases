@@ -452,3 +452,38 @@ consequences:
   0.0002), and any feature idea grounded in *new* evidence rather than
   re-permuting the existing columns.
 
+
+## E05 — Does the Source Dataset Help? (predeclared 2026-09-02, before execution)
+
+Kaggle kernel v8, notebook v6, **CPU** (GPU is screening-only and
+unreliable near gate boundaries — E04 Findings 1 and 4).
+
+**Context:** the source dataset is identified and CC0
+(`docs/7_source_dataset_provenance.md`). It adds 9,478 usable rows to
+668,665 — **1.5%** — and is itself synthetic, so the usual "real data
+beats generated data" argument does not apply. **The honest prior is that
+this does nothing**; it is tested because it is the last untested lever
+and costs two fits, not because it is expected to win.
+
+**Design (leakage-safe):** source rows are appended to the **training
+portion of each fold only**. Validation folds stay pure competition data,
+so OOF remains measured on the competition distribution and stays
+comparable to every prior row. Rows with missing values are dropped
+(9,478 of 10,000 remain) to keep the no-missing regime the test set has.
+
+| Run | Description |
+| --- | --- |
+| `e05_cpu_base` | champion config + features v1, seed 42, competition data only — in-run gate baseline (expected ≈ 0.94204, matching `e02_cat_interactions`) |
+| `e05_cpu_plus_source` | identical, with 9,478 source rows added to each training fold |
+
+**Promotion criteria:** the standing paired gate, `e05_cpu_plus_source`
+vs. `e05_cpu_base`, both single-seed CPU. This is a **screen**, not a
+championship bid: the standing champion is a 5-seed average, so clearing
+this gate would justify an averaged follow-up (E06), not an immediate
+submission. **No submission from E05 regardless of outcome.**
+
+**Falsifiable prediction, stated before the run:** the delta will be
+below the measured single-seed noise floor of 0.00013, i.e. this fails to
+promote. If it promotes, the prior above was wrong and E06 follows.
+
+*(results pending — notebook v6 kernel run)*
