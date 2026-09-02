@@ -532,3 +532,76 @@ so there is no blend to consider either.
   champion is fit rather than *what* it is fit on. Both must be
   predeclared as E06 with a falsifiable prediction before any run.
 
+
+
+## E06 — Value Identity: Exact Numeric Values as Categoricals (predeclared 2026-09-03, before execution)
+
+Kaggle kernel v9, notebook v7, **CPU**, full data, F1 folds.
+
+**Evidence that motivated it** (local diagnostics, 2026-09-03, no model
+fitting — recorded in `docs/2_eda_insights.md` §10):
+
+1. The "numeric" columns are discrete. `Annual_Income_USD` has 13,214
+   distinct values in 668,665 rows; **492 values each occur ≥200 times
+   and together cover 32% of rows**, and `30000` alone covers 9.2%.
+   `Daily_Commute_km` has 805 values, with `5.0` on 21.6% of rows.
+2. **97.9% of train income values are values in the 8,915-income source
+   dataset**, and every frequent train income is a source income that
+   appears 2–3 times there. The generator sampled income from the
+   source's values, so the exact value identifies a source row.
+3. The identity carries label information the magnitude does not. An
+   out-of-fold (F1) target encoding of the *exact* income value scores
+   **AUC 0.7072** univariate vs **0.6812** for 100 quantile bins; e.g.
+   income 72,441 has a 3.6% purchase rate inside a bin averaging 12.4%.
+   For the 506k rows whose income maps to a unique source row, the
+   purchase rate is **26.1% when that source row is `Yes` vs 17.6% when
+   `No`**.
+4. The champion cannot see this: CatBoost quantizes numerics to 254
+   borders, so one value among 13k is never isolated.
+5. Incremental estimate over the champion, by a 5-fold CV'd logistic
+   stack on the champion's OOF logit: **+0.00089** for the income
+   encoding, +0.00096 with commute added, +0.00011 for a source-label
+   lookup alone, **+0.00134** for all three. Caveat: a stack that reuses
+   the same folds as its inputs carries a mild second-level leak, so
+   these are upper-ish estimates, not predictions.
+
+**Design.** Features v3 = v1 (interactions) plus string copies of
+`Annual_Income_USD` and `Daily_Commute_km` (`Annual_Income_USD_id`,
+`Daily_Commute_km_id`) passed to CatBoost as categoricals. CatBoost's
+ordered target statistics are computed inside each training fold, so
+this is leakage-safe by construction; validation folds see only the
+prior for values absent from their training fold, exactly as test rows
+will (0.58% of test incomes are unseen in train). The numeric columns
+are kept. One arm adds a source-dataset lookup: for each row, the mean
+label and count of source rows sharing its income (−1 / 0 when none) —
+this uses the source's labels only, never the competition target, so it
+needs no fold handling.
+
+| Run | Description |
+| --- | --- |
+| `e06_cpu_base` | champion config, features v1, seed 42 — in-run gate baseline (expected 0.94204 exactly; CPU is bit-reproducible, E05 Finding 3) |
+| `e06_cat_value_ids` | identical, features v3 |
+| `e06_cat_value_ids_src` | features v3 + source income lookup (`Src_Income_Rate`, `Src_Income_N`) |
+
+**Promotion criteria:** the standing paired gate, each candidate vs.
+`e06_cpu_base`, single-seed CPU. Because the standing champion is a
+5-seed average at 0.94223, a promoted candidate takes the submission
+slot **only if its OOF also exceeds 0.94223** — otherwise the run is
+evidence-only and a seed-averaged follow-up decides. This rule is now
+enforced in code (`STANDING_CHAMPION_OOF`, §9), not by a printed note.
+Between the two candidates, the higher OOF is submitted; their
+difference is recorded as an observation, not gated.
+
+**Falsifiable predictions, stated before the run:**
+
+- `e06_cat_value_ids` beats `e06_cpu_base` by **at least +0.0005**
+  (≈4× the noise floor) and clears the gate with 5/5 folds. If the delta
+  is below +0.00026 (2× noise floor), the value-identity hypothesis is
+  wrong *as a CatBoost feature* and the stack estimate was leak-inflated.
+- `e06_cat_value_ids_src` is within ±0.0002 of `e06_cat_value_ids`: the
+  source lookup is mostly redundant with the in-fold target statistics on
+  the same key.
+- Wall-clock rises to roughly 1.3× the baseline fit (high-cardinality
+  CTRs), i.e. ~75 min per candidate; the whole run stays under 4 h.
+
+*(results pending — notebook v7 kernel run)*

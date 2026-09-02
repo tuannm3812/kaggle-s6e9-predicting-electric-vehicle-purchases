@@ -123,3 +123,24 @@ notebook itself carries findings only (`docs/0_coding_standards.md`).
    from noise; derive its width from this dataset's own fold std.
 6. Explicitly **not** needed: missingness handling, drift correction,
    duplicate handling (§§1, 6–7).
+
+
+## 10. Post-hoc: the numeric columns are value identities (2026-09-03)
+
+Found after E05, from local diagnostics rather than the EDA notebook;
+recorded here because it changes what "7 numeric features" means.
+
+- `Annual_Income_USD`: 13,214 distinct values; 492 values occur ≥200
+  times each and cover 32% of rows; `30000` alone is 9.2% of rows.
+  `Daily_Commute_km`: 805 distinct values, `5.0` on 21.6% of rows.
+  `Age` (45), `Charging_Stations_*` (15/20), `Number_of_Cars_Owned` (4),
+  `Environmental_Concern_Level` (5) are small integer sets.
+- 97.9% of train incomes are values present in the source dataset's
+  8,915 incomes; the frequent ones are incomes the source lists 2–3
+  times. The generator sampled the value, not a distribution.
+- The exact value carries target signal beyond its magnitude: OOF target
+  encoding of the exact income scores AUC 0.7072 vs 0.6812 for 100
+  quantile bins. Rows whose income maps to a unique source row buy at
+  26.1% when that row's label is Yes vs 17.6% when No.
+- Tree quantization (254 borders) cannot isolate one value in 13k, so no
+  model so far has used this. Tested as E06 (`docs/4_experiment_ledger.md`).
