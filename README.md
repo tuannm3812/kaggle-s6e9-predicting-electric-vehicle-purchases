@@ -12,16 +12,20 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**E02 interactions promoted and scored (2026-09-02).**
+**E03 seed-averaged interactions promoted and scored (2026-09-02).**
 
 | Champion | OOF AUC (F1: 5-fold strat., seed 42) | Promotion |
 | --- | --- | --- |
-| `e02_cat_interactions` | **0.94204 ± 0.00074** | paired gate: 5/5 folds, 95% CI (+0.000209, +0.000317), P(Δ>0)=1.0 |
+| `e03_cat_int_avg5seeds` | **0.94223 ± 0.00075** | paired gate: 5/5 folds, 95% CI (+0.000155, +0.000227), P(Δ>0)=1.0 |
 
-Public leaderboard: **0.94198** (submission 2, kernel v3, 2026-09-02) —
-LB moved +0.00029 for an OOF gain of +0.00027; CV↔LB tracking confirmed
-twice. Manifest:
+Public leaderboard: **0.94210** (submission 3, kernel v4, 2026-09-02).
+Progression 0.94169 → 0.94198 → 0.94210, each step a paired-gate
+promotion; CV↔LB gaps stay within −0.00013. Manifest:
 [`docs/5_submission_manifest.md`](docs/5_submission_manifest.md).
+
+E03 named its expected result before running — predicted OOF 0.94220 for
+combining interactions with seed-averaging, and the 3-seed average
+returned exactly 0.94220 ([`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md)).
 
 All five baseline runs, decisions, and the predeclared promotion gates:
 [`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md). EDA findings:

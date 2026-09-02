@@ -129,3 +129,25 @@ its ledger rows will say "local". Recorded in
   committed output-free; the executed record is the kernel version page.
 - Open: E03 (interactions + seed-average combo) flagged in the ledger,
   **not yet predeclared**; source dataset still unidentified.
+
+## 2026-09-02 — E03: additivity confirmed exactly; LB 0.94210
+
+- Kernel v4 COMPLETE (~5 h, CPU). **Checked:** in-run champion re-fit
+  reproduced 0.94204 exactly; the dry-run design held (5 fits, champion
+  fit once as the seed-42 member).
+- **Predeclared prediction met exactly:** ledger said OOF ≈ 0.94220 if
+  interactions and seed-averaging are additive; `e03_cat_int_avg3seeds`
+  returned **0.94220**. Both averages promoted (5/5 folds);
+  `e03_cat_int_avg5seeds` (0.94223) took the champion slot by the
+  highest-OOF rule — recorded with the caveat that the 5th seed bought
+  +0.00003 for +5763 s, and 3 seeds is a sanctioned fallback.
+- Measured noise floor: single-seed spread of one config is 0.00013.
+- Submitted `-v 4`: **public 0.94210**. Manifest row 3. Standing 106/280
+  — rank number rose while score improved because the field grew; noted
+  in the manifest so nobody reads rank as a model signal.
+- **All cheap levers now closed** (budget, Optuna, blending, averaging,
+  the one EDA-backed feature idea). Recorded so a later session doesn't
+  retry them.
+- Next: E04 on GPU (sanctioned 2026-09-02) — must re-fit the champion,
+  since GPU/CPU are separate comparability classes. Source dataset still
+  unidentified.

@@ -247,4 +247,49 @@ both promote, the predeclared highest-OOF rule selects between them.
 run is ~5 fits ≈ 4.7 h plus the re-fit. Predeclared as acceptable for a
 run that decides whether seed-averaging enters the final champion.
 
-*(results pending — notebook v4 kernel run)*
+### E03 results (Kaggle kernel v4, COMPLETE 2026-09-02 ~12:01 local, **CPU**)
+
+In-run champion re-fit: `e02_cat_interactions` OOF 0.94204 ± 0.00074
+(3018 s), matching kernel v3 exactly — the seed-42 fit doubles as an
+average member, so five fits covered both candidates.
+
+| Run | OOF AUC (mean ± fold std) | Wall-clock | Note |
+| --- | --- | --- | --- |
+| `e03_cat_int_avg5seeds` | **0.94223 ± 0.00075** | 14570 s (5 members) | **promoted — new champion** |
+| `e03_cat_int_avg3seeds` | 0.94220 ± 0.00074 | 8807 s (3 members) | promoted; **matches the predeclared prediction exactly** |
+| `e03_cat_int_s99` | 0.94209 ± 0.00073 | 2931 s | seed component |
+| `e03_cat_int_s2026` | 0.94207 ± 0.00071 | 2858 s | seed component |
+| `e03_cat_int_s7` | 0.94205 ± 0.00075 | 2931 s | seed component |
+| `e02_cat_interactions` (re-fit) | 0.94204 ± 0.00074 | 3018 s | gate baseline, also seed-42 member |
+| `e03_cat_int_s13` | 0.94196 ± 0.00081 | 2833 s | seed component |
+
+**Paired gate:**
+
+| Candidate | Fold wins | 95% CI (ΔAUC) | P(Δ>0) | Verdict |
+| --- | --- | --- | --- | --- |
+| `e03_cat_int_avg5seeds` | 5/5 | (+0.000155, +0.000227) | 1.000 | **promoted** |
+| `e03_cat_int_avg3seeds` | 5/5 | (+0.000134, +0.000199) | 1.000 | promoted, lower OOF |
+
+### Decisions (2026-09-02, post-E03)
+
+- **Hypothesis confirmed exactly.** The predeclaration predicted OOF
+  ≈ 0.94220 if interactions and seed-averaging are additive; the 3-seed
+  average returned **0.94220**. The effects address different error
+  sources and compose without overlap. This is the strongest form of
+  evidence this project has produced: a number named before the run.
+- **Champion: `e03_cat_int_avg5seeds`** (0.94223) by the predeclared
+  highest-OOF rule — **but the 5th seed bought +0.00003 for +5763 s**.
+  The 3-seed variant is the better compute trade and is a sanctioned
+  fallback if the final week needs the budget; recorded here so that
+  choice needs no re-litigation.
+- **Averaging plateaus past three seeds** — the question the 5-seed
+  variant existed to answer, now answered.
+- **Single-seed spread of one config: 0.94196–0.94209 (0.00013).** This
+  is the noise floor for single-seed comparisons; smaller "gains" mean
+  nothing without the paired gate.
+- **Diversity:** 0.9999 (avg3), 0.9992 (single-seed) — nested
+  averages of one config, far above 0.995 → blending stays closed.
+- **All cheap levers are now exhausted** (budget, Optuna, blending,
+  averaging, the one EDA-supported feature idea). Further gains need a
+  new feature hypothesis or more compute → E04 goes to GPU.
+
