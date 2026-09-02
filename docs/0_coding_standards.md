@@ -161,3 +161,26 @@ single top-level section (one `###` each), not promoted to peers of
 Config and Submission — a notebook that accretes `8b`, `8c`, … as
 experiments land has lost the map. Renumber when a section is added or
 retired rather than suffixing.
+
+## Derive run-guards, never enumerate them (2026-09-02)
+
+A notebook that accumulates experiment flags (`RUN_E01`, `RUN_E02`, …)
+must not gate shared sections on an enumerated list like
+`if RUN_CHAMPION and not (RUN_E03 or RUN_E04)`. That list was forgotten
+twice in one day — when E04 was added, and again for E05 — and each time
+the failure was silent and consequential: the generic champion re-fit
+would fit a *single* model under a seed-*average* champion's name, then
+the submission cell would happily write an artifact from it.
+
+Derive the condition instead (`EXPERIMENT_ACTIVE = RUN_E02 or …`), define
+it next to the flags, and say in a comment that new flags are added there
+rather than at each use site. More generally: when a bug class recurs,
+change the structure that permits it, not just the instance.
+
+**Dry-run every branch before spending platform compute.** Stub the
+harness, execute the notebook's control flow with fake numbers, and assert
+on fit counts, which runs receive extra data, which candidate is selected,
+and whether an artifact is written. This practice caught the mislabeled
+re-fit twice, a `StopIteration` on a carried-over champion, and a
+submission that would have been written from predictions the run never
+produced.
