@@ -146,3 +146,11 @@ private worklog. Consequence:
   finished work rather than intent.
 - A closing summary of *what this notebook established* is fine; a list
   of what to do next is not.
+
+**Section numbering.** Headings are a reader's map, so they must stay a
+clean hierarchy: top-level `##` for real stages of the workflow, `###`
+for parts of one stage. Completed experiments belong grouped under a
+single top-level section (one `###` each), not promoted to peers of
+Config and Submission — a notebook that accretes `8b`, `8c`, … as
+experiments land has lost the map. Renumber when a section is added or
+retired rather than suffixing.
