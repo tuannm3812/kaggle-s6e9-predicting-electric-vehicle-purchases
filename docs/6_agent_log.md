@@ -393,3 +393,41 @@ confirmed the fail direction writes nothing.
 range [0.0000036, 0.99983]). Not submitted — awaiting the user's
 go-ahead. Plan reopened: seed-averaging and, for the first time, a
 blend (correlation 0.9868 clears the 0.995 bar).
+
+## 2026-09-03 — Post-E06 screens, then E07 predeclared and launched
+
+Three ideas killed for free against saved OOF matrices, before spending
+any compute (ledger "Free post-E06 screens"): blending with pre-E06
+models (hurts at every weight — the 0.995 diversity bar is necessary but
+not sufficient, since the partners are 0.0034 weaker), tracing rows back
+to their source row (the generator resampled columns independently, so
+multi-column keys match 1.7–8% of rows and add ±0.00001), and six
+target-free derived features (all exactly ±0.00000).
+
+User chose the sequenced plan: **E07** explore single-seed → **E08**
+average the winner → **E09** 10-fold under a new fold definition F2.
+Ordered so nothing is invalidated later: E03 proved averaging additive,
+so averaging before the config is settled would be wasted compute.
+
+E07 predeclared at `9765971` **before** the notebook change, as usual.
+It re-opens capacity and encoding — axes E01/E04 closed against a
+representation that lacked the value-identity signal, which is a stated,
+scoped reason rather than a licence to re-run history; a null closes them
+permanently.
+
+**A bug the smoke check caught before it cost a run:** `SOURCE_FRAME`
+was still guarded by `RUN_E05 or RUN_E06`, so with only E07 active the
+source dataset never loaded and `X_v3s`/`X_v4` were never built — E07
+would have printed "skipped" and fitted nothing for ~4 h of queue time.
+This is precisely the enumerated-flag-list failure the standards already
+warn about, recurring at a *second* site, so the fix derives it once
+(`NEEDS_SOURCE`) next to `EXPERIMENT_ACTIVE` rather than patching the
+instance.
+
+Dry-run: **4096/4096** flag combinations clean, 12 scenarios pass
+(5 new for E07: promotion above/below the standing floor, no promotion,
+source missing, two-arm tie-break). Two older E06 scenarios failed at
+first and were *stale tests, not bugs* — they encoded the old standing
+champion (0.94223) and its name; behaviour was correct.
+
+Kernel v10 launched (CPU, 4 fits, ~6.5 h predicted).
