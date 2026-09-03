@@ -431,3 +431,49 @@ first and were *stale tests, not bugs* — they encoded the old standing
 champion (0.94223) and its name; behaviour was correct.
 
 Kernel v10 launched (CPU, 4 fits, ~6.5 h predicted).
+
+## 2026-09-04 — E07 null; E08 launched (averaging + an ungated test-time arm)
+
+**E07: all three arms null, and my headline prediction was wrong.**
+Capacity at 4000×0.025 returned **+0.00001** against a predeclared
+"≥ +0.0002, most likely winner". By the rule I wrote before the run,
+capacity is now closed permanently — E01's finding was about the problem,
+not the feature set, and the "more signal rewards more capacity"
+reasoning that justified re-opening it is falsified. All-value-ids
++0.00004 (correct call), `max_ctr_complexity=1` −0.00023 (correct call,
+and it shows categorical combinations are real signal). Runtime
+prediction also wrong: 7 h 31 m against "under 6.5 h". 2 of 4 right.
+
+`e07_base` came back bit-identical to `e06_cat_value_ids_src` — fourth
+consecutive CPU reproducibility confirmation.
+
+**What E07 actually established:** the model is saturated on
+*configuration*. Three independent knobs all move it less than the noise
+floor, so the ~0.0008 gap to the leaderboard top is not a tuning problem
+and should not be attacked with more configs.
+
+**E08 therefore changes how the champion is fit, not what it is.**
+Part A seed-averages it (E03 measured +0.00019 for this operation).
+Part B is a test-time change with a real motive: E06's LB beat its OOF
+by +0.00020, and the likely mechanism is that value-identity encodings
+are target statistics — test rows get one from all 668,665 rows while
+each fold model holds ~535,000. So Part B fits on all rows and predicts
+test directly.
+
+**Part B has no OOF and cannot be gated.** Rather than write a warning,
+it lives in a separate `fulldata_test_store` that the gate, champion
+selection and the submission cell structurally cannot read, and it emits
+`submission_fulldata.csv` on its own path. The dry-run asserts exactly
+that property (E08 scenario B: absent from `test_store`, absent from
+`gate_results`, own artifact present). It will be decided by a paired
+leaderboard comparison — valid here because the two models are
+near-identical and scored on the same rows — at a cost of 2 of 10 daily
+submissions, and the prediction (+0.0001…+0.0003) is on record so the
+manifest's explanation of the +0.00020 gap is falsifiable.
+
+Dry-run: **8192/8192** flag combinations clean, 17 scenarios pass. One
+initial failure was a wrong assertion of mine (the average is registered
+by `register_average`, not `run_cv`), not a notebook defect.
+
+Kernel v11 launched (CPU, 4 CV fits + 3 full-data fits, ~5.2 h predicted
+— budgeted with E07's corrected cost figure).
