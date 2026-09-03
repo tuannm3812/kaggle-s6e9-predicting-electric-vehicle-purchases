@@ -295,3 +295,101 @@ value-id columns and source lookup build correctly (0.58% of test
 incomes unseen; 97.9% train / 97.9% test rows match a source income).
 
 Awaiting the user's go-ahead to push kernel v9 (CPU, est. ~3.5 h).
+
+## 2026-09-03 — Independent review of E06 predeclaration + notebook v7 (Cursor)
+
+Reviewed commits `b0beece` (ledger/EDA predeclare) and `7073d98`
+(notebook v7). Checked predeclaration order, feature construction, §9
+submission guards, kernel metadata, and key quantitative claims against
+local `data/` (source file not present locally).
+
+**Verified:**
+
+- Predeclaration order is correct: ledger E06 at `b0beece` precedes
+  notebook v7 at `7073d98`.
+- Local data reproduces the headline diagnostics in ledger E06 / EDA §10:
+  13,214 distinct incomes; `30000` on 9.21% of rows; 0.58% of test
+  incomes unseen in train; `astype(str)` keys are stable (match rate 1.0).
+- `make_features(value_ids=True)` builds the intended v3 frame (18 cols;
+  `_id` columns as object dtype); kernel copy matches
+  `notebooks/02_baseline_modeling.ipynb`.
+- `kernel-metadata.json` already attaches the source dataset
+  (`itzzomkar/ev-adoption-behavior-and-range-anxiety`), so the
+  `e06_cat_value_ids_src` arm will run on Kaggle.
+- The new same-device submission floor (`STANDING_CHAMPION_OOF` +
+  `SUBMIT_OK` in §9) matches the ledger text and closes the E04-class
+  defect pattern (prose warning without a control). Stubbed control-flow
+  checks: promoted-above-standing writes; promoted-below-standing does
+  not; E05 screen never writes.
+- `e06_cpu_base` is the right in-run comparator (single-seed
+  `champion_factory` on interactions, expected 0.94204 per E05 Finding 3).
+
+**Assessment — sound to run:**
+
+- The hypothesis is well-motivated and honestly scoped: value identity is
+  a *representation* change CatBoost's 254-border quantization cannot
+  express, not a rehash of a closed axis.
+- Falsifiable predictions (+0.0005 vs base, ±0.0002 between arms) and
+  the stack-leak caveat in the ledger are proportionate.
+- Source-income lookup uses source labels only (no competition-target
+  fold handling needed); the generative identity argument is explicit.
+
+**Nits / watch items (none blocking):**
+
+1. **Dry-run is not reproducible from the repo.** The 2048/2048 and
+   seven-scenario claims are plausible (11 flags → 2048; I stubbed
+   control flow with zero exceptions), but there is no checked-in harness
+   script — same gap as the E04 audit sweep. Consider committing a small
+   stub test if this pattern recurs.
+2. **`docs/3_implementation_plan.md` is stale** — §"Current state" still
+   says "nothing predeclared" and omits E06; update after the run, not
+   before.
+3. **Two-bar outcome needs a predeclared follow-up.** If
+   `e06_cat_value_ids` clears the paired gate vs `e06_cpu_base` but sits
+   below 0.94223, §9 correctly writes no submission — but no E07
+   seed-average of the v3 config is predeclared yet. Decide that *before*
+   reading results, not after a promising evidence-only run.
+4. **Runtime risk:** 13k-cardinality income categoricals may cost more
+   than the ledger's 1.3× estimate; the 4 h budget still looks safe on
+   CPU with only 2–3 fits.
+5. **Carry forward unverified audit items** from 2026-09-02 (paired
+   bootstrap construction, family-wise error across gates, `fold_std`
+   ddof=0, unpinned `requirements.txt`) — unrelated to E06 but still open.
+
+**Recommendation:** approve kernel v9 push. On return: fill ledger results,
+E06 insight cell, manifest row only if `SUBMIT_OK` is True, and predeclare
+any seed-average follow-up before interpreting an evidence-only promotion.
+
+## 2026-09-03 — E06 lands: +0.00337, the largest gain of the project
+
+Kernel v9 COMPLETE (2.93 h, three CPU fits). `e06_cat_value_ids`
+**0.94541** vs baseline 0.94204: +0.00337, 5/5 folds, P(Δ>0) 1.000 —
+against a predeclared threshold of ≥+0.0005. Champion is now
+`e06_cat_value_ids_src` (0.94542) per the predeclared higher-OOF rule.
+
+**Verification done before believing it**, because the jump is 26× the
+noise floor and every prior step was ~0.0002:
+
+- Re-ran the paired gate *outside* the notebook, from saved matrices,
+  against the standing champion rather than the in-run baseline:
+  +0.00318, 5/5, CI (+0.00305, +0.00332), P 1.000.
+- Checked the gain is not memorization — it is positive across every
+  frequency stratum holding 99% of rows, and negative only on singleton
+  values (0.6% of rows).
+- Confirmed test's value-frequency profile matches train's, and that OOF
+  and test prediction distributions agree to 3–4 decimals.
+- `e06_cpu_base` came back **bit-identical** to `e05_cpu_base` (third
+  confirmation that CPU runs reproduce exactly across kernel versions).
+
+**Two process notes worth a reviewer's attention.** First, the ideation
+that produced this did *not* come from the multi-agent workflow — those
+agents died on session limits twice — but from a 30-second local
+diagnostic on column cardinality. Second, the notebook's new
+`STANDING_CHAMPION_OOF` guard was exercised in the pass direction here
+(0.94542 > 0.94223 → artifact written); the dry-run had already
+confirmed the fail direction writes nothing.
+
+**Status:** artifact validated (286,571 rows, 286,571 unique values,
+range [0.0000036, 0.99983]). Not submitted — awaiting the user's
+go-ahead. Plan reopened: seed-averaging and, for the first time, a
+blend (correlation 0.9868 clears the 0.995 bar).

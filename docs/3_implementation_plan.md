@@ -147,12 +147,24 @@ final week needs compute back.
 | GPU for champion fitting | E04 | −0.00070 vs CPU; screening only |
 | Source dataset as extra training rows | E05 | +0.00001, CI spans zero, P(Δ>0) 0.627 |
 
-**Open with real upside:** nothing predeclared. Every lever listed at the
-start of the project has now been measured. Candidates for an E06 must
-come from outside that list — a model family decorrelated enough to
-clear the 0.995 blend bar, or a change to the fitting procedure itself —
-and must be predeclared with a falsifiable prediction in the ledger
-before running.
+**Reopened by E06 (2026-09-03).** The closed axes above were all
+measured on a representation that discarded the signal: the exact value
+of `Annual_Income_USD` identifies a source row, and tree quantization
+could not see it. Adding value identities as CatBoost categoricals moved
+OOF **+0.00337** — 26× the noise floor and 5× the total of every
+accepted step before it. Champion is now `e06_cat_value_ids_src`
+(0.94542).
+
+**Open with real upside:**
+
+1. **Seed-average the new champion.** E03 measured averaging as additive
+   (+0.00019) but never on this feature set. Cheapest credible gain.
+2. **A real blend, for the first time.** `e06_cat_value_ids` correlates
+   0.9868–0.9873 with the pre-E06 models — below the 0.995 diversity
+   bar every earlier pair failed.
+3. **Re-test cheap axes that were measured against the old
+   representation** — the null results may not survive it. Re-test
+   selectively and predeclare each; do not assume they flip.
 
 **If nothing further lands,** the current champion is a defensible final
 answer. Final-week work is then reproducibility, not search: re-run the

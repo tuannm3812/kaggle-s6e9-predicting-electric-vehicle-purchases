@@ -604,4 +604,78 @@ difference is recorded as an observation, not gated.
 - Wall-clock rises to roughly 1.3× the baseline fit (high-cardinality
   CTRs), i.e. ~75 min per candidate; the whole run stays under 4 h.
 
-*(results pending — notebook v7 kernel run)*
+### Results (Kaggle kernel v9, notebook v7, CPU, full data, F1 folds)
+
+| Run | OOF AUC | fold std | Folds | Wall | Peak RSS |
+| --- | --- | --- | --- | --- | --- |
+| `e06_cpu_base` | 0.94204 | 0.00074 | 0.94087 / 0.94172 / 0.94304 / 0.94257 / 0.94201 | 2,656 s | 1.99 GB |
+| `e06_cat_value_ids` | **0.94541** | 0.00066 | 0.94443 / 0.94512 / 0.94646 / 0.94560 / 0.94545 | 3,927 s | 2.56 GB |
+| `e06_cat_value_ids_src` | **0.94542** | 0.00062 | 0.94453 / 0.94514 / 0.94643 / 0.94561 / 0.94545 | 3,958 s | 2.59 GB |
+
+**Paired gate vs. `e06_cpu_base`:** both candidates **5/5 fold wins**,
+P(Δ>0) = 1.000 — `e06_cat_value_ids` CI (+0.003236, +0.003510),
+`e06_cat_value_ids_src` CI (+0.003248, +0.003530). **Both promoted.**
+
+**Independently re-run against the standing champion**
+`e03_cat_int_avg5seeds` (0.94223), outside the notebook, from the saved
+matrices: `e06_cat_value_ids` **+0.00318**, 5/5 folds, 95% CI
+(+0.003047, +0.003315), P(Δ>0) = 1.000. The promotion does not rest on
+the in-run single-seed baseline alone.
+
+**Findings**
+
+1. **The hypothesis held, by a margin larger than the entire search
+   before it.** +0.00337 over the in-run baseline, **~26× the 0.00013
+   noise floor**, against a predeclared threshold of ≥+0.0005. Every
+   accepted step from v1 to E03 totalled +0.00066; this single feature is
+   five times that.
+2. **The source lookup is redundant, as predicted.** `_src` beats
+   `value_ids` by **+0.000018** — 3/5 folds, CI (−0.000012, +0.000050),
+   P(Δ>0) = 0.871. The predeclared band was ±0.0002; the observed
+   difference is an order of magnitude inside it. CatBoost's in-fold
+   target statistics on the same key already extract what the source
+   labels carry, so **the external dataset adds nothing** beyond what
+   the competition data itself encodes.
+3. **The gain is broad, not memorization.** By the train frequency of a
+   row's income value: 6–20 **+0.01816** (2.1% of rows), 21–100
+   **+0.00422** (29.1%), 101–1000 **+0.00224** (57.5%), >1000 +0.00032
+   (9.7%). Only singleton values (freq = 1, 0.6% of rows) are *worse*,
+   −0.00199 — the expected noisy-statistic case. Test's frequency
+   profile matches train's almost exactly (29.4% / 57.1% / 9.7%), with
+   0.58% unseen and 0.39% singleton, so ~1% of test rows sit in the
+   unfavourable zone.
+4. **Distributions agree**, guarding against a train/test feature
+   mismatch: OOF vs test prediction quantiles match to 3–4 decimals at
+   q01/q25/q50/q75/q99, means 0.17450 vs 0.17452 against a 0.17465 base
+   rate.
+5. **Wall-clock prediction missed slightly:** candidates ran 1.48× the
+   baseline, not the predicted 1.3× (high-cardinality CTRs cost more than
+   estimated). Total run 2.93 h, inside the predicted 4 h.
+6. **The diversity bar is cleared for the first time in this project.**
+   `e06_cat_value_ids` correlates **0.9868** with `e06_cpu_base` and
+   0.9873 with the standing champion — below the 0.995 blend bar, where
+   every earlier pair sat at 0.9958–0.9999. The two value-id arms
+   correlate 0.9994 with each other, so *they* must not be blended.
+
+### Decisions (2026-09-03, post-E06)
+
+- **New champion: `e06_cat_value_ids_src`** (OOF 0.94542), by the
+  predeclared rule "between the two candidates, the higher OOF is
+  submitted". Recorded caveat: its margin over `e06_cat_value_ids` is
+  statistical noise (Finding 2), and the simpler arm carries no external
+  dataset dependency. The rule was fixed before the run and is followed
+  as written rather than re-chosen after seeing the numbers; if the
+  dependency ever becomes inconvenient, `e06_cat_value_ids` is a
+  sanctioned drop-in at −0.00002.
+- **The plateau was never a ceiling — it was a blind spot.** E01–E05
+  searched capacity, regularization, blending, averaging, features and
+  extra rows, and all of them were flat because they all operated on a
+  representation that discarded the signal. The lesson for the remaining
+  weeks: when many independent axes all return null, suspect the
+  representation before concluding the problem is exhausted.
+- **Opened by this result:** seed-averaging the new champion (E03 proved
+  averaging additive, +0.00019, and it has never been tested on this
+  feature set), and — for the first time — a genuine blend, since the
+  0.995 diversity bar is cleared. Both must be predeclared as E07.
+
+*(Submission pending — artifact validated, awaiting the user's go-ahead.)*
