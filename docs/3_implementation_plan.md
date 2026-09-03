@@ -166,6 +166,20 @@ accepted step before it. Champion is now `e06_cat_value_ids_src`
    representation** — the null results may not survive it. Re-test
    selectively and predeclare each; do not assume they flip.
 
+**Agreed sequence (2026-09-03, user directive "all three, sequenced").**
+Ordered so that no run's work is invalidated by a later one — E03 proved
+seed-averaging additive, so the config is settled *before* it is
+averaged:
+
+| Run | Experiment | Why this order |
+| --- | --- | --- |
+| kernel v10 | **E07** — capacity, full value-ids, CTR complexity (single seed) | Explore first: averaging a config that then changes is wasted compute |
+| kernel v11 | **E08** — seed-average E07's winner | Additive gain (+0.00019 measured in E03), applied once the config is final |
+| kernel v12 | **E09** — 10-fold under a new fold definition **F2** | Motivated by E06's +0.00020 LB>OOF gap: test statistics use all 668k rows, each F1 fold only ~535k. Needs F2 because it breaks comparability with every F1 row; gate F2-vs-F2 only |
+
+**Closed for good by the free screens (2026-09-03):** blending, source
+tracing, and target-free derived features — see the ledger.
+
 **If nothing further lands,** the current champion is a defensible final
 answer. Final-week work is then reproducibility, not search: re-run the
 champion kernel end-to-end, confirm the artifact, pin versions, and lock

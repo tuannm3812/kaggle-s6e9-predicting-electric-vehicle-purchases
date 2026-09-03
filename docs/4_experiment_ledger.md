@@ -723,3 +723,52 @@ floor flag, and income mod 1000. Every one scores **±0.00000** over the
 champion in the CV stack, individually and all six together. The
 value-identity categoricals already carry whatever these encode.
 
+
+## E07 — Re-testing Capacity and Encoding on the New Representation (predeclared 2026-09-03, before execution)
+
+Kaggle kernel v10, notebook v8, **CPU**, full data, F1 folds, seed 42
+throughout. First of a three-run sequence agreed with the user:
+**E07 explores single-seed**, E08 averages the winner (E03 proved
+averaging additive, so averaging before the config is settled would be
+wasted compute), E09 evaluates 10-fold under its own fold definition.
+
+**Why re-open axes the ledger calls closed.** E01 closed capacity and
+E04 closed regularization — both measured on a representation that
+discarded the value-identity signal E06 later found worth +0.00337. An
+optimum located when 0.0034 less signal was extractable is not evidence
+about the optimum now. This is a *scoped* re-opening with a stated
+reason, not a licence to re-run history: each arm below is gated
+normally, and a null result closes it again for good.
+
+| Run | Description |
+| --- | --- |
+| `e07_base` | the champion config (2000 × 0.05, features v3 + source lookup), seed 42 — in-run gate baseline; expected to reproduce 0.94542 exactly (CPU is bit-reproducible, confirmed three times) |
+| `e07_all_value_ids` | + the remaining five numerics as string categoricals (`Age`, both station counts, `Number_of_Cars_Owned`, `Environmental_Concern_Level`) — target-encoding them rather than splitting on them |
+| `e07_cap_4000x025` | 4000 iterations at lr 0.025 — same budget product, finer steps |
+| `e07_ctr1` | `max_ctr_complexity=1` (default 4): no categorical *combinations*. Tests whether combinations built on a 13,214-level categorical are noise rather than signal |
+
+**Promotion criteria:** the standing paired gate, each arm vs.
+`e07_base`, all single-seed CPU on identical folds. A promoted arm takes
+the submission slot only if its OOF also exceeds
+`STANDING_CHAMPION_OOF = 0.94542`; enforced in code via `SUBMIT_OK`.
+
+**Falsifiable predictions, stated before the run:**
+
+1. `e07_cap_4000x025` is the **most likely winner**: ≥ +0.0002. More
+   extractable signal usually rewards more capacity, and this is the
+   arm the re-opening argument is really about. If it lands below
+   +0.00013 (the noise floor), capacity is closed permanently — the
+   representation change did not move it, and the E01 finding was about
+   the problem rather than the features.
+2. `e07_all_value_ids` is **within ±0.0003** and fails to promote. Age
+   (45 values), the station counts (15/20), cars (4) and concern level
+   (5) are low-cardinality; trees isolate those with a few splits
+   already, so target statistics should add nothing. The E06 gain came
+   from cardinality trees *cannot* split through (13,214 and 805), which
+   these are not.
+3. `e07_ctr1` is **negative** (combinations help): between −0.0015 and
+   0. Included because it is cheap, decisive either way, and would
+   roughly halve run time if it were somehow neutral.
+4. Total run under 6.5 h; `e07_cap_4000x025` is the long pole at ~2.2 h.
+
+*(results pending — notebook v8 kernel run)*
