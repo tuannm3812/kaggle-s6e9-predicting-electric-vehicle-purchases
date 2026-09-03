@@ -686,3 +686,40 @@ test-time value statistics are estimated from all 668,665 training rows
 while each OOF fold used ~535k, so OOF slightly under-states this
 feature family. Standing 130/531 (24.4th percentile) from 106/280
 (~37th).
+
+
+## Free post-E06 screens (2026-09-03, local, no fitting)
+
+Three ideas tested against the saved OOF matrices at zero compute cost.
+All three are **closed**; recorded so they are not re-attempted.
+
+**1. Blending E06 with the pre-E06 models — closed, and the diversity
+bar was the wrong test.** E06 Finding 6 noted correlation 0.9868, the
+first pair ever under the 0.995 bar. But every rank-blend weight *hurts*,
+monotonically: with `e03_cat_int_avg5seeds` at w=0.95 → −0.00003, w=0.90
+→ −0.00007, w=0.75 → −0.00028. Same shape for `e06_cpu_base` and
+`e02_lgbm_1000x05_interactions` (corr 0.9852). The partners are 0.0034
+weaker, and decorrelation cannot pay for that much deficit.
+**Lesson: the 0.995 diversity bar is necessary, not sufficient — a
+partner also needs comparable strength. The bar as written would have
+green-lit all three of these.** Blending the two E06 arms with each
+other gives +0.00003 (corr 0.9994, fails the bar anyway).
+
+**2. Tracing rows back to their source row — closed.** If a row could be
+matched to the source row that generated it, its label would be readable
+directly. It cannot: the generator resampled columns independently, so
+multi-column keys match almost nothing. Income alone matches 97.9% of
+train rows (75.8% uniquely), but adding one more column collapses it —
+income+commute matches **8.2%**, income+commute+age **1.7%**,
+income+age+cars+city 7.7%. And on the rows that *do* match uniquely, the
+source label adds **±0.00001** over E06. This independently re-confirms
+E06 Finding 2 by a second route: the source dataset holds nothing the
+in-fold target statistics have not already extracted.
+
+**3. Six target-free derived features — all exactly null.** Frequency of
+the income value (train-only and train+test), frequency of the commute
+value, the `income == 30000` floor flag (9.2% of rows), the commute
+floor flag, and income mod 1000. Every one scores **±0.00000** over the
+champion in the CV stack, individually and all six together. The
+value-identity categoricals already carry whatever these encode.
+
