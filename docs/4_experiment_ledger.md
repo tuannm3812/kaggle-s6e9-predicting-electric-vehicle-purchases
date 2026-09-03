@@ -771,4 +771,132 @@ the submission slot only if its OOF also exceeds
    roughly halve run time if it were somehow neutral.
 4. Total run under 6.5 h; `e07_cap_4000x025` is the long pole at ~2.2 h.
 
-*(results pending — notebook v8 kernel run)*
+### Results (Kaggle kernel v10, notebook v8, CPU, full data, F1 folds)
+
+| Run | OOF AUC | Δ vs base | fold std | Wall | Peak RSS |
+| --- | --- | --- | --- | --- | --- |
+| `e07_base` | 0.94542 | — | 0.00062 | 5,015 s | 2.97 GB |
+| `e07_all_value_ids` | 0.94546 | +0.00004 | 0.00064 | 8,167 s | 3.30 GB |
+| `e07_cap_4000x025` | 0.94544 | +0.00001 | 0.00064 | 9,905 s | 3.30 GB |
+| `e07_ctr1` | 0.94520 | −0.00023 | 0.00063 | 2,445 s | 3.30 GB |
+
+**Paired gate vs. `e07_base`** — **nothing promoted**:
+
+| Candidate | Fold wins | 95% CI | P(Δ>0) | Promoted |
+| --- | --- | --- | --- | --- |
+| `e07_all_value_ids` | 4/5 | (−0.000009, +0.000076) | 0.954 | **No** |
+| `e07_cap_4000x025` | 3/5 | (−0.000009, +0.000036) | 0.888 | **No** |
+
+No submission written. Champion unchanged: `e06_cat_value_ids_src`.
+
+### Scoring the predeclared predictions — 2 of 4 right
+
+1. **Prediction 1 was WRONG, and it was the headline.** `e07_cap_4000x025`
+   was predicted "most likely winner, ≥ +0.0002". It delivered
+   **+0.00001** — 3/5 folds, P(Δ>0) 0.888, an order of magnitude below
+   the claim and below the 0.00013 noise floor. Per the predeclared
+   rule, **capacity is now closed permanently**: the representation
+   change did not move its optimum, so E01's finding was about the
+   problem, not the feature set. The reasoning that justified re-opening
+   it — "more extractable signal usually rewards more capacity" — is
+   falsified here and should not be reused as a motive.
+2. **Prediction 2 correct.** `e07_all_value_ids` +0.00004, inside the
+   predicted ±0.0003, failed to promote. It failed on the CI criterion
+   alone (P(Δ>0) 0.954 does clear 0.95, but the interval includes zero),
+   which is the gate behaving as designed — and a useful reminder that
+   with two gates at 95% in one run, a lone P just over the threshold is
+   exactly what multiple comparisons produce.
+3. **Prediction 3 correct.** `e07_ctr1` −0.00023, inside the predicted
+   −0.0015…0 band. Categorical **combinations are signal, not noise**,
+   even when built on a 13,214-level feature — but they cost 2× the
+   runtime for +0.00023, which is itself below the noise floor.
+4. **Prediction 4 wrong on runtime.** Predicted under 6.5 h; actual
+   **7 h 31 m** (7.09 h of fitting). The two feature-heavy arms ran
+   2.3 h and 2.8 h against my ~1.2 h estimate — high-cardinality CTRs
+   scale worse with iterations than assumed. Future budgeting for this
+   representation should use ~1.4 s per 1000 rows per 1000 iterations,
+   not the pre-E06 figure.
+
+**Reproducibility:** `e07_base` is **bit-identical** to
+`e06_cat_value_ids_src` from kernel v9 (`np.array_equal` True). Fourth
+consecutive confirmation that CPU runs reproduce exactly across kernel
+versions.
+
+### Decisions (2026-09-04, post-E07)
+
+- **Champion unchanged:** `e06_cat_value_ids_src` (OOF 0.94542, public
+  0.94562).
+- **Closed permanently:** capacity (second measurement, now on the new
+  representation), encoding breadth (low-cardinality numerics as
+  categoricals), CTR complexity. All correlations among E07 arms are
+  0.9985–0.9997, far above the diversity bar, so no blend either.
+- **What E07 really established:** the model is **saturated on this
+  representation**. Three independent knobs — capacity, feature breadth,
+  categorical interaction depth — all move it less than the noise floor.
+  The remaining gap to the leaderboard top (~0.0008) is therefore not a
+  tuning problem, and should not be attacked with more configurations.
+
+*(E08 next, per the agreed sequence: seed-average the champion.)*
+
+## E08 — Seed Averaging, and a Test-Time Fitting Change (predeclared 2026-09-04, before execution)
+
+Kaggle kernel v11, notebook v9, **CPU**, F1 folds. Second of the agreed
+three-run sequence. E07 established the model is saturated on
+*configuration*, so E08 changes **how the champion is fit**, not what.
+
+### Part A — seed averaging (gated normally)
+
+| Run | Description |
+| --- | --- |
+| `e08_s42` | champion config (features v3 + source lookup), seed 42 — gate baseline and average member; expected to reproduce 0.94542 exactly |
+| `e08_s7`, `e08_s2026` | same, seeds 7 and 2026 |
+| `e08_avg3seeds` | element-wise mean of the three — the candidate |
+
+**Promotion criterion:** the standing paired gate vs. `e08_s42`. Takes
+the submission slot only if OOF also exceeds
+`STANDING_CHAMPION_OOF = 0.94542`.
+
+**Falsifiable prediction:** **+0.00019**, matching E03's measurement of
+the identical operation on the previous representation (0.94204 →
+0.94223), so OOF ≈ **0.94561**, promoting 5/5. If averaging now returns
+less than +0.00010, seed variance is not additive with the value-identity
+features and the E03 result does not generalise across representations.
+
+### Part B — full-data refit for test predictions (NOT gated — read this)
+
+**The motivation is a measured asymmetry, not a hunch.** E06's public LB
+*beat* its OOF by +0.00020, reversing the sign of the three previous
+gaps. The likely mechanism: a row's value-identity encoding is a target
+statistic over rows sharing that value, and **test rows get statistics
+estimated from all 668,665 training rows, while each OOF fold's came
+from only ~535,000**. If that is the cause, then the current test
+prediction — the mean of five fold-models, each still holding only 80%
+of the statistics — is leaving that advantage on the table.
+
+`e08_fulldata_avg3`: the champion config fit on **all 668,665 rows**
+(seeds 42, 7, 2026, averaged), predicting test directly.
+
+**This arm has no OOF and therefore cannot be gated.** It is kept in a
+separate store, can never enter the gate or champion selection, and
+writes a *separate* artifact (`submission_fulldata.csv`). Saying so
+plainly because the project's own rule is that a decision which must
+stop something has to be a mechanism, not a note — the mechanism here is
+the separate store, not this paragraph.
+
+**How it gets decided, since OOF cannot:** by a paired leaderboard
+comparison — submit both artifacts and compare. That is sound here
+specifically because the two models are near-identical and scored on the
+same rows, so the *difference* is far better determined than either
+absolute score. It costs 2 of 10 daily submissions.
+
+**Falsifiable prediction:** `submission_fulldata.csv` scores **+0.0001
+to +0.0003** above the 5-fold-average artifact on the public LB. If it
+scores *lower*, the LB>OOF gap has some other cause and the fold-model
+average stays — in which case the +0.00020 explanation in
+`docs/5_submission_manifest.md` is wrong and must be corrected.
+
+**Predicted cost:** Part A ~4.2 h (3 × 1.4 h), Part B ~1.0 h (3 fits on
+668k rows, no folds). Total ~5.2 h — budgeted with E07's corrected
+figure, having under-estimated that run by an hour.
+
+*(results pending — notebook v9 kernel run)*
