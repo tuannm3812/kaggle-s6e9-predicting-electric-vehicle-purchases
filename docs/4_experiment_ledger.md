@@ -678,4 +678,11 @@ the in-run single-seed baseline alone.
   feature set), and — for the first time — a genuine blend, since the
   0.995 diversity bar is cleared. Both must be predeclared as E07.
 
-*(Submission pending — artifact validated, awaiting the user's go-ahead.)*
+**Submitted** 2026-09-03 (submission 4, id 55980494, kernel v9):
+**public LB 0.94562**, up from 0.94210. CV↔LB gap **+0.00020** — the
+first *positive* gap in this project, after −0.00008 / −0.00006 /
+−0.00013. Mechanical explanation in `docs/5_submission_manifest.md`:
+test-time value statistics are estimated from all 668,665 training rows
+while each OOF fold used ~535k, so OOF slightly under-states this
+feature family. Standing 130/531 (24.4th percentile) from 106/280
+(~37th).
