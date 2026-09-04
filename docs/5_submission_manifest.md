@@ -12,6 +12,7 @@ Every leaderboard submission, recorded the moment it is scored, per
 | 4 | 2026-09-03 11:48 | 55980494 | `ev-purchases-baseline-modeling` v9 | `e06_cat_value_ids_src` | 0.94542 (Kaggle run) | **0.94562** | exact numeric values are identities the champion could not see (E06, paired-gate promoted 5/5, P=1.000) → **confirmed**: LB +0.00352 for OOF +0.00319; first positive CV↔LB gap (+0.00020) |
 | 5 | 2026-09-04 04:41 | 56004792 | `ev-purchases-baseline-modeling` v11 | `e08_avg3seeds` (gated) | 0.94550 | **0.94565** | 3-seed averaging still pays on the new representation (E08A, promoted 5/5) → **confirmed but far smaller than predicted**: +0.00007 OOF vs +0.00019 predicted; CV↔LB gap +0.00015 |
 | 6 | 2026-09-04 04:41 | 56004795 | `ev-purchases-baseline-modeling` v11 | `e08_fulldata_avg3` (**ungated**, no OOF) | — | **0.94569** | full-data refit improves test-time value statistics (E08B) → **direction confirmed, magnitude wrong**: +0.00004 vs +0.0001…+0.0003 predicted. Not promoted — below the noise floor |
+| 7 | 2026-09-04 13:12 | 56013125 | `ev-purchases-baseline-modeling` v13 | `e09_f2_avg3seeds` (**cross-class**, F2/10-fold) | 0.94564 (F2 — not comparable to F1 rows) | **0.94570** | 10-fold beats 5-fold at test time (E09) → **confirmed, +0.00005, inside the predicted +0.00003…+0.00012** |
 
 ## Notes
 
@@ -19,14 +20,21 @@ Every leaderboard submission, recorded the moment it is scored, per
   so the score is tied to code Kaggle executed (master standard §11).
   Artifact pre-validated with `scripts/verify_submission.py` (286,571 rows,
   range [0.0000, 0.9893]).
-- Quota use: 6 across 4 days. Five were backed by a paired-gate
+- Quota use: 7 across 4 days. Five were backed by a paired-gate
   promotion; submission 6 is the deliberate exception — an **ungated**
   artifact submitted specifically because OOF cannot evaluate a
   test-prediction strategy, with its hypothesis and falsification
   threshold recorded before submission.
 - Standing (mutable, re-check live): 79/157 → 83/227 → 106/280 →
-  130/531 → **166/624** (26.6th percentile, snapshot 2026-09-04;
-  leader 0.94656, gap 0.00087). The
+  130/531 → 166/624 → **186/699** (26.6th percentile, snapshot
+  2026-09-04; leader 0.94656, gap 0.00086). The field is dense here:
+  a further +0.0001 would move roughly 10 places.
+- **"Champion" and "best submission" now name different artifacts**, and
+  deliberately so. `e08_avg3seeds` (0.94565) is the champion — the
+  designation earned through a paired OOF gate. `e09_f2_avg3seeds`
+  (0.94570) is the best public score, but lives in fold definition F2
+  and cannot be gated against an F1 champion. Both are candidates for
+  the final two-submission selection. The
   *rank number* rose while the score improved because the field is
   growing fast; percentile moved ~37% → ~24% on E06. Rank is not
   evidence about the model — the OOF/LB deltas are. Leader 0.94644;

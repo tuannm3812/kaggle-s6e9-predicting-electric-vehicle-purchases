@@ -1129,5 +1129,45 @@ rather than a gate.
 as many rows, so per-fold AUC is simply noisier. Only the pooled OOF is
 comparable across fold definitions.
 
-*(Leaderboard comparison pending — `submission_f2.csv` validated:
-286,571 rows, all unique, in range.)*
+### Leaderboard result (submission 7, 2026-09-04)
+
+`submission_f2.csv` → public **0.94570**, against the champion's 0.94565.
+**Δ = +0.00005 — inside the predicted +0.00003…+0.00012 band.**
+
+**Prediction 2 correct.** Two of E09's four predictions landed inside
+their stated bands, after E08's two 3× over-estimates. The correction
+that produced this was simply to scale predictions down; the record now
+reads: E05 correct, E06 correct (direction, magnitude far exceeded),
+E07 2/4, E08 0/2 on magnitude, E09 2/4.
+
+**Two independent measurements agree on direction and disagree on size:**
+the cross-class OOF says +0.00014 (biased toward F2 by construction), the
+leaderboard says +0.00005 (unbiased, single comparison). The truth is
+likely nearer the smaller number, and the gap between them is itself the
+measure of the OOF bias this predeclaration warned about.
+
+### Decisions (2026-09-04, post-E09)
+
+- **Best submission to date: `e09_f2_avg3seeds`, public 0.94570.**
+- **The gated champion in the F1 class remains `e08_avg3seeds`.** F2
+  cannot be gated against it, so "champion" (a paired-OOF designation)
+  and "best submission" (a leaderboard fact) now name different
+  artifacts. Keeping the two words distinct is the point of the class
+  rule, not an inconsistency to tidy away.
+- **F2 becomes the default fold definition for any future work**, on the
+  strength of two agreeing measurements plus a mechanical reason (each
+  fold model trains on ~602k rows instead of ~535k, and each test row
+  averages 10 models instead of 5). Any *new* candidate must then be
+  gated F2-vs-F2, which the harness already enforces.
+- **The three-run sequence is finished.** E07 null, E08 +0.00007 OOF /
+  the LB>OOF correction, E09 +0.00005 LB. Total from the sequence:
+  **+0.00005 of leaderboard**, from ~20 h of compute. Standing 186/699
+  (26.6th percentile); leader 0.94656, gap 0.00086.
+- **Honest read on what remains.** Every axis this project has enumerated
+  is now measured, and the last three runs bought a twentieth of the gap
+  to the top. The remaining 0.00086 is not reachable by tuning,
+  averaging, fold counts, or extra rows — all measured, all small. It
+  needs a *representational* idea of the kind E06 was, and there is no
+  candidate for one on the table. Predeclare nothing further without
+  evidence first; the cheap local diagnostics that found E06 cost
+  minutes, while a speculative kernel run costs hours.

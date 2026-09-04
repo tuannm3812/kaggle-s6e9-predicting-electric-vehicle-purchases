@@ -175,7 +175,16 @@ averaged:
 | --- | --- | --- |
 | kernel v10 | **E07** — capacity, full value-ids, CTR complexity (single seed) | Explore first: averaging a config that then changes is wasted compute |
 | kernel v11 | **E08** — seed-average E07's winner | Additive gain (+0.00019 measured in E03), applied once the config is final |
-| kernel v12 | **E09** — 10-fold under a new fold definition **F2** | Motivated by E06's +0.00020 LB>OOF gap: test statistics use all 668k rows, each F1 fold only ~535k. Needs F2 because it breaks comparability with every F1 row; gate F2-vs-F2 only |
+| kernel v12/13 | **E09** — 10-fold under a new fold definition **F2** | Motivated by E06's +0.00020 LB>OOF gap: test statistics use all 668k rows, each F1 fold only ~535k. Needs F2 because it breaks comparability with every F1 row; gate F2-vs-F2 only |
+
+**Sequence outcome (2026-09-04):** E07 null, E08 +0.00007 OOF plus a
+correction to the LB>OOF explanation, E09 +0.00005 LB. Best submission
+`e09_f2_avg3seeds` at public **0.94570**; gated champion `e08_avg3seeds`
+at 0.94565. Roughly 20 h of compute for a twentieth of the gap to the
+leader — the enumerated axes are exhausted, and the remaining 0.00086
+needs a representational idea like E06's, not another tuning pass.
+**Find evidence cheaply and locally before predeclaring anything
+further.**
 
 **Closed for good by the free screens (2026-09-03):** blending, source
 tracing, and target-free derived features — see the ledger.
