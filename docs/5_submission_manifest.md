@@ -66,3 +66,33 @@ Every leaderboard submission, recorded the moment it is scored, per
   The blend path is **no longer closed** — E06's OOF correlates 0.9868
   with the pre-E06 models, the first pair under the 0.995 diversity bar
   (`docs/4_experiment_ledger.md`, E06 Finding 6).
+
+## Final submission selection (decided 2026-09-04, act before 2026-09-30)
+
+Kaggle scores two selected submissions against the private leaderboard.
+**This is a UI-only action** — the Kaggle CLI has no command for it
+(`kaggle competitions` exposes submit/submissions/leaderboard and nothing
+for selection), so it must be done by hand on the competition's My
+Submissions page. If nothing is selected, Kaggle defaults to the best
+public scorers, which happens to be close to the recommendation below —
+but relying on that default is not the same as deciding.
+
+**Recommended pair:**
+
+| Slot | Submission | Public LB | Why this one |
+| --- | --- | --- | --- |
+| 1 | **7** — `e09_f2_avg3seeds` | 0.94570 | Best public score, and the best-evidenced model: promoted 9/10 folds within F2, with each of its 10 fold models trained on ~602k rows and each test row an average of 10 models |
+| 2 | **5** — `e08_avg3seeds` | 0.94565 | The gated champion in class F1, promoted 5/5 folds. An independent validation lineage on a different fold partition, so its errors are not the same errors |
+
+**Why not submission 6** (`e08_fulldata_avg3`, 0.94569, the middle
+score): it has **no out-of-fold validation at all** — that is the whole
+reason it was never promoted. Picking it over the gated champion would
+mean preferring a 0.00004 public-LB margin, itself below the 0.00005
+noise floor, to the only evidence that generalises. The pair above trades
+a hair of public score for the two artifacts with real validation behind
+them.
+
+**Honest caveat on hedging.** All three candidates correlate 0.9996–0.9999
+on test predictions, so any pair hedges very little; their private scores
+will land within noise of each other. The choice is close to immaterial,
+and saying so is more useful than dressing it up as a strategy.

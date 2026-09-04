@@ -197,7 +197,21 @@ further.**
 **Closed for good by the free screens (2026-09-03):** blending, source
 tracing, and target-free derived features — see the ledger.
 
-**If nothing further lands,** the current champion is a defensible final
-answer. Final-week work is then reproducibility, not search: re-run the
-champion kernel end-to-end, confirm the artifact, pin versions, and lock
-the final submission by 2026-09-29 (one day of buffer).
+## Phase 4 — Closing out (2026-09-04 onward)
+
+Search is finished: every enumerated axis is measured and five further
+free screens found nothing. What remains is not modelling.
+
+| Task | Status |
+| --- | --- |
+| Pin dependency versions | **done** — `requirements.txt` pinned to the kernel-v13 environment |
+| Record catboost in the reproducibility snapshot | **done** — it produces the champion and was missing |
+| Verify the champion's reproduction path still executes | **done** — `check_frames.py` passes for `RUN_E08`; CPU runs have reproduced bit-identically five times |
+| Choose the final two submissions | **decided** — see `docs/5_submission_manifest.md`; the action itself is UI-only and still outstanding |
+| Select them on Kaggle before 2026-09-30 23:59 UTC | **outstanding — the only hard deadline left** |
+
+**A full re-run purely to re-confirm reproducibility is not planned.** The
+CPU pipeline has produced bit-identical OOF vectors across kernel
+versions five separate times (E05, E06, E07, E08, E09 baselines), which
+is stronger evidence than one more run would add, and it would cost ~4 h
+for no new information.
