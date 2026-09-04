@@ -1311,3 +1311,45 @@ library that produces the champion), and the pinned `requirements.txt`
 matches the Kaggle worker exactly: numpy 2.0.2, pandas 2.3.3,
 scikit-learn 1.6.1, lightgbm 4.6.0, catboost 1.2.10, Python 3.12.13.
 
+
+## Stacking screen (2026-09-05, local, free)
+
+Stacking is mechanically different from the blending already closed: a
+blend applies one global weight, while a meta-learner can in principle
+learn *where* each base model is better. Tested properly rather than
+assumed. Meta-folds use seed 2026, deliberately different from the base
+F1 folds.
+
+| Stack | OOF | vs best single (0.94564) |
+| --- | --- | --- |
+| sanity: best model alone through the meta-learner | 0.94564 | −0.00000 |
+| linear stack, 8 base models | 0.94568 | **+0.00005** |
+| linear stack + meta-features (value frequency, floor flags, income) | 0.94568 | +0.00004 |
+| **non**linear stack (LightGBM meta) + meta-features | 0.94550 | −0.00014 |
+
+**Verdict: closed.** +0.00005 sits exactly *at* the noise floor, and the
+measurement is optimistically biased — base OOF predictions come from
+models that saw the meta-training rows in their own training folds, the
+standard stacking leak. The true value is below what is shown.
+
+**Two hypotheses falsified, which is the useful part:**
+
+1. **"A stack learns where each model is better."** Adding
+   meta-features that would let it do exactly that (income-value
+   frequency, floor flags) changed nothing: +0.00005 → +0.00004. The
+   meta-learner is behaving as a marginally better *global* blend, not a
+   conditional one. And the nonlinear meta-learner, which has the
+   capacity to exploit such structure, **overfits** (−0.00014).
+2. **"Eight diverse models must add something."** Drop-one analysis says
+   otherwise — only `e09_f2_avg3seeds` matters (−0.000129 when removed);
+   the other seven each contribute **±0.00002 or less**, and three of
+   them contribute a *negative* amount. Learned weights concentrate on
+   it (+0.742) with everything else near zero. Stacking only the three
+   strong CatBoost models gives +0.00002.
+
+**Why, in one sentence:** this project does not have eight models, it has
+**one model replicated** — every strong candidate is the same CatBoost
+value-identity configuration at correlation 0.998–0.9999, and the
+genuinely different families are 0.003+ weaker, which no meta-learner can
+repair. That is the same wall the blending and LightGBM-partner screens
+hit, reached by a third route.
