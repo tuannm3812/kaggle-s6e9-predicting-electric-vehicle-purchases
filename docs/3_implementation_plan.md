@@ -58,9 +58,11 @@ Executed end-to-end locally (kernel `s6e8-py39`, ~10 min wall-clock, dominated b
    no threshold.
 6. Every run — including rejected ones — gets a ledger row.
 
-## Phase 3 — Optimization & Ensemble (evidence-gated, by ~2026-09-20)
+## Phase 3 — Optimization & Ensemble (evidence-gated, by ~2026-09-20) *(complete)*
 
-Status 2026-09-01: step 1 done (E01 — `e01_cat_2000x05` promoted via
+Status 2026-09-04: complete — E01–E09 all recorded in the ledger; the
+ensemble path is closed (every blend measured ≤ +0.00002). Original
+status line kept below for the record. Status 2026-09-01: step 1 done (E01 — `e01_cat_2000x05` promoted via
 the paired gate, `docs/4_experiment_ledger.md`); step 4 resolved as
 **skip Optuna** (predeclared no-headroom condition met). Steps 2/3/5/6
 remain gated as written; E02 blend is eligible on diversity.
@@ -121,7 +123,7 @@ decided by the Phase 2 measurement, not assumed.
 | `4_experiment_ledger.md` | 2–5 | fold definition, every run, promotion decisions |
 | `5_submission_manifest.md` | 4 | every submission, score, decision |
 | `6_agent_log.md` | — | append-only agent collaboration log (master §13) |
-| `7_source_dataset_provenance.md` | open | only if the source dataset is identified |
+| `7_source_dataset_provenance.md` | written 2026-09-02 | the source dataset, its licence, and how it is used |
 
 ## Current state and next moves (internal — 2026-09-02)
 
@@ -129,9 +131,10 @@ Kept here rather than in the notebooks: `notebooks/` is pushed to a
 **public** Kaggle kernel, so forward strategy stays in `docs/`. See the
 convention in `docs/0_coding_standards.md`.
 
-**Champion:** `e03_cat_int_avg5seeds` — OOF 0.94223, public 0.94210
-(submission 3). 3-seed variant (0.94220) is a sanctioned fallback if the
-final week needs compute back.
+**Champion (2026-09-04):** `e08_avg3seeds` — OOF 0.94550 (class F1),
+public **0.94565**. Best public score is `e09_f2_avg3seeds` at
+**0.94570**, which sits in class F2 and cannot be gated against an F1
+champion; both are candidates for the final two-submission selection.
 
 **Closed axes** — each measured, each recorded in
 `docs/4_experiment_ledger.md`; re-running any of them is waste:
@@ -146,25 +149,30 @@ final week needs compute back.
 | Subsidy-gate features | E04 | features v2 +0.00003, gate-rejected |
 | GPU for champion fitting | E04 | −0.00070 vs CPU; screening only |
 | Source dataset as extra training rows | E05 | +0.00001, CI spans zero, P(Δ>0) 0.627 |
+| Capacity, **re-tested post-E06** | E07 | +0.00001 — closed permanently; the representation change did not move its optimum |
+| Encoding breadth (low-cardinality numerics as categoricals) | E07 | +0.00004, gate-rejected |
+| CTR complexity (`max_ctr_complexity=1`) | E07 | −0.00023; combinations are signal, not noise |
+| Seed averaging, **re-tested post-E06** | E08 | +0.00007, below its own predeclared +0.00010 threshold |
+| Full-data refit for test predictions | E08B | +0.00004 on LB; below the noise floor, not promoted |
+| Fold count 5 → 10 | E09 | +0.00005 on LB; adopted as the go-forward default, not a champion |
+| Blending (any partner tried) | E02, E03, free screens | best case +0.00002; partners are ≥0.003 weaker |
+| A decorrelated non-CatBoost partner | free screen 2026-09-04 | LightGBM stays 0.0033 behind even with leak-free nested TE |
 
-**Reopened by E06 (2026-09-03).** The closed axes above were all
-measured on a representation that discarded the signal: the exact value
-of `Annual_Income_USD` identifies a source row, and tree quantization
-could not see it. Adding value identities as CatBoost categoricals moved
-OOF **+0.00337** — 26× the noise floor and 5× the total of every
-accepted step before it. Champion is now `e06_cat_value_ids_src`
-(0.94542).
+**Noise floor: 0.00005** on the current representation (was 0.00013
+pre-E06). Any pre-E06 row quoting 0.00013 as "the" floor is describing
+the old representation.
 
-**Open with real upside:**
+**E06 reopened these axes, and E07–E09 closed them again.** The pre-E06
+nulls were all measured on a representation that discarded the value
+identities, so they were re-tested once, deliberately. They did not
+flip: capacity is now closed *permanently* (E07), encoding breadth and
+CTR complexity are closed (E07), and seed averaging returned +0.00007
+rather than E03's +0.00019 — so E03's additivity result does **not**
+generalise across representations (E08).
 
-1. **Seed-average the new champion.** E03 measured averaging as additive
-   (+0.00019) but never on this feature set. Cheapest credible gain.
-2. **A real blend, for the first time.** `e06_cat_value_ids` correlates
-   0.9868–0.9873 with the pre-E06 models — below the 0.995 diversity
-   bar every earlier pair failed.
-3. **Re-test cheap axes that were measured against the old
-   representation** — the null results may not survive it. Re-test
-   selectively and predeclare each; do not assume they flip.
+**Open with real upside: nothing.** Five free screens on 2026-09-04
+(duplicates, id signal, joint identities, a strong LightGBM partner,
+artifact blending) all returned null. See the ledger.
 
 **Agreed sequence (2026-09-03, user directive "all three, sequenced").**
 Ordered so that no run's work is invalidated by a later one — E03 proved

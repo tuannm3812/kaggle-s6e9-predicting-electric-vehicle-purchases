@@ -1,7 +1,7 @@
 # Predicting Electric Vehicle Purchases
 
 [![Kaggle Competition](https://img.shields.io/badge/Kaggle-Playground%20Series%20S6E9-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/playground-series-s6e9)
-[![Status](https://img.shields.io/badge/Status-Baseline-blue)](docs/4_experiment_ledger.md)
+[![Status](https://img.shields.io/badge/Public%20LB-0.94570-success)](docs/5_submission_manifest.md)
 [![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)](requirements.txt)
 
 Kaggle Playground Series S6E9:
@@ -12,29 +12,33 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**E03 seed-averaged interactions promoted and scored (2026-09-02).**
+**E09 complete (2026-09-04). Nine experiments, seven submissions.**
 
-| Champion | OOF AUC (F1: 5-fold strat., seed 42) | Promotion |
-| --- | --- | --- |
-| `e03_cat_int_avg5seeds` | **0.94223 ± 0.00075** | paired gate: 5/5 folds, 95% CI (+0.000155, +0.000227), P(Δ>0)=1.0 |
+| | Model | OOF AUC | Public LB |
+| --- | --- | --- | --- |
+| **Champion** (paired-gate promoted, fold class F1) | `e08_avg3seeds` | 0.94550 | 0.94565 |
+| **Best public score** (fold class F2 — not gateable against F1) | `e09_f2_avg3seeds` | 0.94564 (F2) | **0.94570** |
 
-Public leaderboard: **0.94210** (submission 3, kernel v4, 2026-09-02).
-Progression 0.94169 → 0.94198 → 0.94210, each step a paired-gate
-promotion; CV↔LB gaps stay within −0.00013. Manifest:
-[`docs/5_submission_manifest.md`](docs/5_submission_manifest.md).
+Progression: 0.94169 → 0.94198 → 0.94210 → 0.94562 → 0.94565 → 0.94570.
 
-E03 named its expected result before running — predicted OOF 0.94220 for
-combining interactions with seed-averaging, and the 3-seed average
-returned exactly 0.94220 ([`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md)).
+**The step that mattered was E06 (+0.00337 OOF), and it came from a
+30-second diagnostic, not a sweep.** The "numeric" columns are *value
+identities*: `Annual_Income_USD` takes 13,214 distinct values, 97.9% of
+them drawn from the source dataset, and the exact value carries label
+information its magnitude does not — signal that tree quantization (254
+borders) cannot reach. Encoding those values as CatBoost categoricals
+was worth five times every other accepted step combined. Full reasoning:
+[`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md), E06.
 
-All five baseline runs, decisions, and the predeclared promotion gates:
-[`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md). EDA findings:
-[`docs/2_eda_insights.md`](docs/2_eda_insights.md) — top-heavy signal, one
-big interaction (the subsidy gate), no missingness, no drift.
+Every run — kept or rejected — is in the ledger with its gate predeclared
+*before* execution, and the failed predictions are recorded as plainly as
+the successful ones. Two comparability classes are enforced in code
+rather than by convention: CPU/GPU, and fold definition F1/F2.
 
 - Task: binary classification — probability that `Will_Buy_EV = "Yes"`.
 - Metric: **ROC AUC** (verified via the Kaggle API, 2026-09-01).
 - Train 668,665 rows x 13 features; test 286,571 rows.
+- Noise floor: **0.00005** on the current representation.
 
 Deadline: **2026-09-30 23:59 UTC** (Kaggle API, re-confirmed 2026-09-01).
 
@@ -45,8 +49,15 @@ Deadline: **2026-09-30 23:59 UTC** (Kaggle API, re-confirmed 2026-09-01).
 kaggle competitions download -c playground-series-s6e9 -p data/
 unzip -o 'data/*.zip' -d data/
 
-# 2. Fill in the unchecked items in docs/1_instructions.md from the
-#    Evaluation and Data tabs before writing any modelling code.
+# 2. Notebooks are authored locally but EXECUTED ON KAGGLE.
+bash scripts/push_kaggle_kernel.sh baseline
+kaggle kernels status tuannm3812/ev-purchases-baseline-modeling
+kaggle kernels output tuannm3812/ev-purchases-baseline-modeling -p out/
+
+# 3. Before pushing, run both local checks (they cover different things):
+python3 scripts/check_frames.py        # every experiment's feature frames exist
+python3 scripts/verify_submission.py <artifact.csv> \
+    --test data/test.csv --sample data/sample_submission.csv
 ```
 
 ## Repository layout
@@ -55,9 +66,13 @@ unzip -o 'data/*.zip' -d data/
   `notebooks/kernels/<name>/` holding each notebook's Kaggle
   `kernel-metadata.json`.
 - [`docs/`](docs/) — numbered notes: coding standards, competition
-  instructions, and (as work starts) EDA, experiments, and submissions.
-- [`scripts/`](scripts/) — `push_kaggle_kernel.sh` for pushing a notebook to
-  its Kaggle kernel, and `verify_submission.py` for pre-submission checks.
+  instructions, EDA insights, the implementation plan, the experiment
+  ledger, the submission manifest, the append-only agent log, and source
+  dataset provenance.
+- [`scripts/`](scripts/) — `push_kaggle_kernel.sh` (push a notebook to its
+  Kaggle kernel), `verify_submission.py` (pre-submission schema checks),
+  and `check_frames.py` (proves each experiment's feature frames are
+  actually built — added after a missing frame killed a kernel run).
 - `data/`, `predictions/` — local and generated, gitignored.
 
 ## Conventions

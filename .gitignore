@@ -21,6 +21,8 @@ data/*
 predictions/*
 !predictions/README.md
 submission.csv
+submission_fulldata.csv
+submission_f2.csv
 scratch/
 catboost_info/
 

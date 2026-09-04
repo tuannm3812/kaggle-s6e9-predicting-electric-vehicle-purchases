@@ -3,12 +3,11 @@
 Every leaderboard submission, recorded the moment it is scored, per
 `docs/0_coding_standards.md`. One submission per accepted hypothesis.
 
-| # | Date (UTC) | Sub id | Kernel / version | Model | OOF AUC (F1) | Public LB | Hypothesis → verdict |
+| # | Date (UTC) | Sub id | Kernel / version | Model | OOF AUC (fold def. noted) | Public LB | Hypothesis → verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 2026-09-01 13:19 | 55940961 | `ev-purchases-baseline-modeling` v2 | `e01_cat_2000x05` | 0.94177 (Kaggle run; 0.94176 local) | **0.94169** | CV tracks LB (EDA no-drift evidence) → **confirmed**: gap −0.00008, well inside fold std (~0.0007) |
 | 2 | 2026-09-01 19:27 | 55946584 | `ev-purchases-baseline-modeling` v3 | `e02_cat_interactions` | 0.94204 (Kaggle run) | **0.94198** | subsidy crosses improve the champion (E02, paired-gate promoted) → **confirmed**: LB +0.00029 vs. OOF +0.00027; CV↔LB gap −0.00006 |
 | 3 | 2026-09-02 02:02 | 55951839 | `ev-purchases-baseline-modeling` v4 | `e03_cat_int_avg5seeds` | 0.94223 (Kaggle run) | **0.94210** | interactions + seed-averaging are additive (E03) → **confirmed**: predicted OOF 0.94220, 3-seed delivered 0.94220 exactly; LB +0.00012 for OOF +0.00019 |
-
 | 4 | 2026-09-03 11:48 | 55980494 | `ev-purchases-baseline-modeling` v9 | `e06_cat_value_ids_src` | 0.94542 (Kaggle run) | **0.94562** | exact numeric values are identities the champion could not see (E06, paired-gate promoted 5/5, P=1.000) → **confirmed**: LB +0.00352 for OOF +0.00319; first positive CV↔LB gap (+0.00020) |
 | 5 | 2026-09-04 04:41 | 56004792 | `ev-purchases-baseline-modeling` v11 | `e08_avg3seeds` (gated) | 0.94550 | **0.94565** | 3-seed averaging still pays on the new representation (E08A, promoted 5/5) → **confirmed but far smaller than predicted**: +0.00007 OOF vs +0.00019 predicted; CV↔LB gap +0.00015 |
 | 6 | 2026-09-04 04:41 | 56004795 | `ev-purchases-baseline-modeling` v11 | `e08_fulldata_avg3` (**ungated**, no OOF) | — | **0.94569** | full-data refit improves test-time value statistics (E08B) → **direction confirmed, magnitude wrong**: +0.00004 vs +0.0001…+0.0003 predicted. Not promoted — below the noise floor |
@@ -18,13 +17,16 @@ Every leaderboard submission, recorded the moment it is scored, per
 
 - Submitted via the kernel-version flow (`-k tuannm3812/ev-purchases-baseline-modeling -v 2`),
   so the score is tied to code Kaggle executed (master standard §11).
-  Artifact pre-validated with `scripts/verify_submission.py` (286,571 rows,
-  range [0.0000, 0.9893]).
-- Quota use: 7 across 4 days. Five were backed by a paired-gate
-  promotion; submission 6 is the deliberate exception — an **ungated**
-  artifact submitted specifically because OOF cannot evaluate a
-  test-prediction strategy, with its hypothesis and falsification
-  threshold recorded before submission.
+  Every artifact is pre-validated with `scripts/verify_submission.py`
+  (columns, row count, id order, finiteness, range) — 286,571 rows each.
+  Ranges have widened as the models sharpened: submission 1 was
+  [0.0000, 0.9893], submission 7 is [0.0000047, 0.99979].
+- Quota use: 7 across 4 days. **Five** were backed by a paired-gate
+  promotion in the F1 class (1–5). **Two are deliberate exceptions**,
+  each predeclared with a falsification threshold before submission:
+  submission 6 (`e08_fulldata_avg3`) is ungated because no OOF exists
+  for a full-data refit, and submission 7 (`e09_f2_avg3seeds`) is
+  cross-class because an F2 OOF cannot be gated against an F1 champion.
 - Standing (mutable, re-check live): 79/157 → 83/227 → 106/280 →
   130/531 → 166/624 → **186/699** (26.6th percentile, snapshot
   2026-09-04; leader 0.94656, gap 0.00086). The field is dense here:
@@ -37,12 +39,15 @@ Every leaderboard submission, recorded the moment it is scored, per
   the final two-submission selection. The
   *rank number* rose while the score improved because the field is
   growing fast; percentile moved ~37% → ~24% on E06. Rank is not
-  evidence about the model — the OOF/LB deltas are. Leader 0.94644;
-  0.94562 sits ~0.0008 back, and the 95th-place score is 0.94602, so
+  evidence about the model — the OOF/LB deltas are. Leader was 0.94644 at that snapshot;
+  0.94562 sat ~0.0008 back and 95th place was 0.94602, so
   the field is dense here — small real gains still move rank a lot.
-- **CV↔LB tracking holds across all six**: gaps −0.00008, −0.00006,
-  −0.00013, +0.00020, +0.00015. The sign flipped at E06 and stayed
-  positive.
+  *(Superseded — see the standing bullet below for current numbers.)*
+- **CV↔LB tracking holds across all six OOF-backed submissions**: gaps
+  −0.00008, −0.00006, −0.00013, +0.00020, +0.00015, +0.00006 (the last
+  being submission 7's F2 OOF 0.94564 → 0.94570, an in-class gap).
+  Submission 6 has no OOF and so no gap. The sign flipped at E06 and
+  stayed positive.
 - **The explanation of that flip was wrong, and E08B corrected it**
   (2026-09-04). The original note here blamed value statistics being
   estimated from 668,665 rows at test time versus ~535k per fold. E08B

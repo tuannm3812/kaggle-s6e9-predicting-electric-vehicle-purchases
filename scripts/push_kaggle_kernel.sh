@@ -6,15 +6,18 @@
 # `kaggle kernels push`. The copied .ipynb is gitignored and regenerated
 # every run, so notebooks/ never has two versions to keep in sync by hand.
 #
-# Usage: scripts/push_kaggle_kernel.sh <eda|baseline|experiments>
+# Usage: scripts/push_kaggle_kernel.sh <eda|baseline>
 #
-# "eda" and "baseline" push the public kernels. "experiments" pushes the
-# same notebooks/02_baseline_modeling.ipynb source to a separate, private,
-# GPU-enabled kernel (notebooks/kernels/experiments/) used for
-# tuning/search runs -- kept out of the public baseline kernel's version
-# history. GPU availability does not imply the model code actually runs on
-# GPU; none of this project's LightGBM/CatBoost/HGB configurations select
-# GPU computation.
+# Both targets push public kernels. A third "experiments" target once
+# existed for a separate private GPU kernel, but notebooks/kernels/
+# experiments/ was never created, so the target could only ever fail at
+# the copy step; it is removed rather than left as a trap. Every run in
+# the ledger went through "baseline".
+#
+# On GPU: enabling it in kernel metadata does NOT make the model use it --
+# CatBoost must also be given task_type="GPU" (the notebook's USE_GPU flag
+# does this). Note that GPU results are a separate comparability class and
+# are screening-only here; see docs/0_coding_standards.md.
 
 set -euo pipefail
 
@@ -30,12 +33,8 @@ case "${1:-}" in
     NOTEBOOK="02_baseline_modeling.ipynb"
     KERNEL_DIR="$NOTEBOOKS_DIR/kernels/baseline_modeling"
     ;;
-  experiments)
-    NOTEBOOK="02_baseline_modeling.ipynb"
-    KERNEL_DIR="$NOTEBOOKS_DIR/kernels/experiments"
-    ;;
   *)
-    echo "Usage: $0 <eda|baseline|experiments>" >&2
+    echo "Usage: $0 <eda|baseline>" >&2
     exit 1
     ;;
 esac

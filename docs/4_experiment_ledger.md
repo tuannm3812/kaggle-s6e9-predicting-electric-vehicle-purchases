@@ -28,7 +28,9 @@ fold scheme gets a new tag (F2, …) and restarts comparability.
   no single fold driving the result). This selects a *working* champion for
   iteration; it is not a paired-gate promotion.
 - **Promotion gate (any later challenger vs. champion):** on aligned F1 OOF
-  predictions — (1) challenger wins ≥ 3 of 5 folds, (2) paired stratified
+  predictions — (1) challenger wins a **majority of folds** — ≥ 3 of 5 under F1, ≥ 6 of
+10 under F2 (derived in code as `n_splits // 2 + 1`; predeclared for F2
+on 2026-09-04, and E09's 9/10 clears it either way), (2) paired stratified
   bootstrap 95% CI of ΔAUC entirely > 0, (3) P(Δ>0) ≥ 0.95. All three must
   hold.
 - **Ensemble diversity bar:** blending is considered only if
@@ -154,7 +156,7 @@ gate always compares within-run vectors). Folds stay F1 — the fold seed
 
 | Candidate | Config | Hypothesis |
 | --- | --- | --- |
-| `e02_cat_interactions` | champion config + 3 subsidy crosses | explicit gate features improve split allocation beyond what CatBoost finds natively (EDA §5) |
+| `e02_cat_interactions` | champion config + 3 subsidy crosses | explicit gate features improve split allocation beyond what CatBoost finds natively (EDA insights §5) |
 | `e02_cat_avg3seeds` | champion config averaged over model seeds {42, 7, 2026} (components `e02_cat_s7`, `e02_cat_s2026`; seed-42 member is the champion re-fit) | seed-variance reduction lifts OOF AUC; plan's multi-seed condition is met (fold std ~0.0007 >> candidate gaps ~0.0002) |
 | `e02_cat_3000x035` | CatBoost `iterations=3000, learning_rate=0.035` | E01's winning direction (more budget, lower lr) has remaining headroom |
 | `e02_lgbm_1000x05_interactions` | LightGBM 1000×0.05 + the same 3 crosses | cheap family check of the interaction hypothesis |
@@ -305,7 +307,7 @@ depth, leaves) and every increase scored worse — recorded then as "the
 plateau is regularization-side, not capacity-starved". Regularization
 (`l2_leaf_reg`, `random_strength`, `bagging_temperature`) has never been
 varied: it is the one model axis with a documented reason to expect
-headroom. Separately, EDA §6 observed charging-station counts are flat
+headroom. Separately, EDA notebook §6 observed charging-station counts are flat
 marginally but was never converted into *conditional* features; feature-v2
 tests that directly.
 
@@ -313,7 +315,7 @@ tests that directly.
 v1 plus `Anxiety_x_Subsidy = (2 − anx_ordinal) × sub`,
 `EnvConcern_x_Income = Environmental_Concern_Level × Annual_Income_USD`,
 `Total_Stations = home + work stations`, and
-`Stations_x_NoHomeCharging = Total_Stations × (1 − hc)` — the EDA §6
+`Stations_x_NoHomeCharging = Total_Stations × (1 − hc)` — the EDA notebook §6
 hypothesis that public charging matters when home charging is absent.
 
 **Stage 1 — single-seed GPU candidates** (baseline
@@ -399,7 +401,7 @@ untested claim in an insight cell; it is now a tested and rejected one.
 
 ### Finding 3 — features v2 add nothing
 
-The EDA §6 hypothesis (`Stations_x_NoHomeCharging` — public charging
+The EDA notebook §6 hypothesis (`Stations_x_NoHomeCharging` — public charging
 should matter when home charging is absent), plus anxiety/income crosses,
 moved OOF +0.00003 and failed the gate. The subsidy-gate feature space
 appears exhausted: E02's three crosses captured what was there.
@@ -451,6 +453,11 @@ consequences:
   training data is the only lever left that could move more than
   0.0002), and any feature idea grounded in *new* evidence rather than
   re-permuting the existing columns.
+
+*(Append-only note added 2026-09-04: the dataset was identified the
+following day — see E05 below and `docs/7_source_dataset_provenance.md`.
+As extra training rows it was null; it is nonetheless used by the
+champion as a **feature** from E06 onward.)*
 
 
 ## E05 — Does the Source Dataset Help? (predeclared 2026-09-02, before execution)
@@ -1001,7 +1008,7 @@ property of the data.
   recorded, reproducible artifact and remains a candidate for the final
   submission pair, where two entries may be selected anyway.
 - **The noise floor for this representation is 0.00005**, not 0.00013.
-- Standing 166/624 (26.6th percentile), leader 0.94656, gap 0.00087.
+- Standing 166/624 (26.6th percentile), leader 0.94656; gap 0.00091 from the gated champion's 0.94565, 0.00087 from the ungated 0.94569.
 
 ## Fold definition F2 (introduced 2026-09-03 for E09)
 

@@ -170,7 +170,7 @@ its ledger rows will say "local". Recorded in
   before any promotion or submission. Had the cross-device rule not been
   predeclared before this run, a GPU champion would have looked like
   progress while losing more than the entire search had gained.
-- Features v2 (EDA §6 conditional charging + anxiety/income crosses):
+- Features v2 (EDA notebook §6 conditional charging + anxiety/income crosses):
   +0.00003, gate-rejected. Caveat recorded in the ledger that GPU's
   coarser binning could mask a small effect; not chased, because there is
   no positive signal to chase.
@@ -307,7 +307,7 @@ local `data/` (source file not present locally).
 
 - Predeclaration order is correct: ledger E06 at `b0beece` precedes
   notebook v7 at `7073d98`.
-- Local data reproduces the headline diagnostics in ledger E06 / EDA §10:
+- Local data reproduces the headline diagnostics in ledger E06 / EDA insights §10:
   13,214 distinct incomes; `30000` on 9.21% of rows; 0.58% of test
   incomes unseen in train; `astype(str)` keys are stable (match rate 1.0).
 - `make_features(value_ids=True)` builds the intended v3 frame (18 cols;
@@ -588,3 +588,58 @@ Also fixed a cosmetic defect the F2 run exposed: the gate printed
 "fold wins 9/5" because the denominator was hardcoded. It now reads the
 run's fold definition. Re-verified afterwards: `check_frames.py` ok on
 all 12 configurations, 16384/16384 dry-run combinations, 21 scenarios.
+
+## 2026-09-04 — Submission 7 scored; then a full repo audit and cleanup
+
+**Submission 7** (`e09_f2_avg3seeds`, kernel v13): public **0.94570**,
++0.00005 over the champion and **inside** the predicted +0.00003…+0.00012
+band. Standing 186/699. "Champion" and "best submission" now deliberately
+name different artifacts — `e08_avg3seeds` holds the gated title in class
+F1, while the better public score lives in class F2 and cannot be gated
+against it.
+
+**Five free screens, all null** (~10 min of local compute, vs ~5 h for a
+speculative kernel run): no train/test duplicate rows, no `id` signal,
+joint value identities too sparse, artifact blending +0.000008, and — the
+most promising idea — a decorrelated LightGBM partner that stays 0.0033
+behind even with leak-free nested target encoding. That last screen
+produced a genuinely useful fact: **naive target encoding hurts
+(−0.00264) because a training row's encoding contains its own label;
+nested encoding recovers +0.00433.** That is exactly what CatBoost's
+ordered target statistics do automatically, and it explains CatBoost's
+dominance here better than "it is a better booster" does.
+
+**Repo audit (subagent) — findings verified by hand before acting.**
+Two were materially wrong, not merely stale:
+
+1. **`docs/7` claimed the source dataset "is not used by the champion and
+   will not be used in any submission."** False since E06: the champion is
+   fit on features v3 **plus** the source income lookup, and four of seven
+   submissions depend on it — so the CC0 citation obligation was live
+   while the doc said it wasn't. Corrected, with the superseded sentence
+   quoted so the error stays visible.
+2. **The gate's fold-win threshold was the literal `3`.** Correct under
+   F1, but under F2 it meant 3 of 10 — a far weaker bar than the gate was
+   ever meant to impose. Now derived as `n_splits // 2 + 1` (3 under F1,
+   6 under F2) and predeclared in the ledger. E09's 9/10 clears either
+   way, so no recorded result changes.
+
+Also fixed: a blank line that split the submission manifest into two
+tables and left rows 4–7 without headers; three different champions named
+in one section of the plan; `AGENTS.md` still leading with "the source
+dataset is unidentified"; a **public** notebook cell naming
+`e01_cat_2000x05` as champion and an empty E09 insight placeholder;
+`README` frozen at E03; `requirements.txt` unpinned (now pinned to the
+kernel-v13 versions, an audit item open since 2026-09-02); `.gitignore`
+missing the two new submission artifacts; a `push_kaggle_kernel.sh`
+target pointing at a directory that never existed; the reproducibility
+snapshot omitting **catboost**, the one library that produces the
+champion; and ambiguous `EDA §N` citations that resolved against two
+different numbering schemes.
+
+Deleted `notebooks/submission.csv` — a 7.9 MB pre-E01 artifact, three
+representations and seven submissions out of date.
+
+Verified after: `check_frames.py` ok on all 12 configurations,
+16384/16384 dry-run combinations, 21 scenarios, and a targeted test that
+the new threshold is 3 under F1 and 6 under F2.

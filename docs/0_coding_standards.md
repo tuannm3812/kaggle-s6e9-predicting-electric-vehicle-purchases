@@ -24,7 +24,7 @@ Notebook-first Kaggle workflow, matching
   `kernel-metadata.json`.
 - `docs/` — durable findings and decisions, numbered per master standard §2.
 - `scripts/` — small CLI helpers only (`push_kaggle_kernel.sh`,
-  `verify_submission.py`), never core logic.
+  `verify_submission.py`, `check_frames.py`), never core logic.
 - `data/` — local Kaggle files. **Gitignored.**
 - `predictions/` — OOF and test prediction matrices. **Gitignored.**
 
@@ -55,6 +55,17 @@ consequences:
 - Record the fold definition (n_splits, seed, stratification key) in the
   experiment ledger the first time it is used.
 
+**Fold definitions are a comparability class (added 2026-09-03).** F1 is
+`StratifiedKFold(5, shuffle=True, random_state=42)`; F2 is the same with
+10 splits. An F1 OOF and an F2 OOF are different measurements and must
+never be gated against each other — more training data per fold flatters
+OOF, which is the treatment under test rather than a confound. This sits
+at the same level of consequence as the CPU/GPU rule, and like it is
+enforced in code: `paired_gate` asserts both runs share a definition,
+`register_average` refuses members spanning classes, and §9 filters
+promotions to the champion's class. A cross-class claim is settled by
+leaderboard instead, with its prediction fixed in advance.
+
 ## Promotion gate
 
 Carried forward from S6E7 and S6E8, which both used it to stop wasted work:
@@ -73,7 +84,9 @@ Carried forward from S6E7 and S6E8, which both used it to stop wasted work:
 - Notebook-based submission where the competition supports it (master
   standard §11). Confirm which applies — see `docs/1_instructions.md`.
 - Run `scripts/verify_submission.py` against `sample_submission.csv` before
-  every submission: column names, row count, dtypes, and value range.
+  every submission: column names, row count, **id order**, finiteness, and
+  value range. (It does not check dtypes; an earlier version of this line
+  said it did.)
 - Record every submission in the submission manifest with its notebook version
   and the decision it supported. Never let a scored submission go unrecorded.
 

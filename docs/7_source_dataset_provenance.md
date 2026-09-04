@@ -77,10 +77,29 @@ untested lever and it is cheap; it is not worth optimism.
   training distribution keeps the competition's no-missing regime rather
   than teaching the model a NaN branch that can never fire at test time.
 
-## Outcome (E05, 2026-09-02)
+## Outcome — two different uses, only one of them null
 
-Tested as extra training rows in training folds only, under the standing
-paired gate (`docs/4_experiment_ledger.md`, E05). **Null:** +0.00001 OOF
-AUC, 95% CI (−0.000049, +0.000073), P(Δ>0) = 0.627. The dataset is not
-used by the champion and will not be used in any submission; this file
-remains as provenance only.
+**As extra training rows (E05, 2026-09-02): null.** Appended to the
+training portion of each fold, it moved OOF +0.00001, 95% CI (−0.000049,
++0.000073), P(Δ>0) = 0.627. That use is closed.
+
+**As a feature (E06 onward, 2026-09-03): in use by the champion.** E06
+reintroduced the dataset in a different role — a per-income lookup of the
+*source rows' own* label rate and count (`Src_Income_Rate`,
+`Src_Income_N`), which touches no competition target and so needs no fold
+handling. The champion `e08_avg3seeds` is fit on features v3 **plus this
+lookup**, as were E07 and E09, and the kernel attaches the dataset via
+`notebooks/kernels/baseline_modeling/kernel-metadata.json`.
+
+**The citation obligation in "Usage rules" above is therefore live**, not
+hypothetical: submissions 4, 5, 6 and 7 all depend on this dataset.
+
+**Caveat worth recording:** E06 Finding 2 measured the lookup's own
+contribution at **+0.000018** — indistinguishable from zero, and below
+even the current 0.00005 noise floor. The champion could drop the
+dependency for about −0.00002. It carries it only because the predeclared
+rule was "the higher-OOF arm wins" and the lookup arm won by that margin.
+
+*(An earlier version of this section read "The dataset is not used by the
+champion and will not be used in any submission." That was written after
+E05 and was already false once E06 landed; corrected 2026-09-04.)*

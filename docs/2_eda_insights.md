@@ -105,9 +105,9 @@ in **~21 s** locally. The scale override stays in force (measure the first
 full-data *model* fit before any sweep), but the data is lighter than the
 7.7 MB sample-submission size implied.
 
-## 9. Next Moves (Baseline Phase Priority Order)
+## 9. Baseline-Phase Plan, As Written on 2026-09-01 *(all items now complete — kept for the record)*
 
-This section is the **only** home for the EDA's forward plan — the
+**Superseded.** Every item below was carried out (items 1–3 in v1/v2, item 4 promoted as E02). Forward strategy now lives in `docs/3_implementation_plan.md` and `docs/4_experiment_ledger.md`, per `docs/0_coding_standards.md`. When written, this section was the only home for the EDA's forward plan — the
 notebook itself carries findings only (`docs/0_coding_standards.md`).
 
 1. Fixed folds, defined once: `StratifiedKFold(n_splits=5, shuffle=True,

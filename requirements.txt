@@ -1,12 +1,15 @@
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-scipy
-lightgbm
-xgboost
-catboost
+# Pinned to the versions the Kaggle worker ran for kernel v13 (notebook
+# v10), which is the trusted execution environment for every ledger row.
+# The reproducibility snapshot in the notebook prints these at run time;
+# if a future kernel image moves, update both together.
+catboost==1.2.10
+lightgbm==4.6.0
+numpy==2.0.2
+pandas==2.3.3
+scikit-learn==1.6.1
+scipy==1.13.1
+matplotlib==3.9.4
+seaborn==0.13.2
 jupyter
 ipykernel
 kaggle

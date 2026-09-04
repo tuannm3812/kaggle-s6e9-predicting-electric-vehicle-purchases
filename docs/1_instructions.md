@@ -101,12 +101,12 @@ Playground Series accepts this; verified in practice on earlier episodes.
 
 ## Still open
 
-- [ ] **Original source dataset.** Playground data is normally generated from
-      a real dataset, usually named on the Data tab. The page prose is not
-      fetchable by URL, and a web search on the distinctive column names
-      (2026-09-01) found no public dataset with this schema. If the Data tab
-      names one, record it in a provenance doc and check whether the original
-      is usable as extra training data.
+- [x] **Original source dataset** — **identified 2026-09-02** as
+      `itzzomkar/ev-adoption-behavior-and-range-anxiety` (CC0). Provenance,
+      licence and usage recorded in
+      [`docs/7_source_dataset_provenance.md`](7_source_dataset_provenance.md).
+      Tested as extra training rows (E05: null) and later used as a
+      *feature* by the champion (E06 onward).
 - [ ] **Overview/Evaluation prose verbatim.** Nice-to-have for the record;
       the operative facts (metric, format) are already verified via API +
       files above.
@@ -116,4 +116,7 @@ Playground Series accepts this; verified in practice on earlier episodes.
 1. ~~Join the competition~~ — **done** (2026-09-01).
 2. ~~Download data~~ — **done** (2026-09-01, `data/`, gitignored).
 3. ~~Fill in metric / target / format / task type~~ — **done**, above.
-4. `notebooks/01_eda.ipynb` — next.
+4. ~~`notebooks/01_eda.ipynb`~~ — **done** (2026-09-01, published as EDA
+   kernel v3).
+5. ~~Modeling~~ — **done**: E01–E09, see
+   [`docs/4_experiment_ledger.md`](4_experiment_ledger.md).
