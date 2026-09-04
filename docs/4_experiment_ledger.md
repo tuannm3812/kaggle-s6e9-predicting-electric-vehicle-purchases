@@ -1002,3 +1002,69 @@ property of the data.
   submission pair, where two entries may be selected anyway.
 - **The noise floor for this representation is 0.00005**, not 0.00013.
 - Standing 166/624 (26.6th percentile), leader 0.94656, gap 0.00087.
+
+## Fold definition F2 (introduced 2026-09-03 for E09)
+
+`StratifiedKFold(n_splits=10, shuffle=True, random_state=42)`.
+
+F1 (5-fold) remains the project's default and every historical row stays
+F1. F2 exists only to test fold count. **An F1 OOF and an F2 OOF are a
+different comparability class** — see the E09 rules below for exactly
+which comparisons are legitimate.
+
+## E09 — Does 10-Fold Beat 5-Fold? (predeclared 2026-09-04, before execution)
+
+Kaggle kernel v12, notebook v10, **CPU**, fold definition **F2**, champion
+config (features v3 + source lookup), seeds 42 / 7 / 2026. Last of the
+agreed three-run sequence.
+
+**Why, and why it is better motivated now than when it was planned.**
+E08B separated two effects that had been conflated. Going from 5 to 10
+folds improves *both* of them at once: each fold model trains on ~602k
+rows instead of ~535k (the data-volume effect, measured at ~+0.00004 at
+its full-data limit), and each test row is predicted by an average of 10
+fold models instead of 5 (the ensembling effect, which E08B implied is
+the larger share of the LB>OOF gap).
+
+| Run | Description |
+| --- | --- |
+| `e09_f2_s42`, `e09_f2_s7`, `e09_f2_s2026` | champion config under F2, one per seed |
+| `e09_f2_avg3seeds` | element-wise mean — the candidate |
+
+### What may and may not be gated — stated before seeing any number
+
+1. **Legitimate, standard gate (F2 vs F2):** `e09_f2_avg3seeds` vs
+   `e09_f2_s42`. This gates *seed averaging under F2* and nothing else.
+2. **Legitimate but a NEW comparability class:** `e09_f2_s42` vs
+   `e08_s42`, paired bootstrap on identical rows. Both are honest OOF
+   vectors over the same 668,665 rows with the same labels and the same
+   config and seed — only the fold count differs, which is the treatment
+   rather than a confound. **It is nonetheless biased toward F2 by
+   construction** (more training data always flatters OOF), so it is
+   recorded as a *cross-class observation*, never as a promotion. It is
+   computed locally from saved matrices, so it costs no kernel time.
+3. **NOT legitimate:** treating an F2 OOF number as comparable to the
+   standing champion's F1 OOF of 0.94550, or entering F2 rows into the
+   F1 series. The champion's OOF and an F2 OOF do not share a row.
+
+**Because of (3), the fold-count claim cannot be settled by OOF.** It is
+settled the same way E08B was: a leaderboard comparison against the
+standing champion's 0.94565, with the prediction fixed in advance.
+
+**Falsifiable predictions — deliberately scaled down, having
+over-estimated by ~3× twice in E08:**
+
+1. `e09_f2_s42` OOF exceeds `e08_s42` (0.94542) by **+0.00008 to
+   +0.00020**. Below +0.00005 (the new noise floor) means fold count
+   does not matter even for OOF, and E09 closes the axis.
+2. `e09_f2_avg3seeds` scores **+0.00003 to +0.00012** above 0.94565 on
+   the public leaderboard. A *negative* result would mean the extra
+   ensembling and data do not survive to test, which would contradict
+   E08B's reading and require correcting it.
+3. Seed averaging under F2 gains **less** than the +0.00007 it gained
+   under F1 — 10-fold models are already an average of twice as many
+   models, so there is less variance left to remove.
+4. Runtime ~7.7 h (10 folds × ~602k rows × 3 seeds), padded to a 9 h
+   expectation. E07 taught me to pad rather than trim.
+
+*(results pending — notebook v10 kernel run)*
