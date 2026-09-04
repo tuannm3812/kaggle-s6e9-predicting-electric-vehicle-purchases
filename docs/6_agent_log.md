@@ -643,3 +643,47 @@ representations and seven submissions out of date.
 Verified after: `check_frames.py` ok on all 12 configurations,
 16384/16384 dry-run combinations, 21 scenarios, and a targeted test that
 the new threshold is 3 under F1 and 6 under F2.
+
+## 2026-09-04 — A user question surfaced a champion-re-fit defect
+
+Asked what would happen if the notebook were run to produce a submission.
+Checking rather than answering from memory found a real defect, and the
+answer would have been wrong if I had guessed.
+
+**The defect.** §5's champion re-fit ran
+`run_cv(BASELINE_CHAMPION, champion_factory, X_int, X_test_int,
+cat_features=BASE_CATEGORICALS)` under the comment *"Only valid when
+BASELINE_CHAMPION names a single-model config"*. Since E08 the champion
+is `e08_avg3seeds` — a **3-seed average on features v3 + source lookup**.
+So `RUN_CHAMPION=True` with no experiment active would have:
+
+1. fit a **single** model, not the 3-seed average;
+2. on `X_int` — the **pre-E06 frame, missing the value identities worth
+   +0.00337**;
+3. registered it under the average's name; and
+4. written `submission.csv` from it, with `SUBMIT_OK` True.
+
+Confirmed by running that exact configuration through the dry-run: one
+fit, champion `e08_avg3seeds`, `submission.csv` written. A submission
+about **0.0034 worse than the champion, labelled as the champion**.
+
+**Why the existing tests missed it.** The 16,384-combination sweep checks
+that no combination raises. This one raised nothing — it quietly did the
+wrong thing. A sweep for exceptions is not a correctness test.
+
+**The fix.** The champion's composition is now data next to the pointer
+(`CHAMPION_SEEDS`, `CHAMPION_IS_AVERAGE`, reusing `CHAMPION_FOLDS`), and
+§5 reproduces it faithfully — three seeds, features v3 + source lookup,
+fold class F1 — or refuses when the source dataset is absent, instead of
+silently substituting a different model. `CHAMPION_REFIT` is derived once
+and feeds `NEEDS_SOURCE` / `NEEDS_VALUE_ID_FRAMES` so §2 builds the
+frames it needs.
+
+Three champion-re-fit scenarios are now permanent dry-run cases asserting
+*what is fit and what is written*: reproduces all three seeds and writes
+a submission; refuses with no artifact when the source is missing; stands
+down when an experiment is active. Full suite after the fix: 16384/16384
+combinations, 24 scenarios, `check_frames.py` ok on all 12 configurations.
+
+Recorded in `docs/0_coding_standards.md` as the third instance of
+"a precondition in prose is not a precondition".

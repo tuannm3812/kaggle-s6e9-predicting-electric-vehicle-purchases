@@ -190,6 +190,29 @@ it next to the flags, and say in a comment that new flags are added there
 rather than at each use site. More generally: when a bug class recurs,
 change the structure that permits it, not just the instance.
 
+**A precondition in a comment is not a precondition (2026-09-04, third
+instance of this pattern).** §5's champion re-fit carried the comment
+*"Only valid when BASELINE_CHAMPION names a single-model config"*. By
+notebook v10 the champion was a **3-seed average on features v3**, so a
+run with `RUN_CHAMPION=True` and no experiment active would fit **one**
+model on the **pre-E06 frame**, register it under the average's name, and
+write `submission.csv` from it — an artifact roughly **0.0034 worse**,
+labelled as the champion. The 16,384-combination sweep passed it, because
+the sweep asserts that nothing *crashes*, not that the right model was
+fit.
+
+The fix makes the champion's composition **data** (`CHAMPION_SEEDS`,
+`CHAMPION_IS_AVERAGE`, `CHAMPION_FOLDS`) and has §5 reproduce it or
+refuse. Two general rules follow, both learned the hard way here:
+
+- **When a section's correctness depends on a fact about a moving
+  pointer, encode the fact next to the pointer.** Every time this project
+  wrote the dependency as prose instead, it broke on the next promotion.
+- **A sweep that only checks for exceptions is not a correctness test.**
+  Add assertions about *what was fit and what was written*, not just that
+  the cell ran. The champion-re-fit scenarios are now permanent cases in
+  the dry-run.
+
 **A stub that supplies what §2 should build cannot test §2 (2026-09-04).**
 The enumerated-flag bug above recurred a *third* time — the guard
 `if (RUN_E06 or RUN_E07 or RUN_E08)` around the value-identity feature
