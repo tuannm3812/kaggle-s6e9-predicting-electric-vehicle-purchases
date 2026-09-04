@@ -1171,3 +1171,63 @@ measure of the OOF bias this predeclaration warned about.
   candidate for one on the table. Predeclare nothing further without
   evidence first; the cheap local diagnostics that found E06 cost
   minutes, while a speculative kernel run costs hours.
+
+## Post-E09 free screens (2026-09-04, local, ~10 min of compute)
+
+Five ideas tested before predeclaring anything, per the plan's rule that
+evidence comes first and cheaply. **All five closed.** Total cost was
+about ten minutes against the ~5 h a speculative kernel run would have
+taken.
+
+**1. Exact duplicate rows between train and test — none.** 0 of 286,571
+test rows match a train row on all 13 features, and train has 0 internal
+duplicates. The generator does not reuse whole rows, only column values
+(which is exactly what E06 exploits).
+
+**2. `id` carries no signal.** corr(id, y) = −0.00001, AUC of raw `id` =
+0.49999, positive rate across id-vigintiles spans 0.1705–0.1777. No row
+ordering artefact.
+
+**3. Joint value identities are too sparse where they would matter.**
+(income, commute) makes 422,843 pairs with median count 1 — only 22% of
+rows sit in a pair seen ≥20 times. The pairs that *are* dense
+(commute+age, commute+stations) are combinations of low-cardinality
+columns that trees already split on, and E07 measured that as null.
+
+**4. A strong decorrelated partner — the most promising remaining idea —
+fails, and the reason is instructive.** Screened on a **150,000-row
+subsample, seed 202609** (not comparable to full-data rows):
+
+| Model (subsample) | AUC |
+| --- | --- |
+| LightGBM, no value identity | 0.93701 |
+| LightGBM + naive target encoding | 0.93438 |
+| LightGBM + **nested** (leak-free) target encoding | 0.93871 |
+| CatBoost + value-id categoricals | **0.94196** |
+
+*Naive target encoding **hurts** (−0.00264 vs base):* encoding a training
+row from a statistic containing its own label leaks, the model
+over-trusts the feature, and it fails on validation. Computing the
+training-fold encoding through a nested inner 5-fold fixes it (+0.00433
+recovery, +0.00170 over base). **This is precisely what CatBoost's
+ordered target statistics do automatically, and it explains why CatBoost
+dominates this dataset** — the E06 gain was never really about CatBoost
+being a better booster.
+
+Even fixed, LightGBM stays **0.00326 behind**. Correlation 0.9844 clears
+the 0.995 diversity bar, and the best rank blend is **+0.00002**. The
+same lesson as the earlier blend screen: the bar is necessary, not
+sufficient, and a partner 0.003 weaker cannot pay its way in.
+
+**5. Blending the three submitted artifacts — nothing there.** Test
+predictions correlate 0.99961–0.99989; the F1/F2 champion OOF blend gains
+**+0.000008**. All far above the diversity bar.
+
+### Assessment (2026-09-04)
+
+The CatBoost + value-identity approach is at its ceiling. Every
+enumerated axis is measured, and today's five screens found no new one.
+The remaining 0.00086 to the leader would need a representational insight
+of the kind E06 was, and **there is no candidate on the table.** Stating
+that plainly is more useful than manufacturing another experiment: the
+project's own record shows tuning-shaped work returning ~0.00005 a run.
