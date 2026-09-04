@@ -527,3 +527,38 @@ Dry-run: **16384/16384** flag combinations clean, 21 scenarios pass, plus
 a direct negative test proving the cross-class gate and average both
 raise (and that a same-class gate still works). Two initial failures were
 stale expectations of mine, not defects.
+
+## 2026-09-04 — Kernel v12 ERRORED: the enumerated-flag bug, third occurrence
+
+`NameError: X_v3s` ~10 minutes in, at E09's first fit. The guard building
+the value-identity frames read `if (RUN_E06 or RUN_E07 or RUN_E08)` and
+was never updated for E09 — the same failure mode as the `SOURCE_FRAME`
+guard I fixed two runs ago, at a *different* site I did not check.
+
+**Why the dry-run missed it, which is the part worth keeping.** The
+harness pre-defines `X_v3s` and every other frame so it can sweep 16,384
+flag combinations cheaply. That injection is exactly what §2 was failing
+to do, so the harness was structurally blind to the bug: **a stub that
+supplies the artefact under test cannot test whether it exists.** All
+16,384 combinations passed a notebook that could not run.
+
+The E07 version of this bug was caught by a *smoke check* that executes
+the real §2 against local data. I ran that for E07 and skipped it for
+E09 — so the safeguard existed and I failed to apply it.
+
+**Structural fixes rather than another patch:**
+
+- Guard derived once as `NEEDS_VALUE_ID_FRAMES`, beside `NEEDS_SOURCE`
+  and `EXPERIMENT_ACTIVE`.
+- New `scripts/check_frames.py` executes the real Config and Data cells
+  per experiment flag and statically resolves every frame name that
+  experiment references. It reproduces the failure on the old notebook
+  and passes on the fixed one, and it now covers **all twelve**
+  experiment configurations — not just the one being pushed. Its first
+  run also surfaced two false-positive classes (names assigned inside
+  the cell), now handled.
+- Recorded in `docs/0_coding_standards.md` as a rule about harness
+  design, not just about this guard.
+
+Cost: ~10 minutes of Kaggle compute, no submission wasted, no data lost.
+Cheap for the lesson, but it is the third instance of one bug class.

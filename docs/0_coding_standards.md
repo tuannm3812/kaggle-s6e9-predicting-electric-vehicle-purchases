@@ -177,6 +177,25 @@ it next to the flags, and say in a comment that new flags are added there
 rather than at each use site. More generally: when a bug class recurs,
 change the structure that permits it, not just the instance.
 
+**A stub that supplies what §2 should build cannot test §2 (2026-09-04).**
+The enumerated-flag bug above recurred a *third* time — the guard
+`if (RUN_E06 or RUN_E07 or RUN_E08)` around the value-identity feature
+frames was not updated for E09 — and kernel v12 died on
+`NameError: X_v3s` after reaching the first fit. The 16,384-combination
+dry-run passed it, because the harness pre-defines `X_v3s` and every
+other frame in order to sweep cheaply. **A harness that injects the
+artefact under test is blind to that artefact's absence.**
+
+Two fixes, both structural:
+
+- The guard is derived once (`NEEDS_VALUE_ID_FRAMES`, beside
+  `NEEDS_SOURCE` and `EXPERIMENT_ACTIVE`) rather than repeated.
+- `scripts/check_frames.py` executes the **real** Config and Data cells
+  for each experiment flag and statically resolves every frame name that
+  experiment references, so a missing frame fails locally in seconds.
+  Run it before every push; the fast dry-run covers control flow, this
+  covers frame availability, and neither substitutes for the other.
+
 **Dry-run every branch before spending platform compute.** Stub the
 harness, execute the notebook's control flow with fake numbers, and assert
 on fit counts, which runs receive extra data, which candidate is selected,
