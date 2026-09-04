@@ -899,4 +899,106 @@ average stays — in which case the +0.00020 explanation in
 668k rows, no folds). Total ~5.2 h — budgeted with E07's corrected
 figure, having under-estimated that run by an hour.
 
-*(results pending — notebook v9 kernel run)*
+### Results — Part A (Kaggle kernel v11, notebook v9, CPU, F1 folds)
+
+| Run | OOF AUC | fold std | Wall |
+| --- | --- | --- | --- |
+| `e08_s42` | 0.94542 | 0.00062 | 4,094 s |
+| `e08_s7` | 0.94544 | 0.00064 | 4,102 s |
+| `e08_s2026` | 0.94539 | 0.00062 | 4,135 s |
+| **`e08_avg3seeds`** | **0.94550** | 0.00063 | (sum) |
+
+**Paired gate vs. `e08_s42`:** **5/5 fold wins**, 95% CI (+0.000053,
++0.000099), P(Δ>0) = 1.000 → **promoted**. New champion, since 0.94550
+also clears the 0.94542 standing floor.
+
+`e08_s42` is **bit-identical** to `e06_cat_value_ids_src` (fifth
+consecutive CPU reproducibility confirmation).
+
+### The prediction failed its own falsification test — averaging does NOT transfer
+
+Predicted **+0.00019**, citing E03's measurement of the identical
+operation. Delivered **+0.00007**. The predeclaration named the
+threshold in advance: *"if averaging now returns less than +0.00010,
+seed variance is not additive with the value-identity features and the
+E03 result does not generalise across representations."* It returned
++0.00007. **So the E03 additivity result does not generalise, and this
+is recorded as a failed prediction even though the gate promoted the
+candidate.**
+
+The promotion is nonetheless real, not noise, and the reason is the
+finding underneath:
+
+**The single-seed noise floor collapsed from 0.00013 to 0.00005.** The
+three seeds span 0.94539–0.94544. On the pre-E06 representation the same
+three seeds spanned 0.00013. Value identities are a *deterministic*
+signal — the same value gets the same statistic regardless of seed — so
+they replace seed-sensitive tree structure with seed-stable encoding.
+That explains both halves at once: there is less seed variance left to
+average away (hence +0.00007, not +0.00019), and +0.00007 is still
+comfortably above the new 0.00005 floor (hence 5/5 folds and a CI
+excluding zero).
+
+**Consequence for the rest of the project:** every "below the noise
+floor" judgement made before E06 used 0.00013. On this representation
+the floor is **0.00005**, so effects previously dismissible are now
+measurable — but E07's arms (+0.00001, +0.00004) remain null even
+against the lower floor, so no earlier conclusion flips.
+
+### Results — Part B (ungated)
+
+`e08_fulldata_avg3` fit on all 668,665 rows, 3 seeds, 3,145 s. It has no
+OOF **by construction** and never entered the gate or champion selection
+(it lives in `fulldata_test_store`; the dry-run asserts its absence from
+`test_store` and `gate_results`). Its test predictions correlate
+**0.99961** with the gated champion's, with a slightly higher mean
+(0.17487 vs 0.17462) and a fatter upper tail (q95 0.8196 vs 0.8163) —
+consistent with better-estimated statistics rather than a different
+model.
+
+Both artifacts validated: 286,571 rows, all-unique predictions, in range.
+
+**Paired leaderboard comparison (2026-09-04, submissions 5 and 6, same
+kernel version, same test rows):**
+
+| Artifact | Model | OOF | Public LB |
+| --- | --- | --- | --- |
+| `submission.csv` | `e08_avg3seeds` (gated) | 0.94550 | 0.94565 |
+| `submission_fulldata.csv` | `e08_fulldata_avg3` (ungated) | — | **0.94569** |
+
+**Prediction wrong again — direction right, magnitude badly over-stated.**
+Predicted +0.0001…+0.0003; delivered **+0.00004**, below the low end and
+below even the *new* 0.00005 noise floor. Two failed magnitude
+predictions in one experiment (Part A +0.00007 vs +0.00019 predicted,
+Part B +0.00004 vs +0.0001 predicted) is a pattern worth naming: **on
+this representation I have been over-estimating effect sizes by roughly
+3×**, and future predeclarations should be scaled accordingly.
+
+**But the comparison is still decisive, and it corrects the record.**
+The full-data arm averages only **3 models**; the gated champion's test
+prediction averages **15** (3 seeds × 5 folds). Full-data won *despite*
+a 5× model-averaging disadvantage, so the data-volume effect on value
+statistics is real — just small.
+
+**Correcting `docs/5_submission_manifest.md`'s explanation of the
++0.00020 LB>OOF gap.** That note attributed the gap to statistics being
+estimated from 668k rows at test time versus ~535k per fold. This
+experiment isolates that mechanism and measures it at **+0.00004** —
+roughly a fifth of the gap. The larger share is a different asymmetry
+the note missed: **each OOF row is predicted by a single model, while
+each test row is predicted by the average of all fold models.** Test
+predictions get ensemble variance reduction that OOF never receives, so
+LB>OOF is mostly an artefact of how the two are constructed, not a
+property of the data.
+
+### Decisions (2026-09-04, post-E08)
+
+- **Champion: `e08_avg3seeds`** (OOF 0.94550, public 0.94565) — promoted
+  through the gate.
+- **The full-data variant is NOT promoted**, despite the higher LB.
+  +0.00004 on a single leaderboard comparison, below the noise floor, is
+  exactly the kind of margin the gate exists to refuse. It is kept as a
+  recorded, reproducible artifact and remains a candidate for the final
+  submission pair, where two entries may be selected anyway.
+- **The noise floor for this representation is 0.00005**, not 0.00013.
+- Standing 166/624 (26.6th percentile), leader 0.94656, gap 0.00087.
