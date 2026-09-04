@@ -1238,3 +1238,37 @@ The remaining 0.00086 to the leader would need a representational insight
 of the kind E06 was, and **there is no candidate on the table.** Stating
 that plainly is more useful than manufacturing another experiment: the
 project's own record shows tuning-shaped work returning ~0.00005 a run.
+
+
+## R1 — End-to-End Champion Reproduction (predeclared 2026-09-05, before execution)
+
+Kaggle kernel v14, notebook v11, **CPU**, fold class F1. Not an
+experiment: no candidate, no gate, no new configuration. It re-fits the
+standing champion `e08_avg3seeds` from the current notebook and checks
+the artifact against the one already on the leaderboard.
+
+**Why it is worth 4 h of compute now that search is over.** Every prior
+reproduction was incidental — a baseline that happened to match. This is
+the first run whose *purpose* is the check, and it exercises the repaired
+§5 path end to end. It also validates the composition-as-data fix: until
+2026-09-05 this exact configuration would have fit a single model on the
+pre-E06 frame and written a submission ~0.0034 worse under the champion's
+name.
+
+**Falsifiable predictions, stated before the run:**
+
+1. `e08_avg3seeds` reproduces **bit-identically** to kernel v11's vector
+   (`np.array_equal` True, OOF exactly 0.94550). CPU runs here have been
+   bit-identical five times; a mismatch would mean notebook v11 is not
+   the code that produced the champion, and the champion would need
+   re-deriving before the deadline.
+2. `submission.csv` is byte-identical in its predictions to submission 5,
+   so re-submitting it would score exactly **0.94565**.
+3. Three fits at ~4,100 s each → **~3.5 h**, under the 5.2 h that three
+   10-fold fits took.
+
+**No submission will be made from this run** — submission 5 already holds
+the identical artifact, and spending a quota slot to re-score the same
+predictions proves nothing the file comparison does not.
+
+*(results pending — notebook v11 kernel run)*
