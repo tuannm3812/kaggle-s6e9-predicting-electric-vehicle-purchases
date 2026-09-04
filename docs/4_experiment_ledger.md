@@ -1353,3 +1353,55 @@ value-identity configuration at correlation 0.998–0.9999, and the
 genuinely different families are 0.003+ weaker, which no meta-learner can
 repair. That is the same wall the blending and LightGBM-partner screens
 hit, reached by a third route.
+
+## E10 — CTR Type: How the Value Statistic Is Estimated (predeclared 2026-09-05, before execution)
+
+Kaggle kernel v15, notebook v12, **CPU**, fold class **F1**, seed 42.
+
+**Why this axis and not another.** E06 established that the whole game
+here is a target statistic over exact values; E07 then closed CTR
+*complexity* (how many categoricals combine). It never touched CTR
+**type** — the estimator itself. That is the knob closest to the only
+mechanism that has ever paid in this project, and it is the last
+untested one.
+
+**Screened in F1, deliberately, despite E09 making F2 the default for new
+work.** An F1 fit costs ~4,100 s against ~6,100 s, and a CTR-type effect
+large enough to matter would show in either. **Anything that promotes
+here must be re-fit under F2 before it can become a submission** — the
+same screen-then-confirm pattern used for GPU.
+
+| Run | Description |
+| --- | --- |
+| `e10_base` | champion config — in-run gate baseline; expected to reproduce 0.94542 exactly |
+| `e10_onehot10` | `one_hot_max_size=10`, so the five low-cardinality categoricals are one-hot encoded and CTR is reserved for the two high-cardinality value identities |
+| `e10_ctr_binarized` | `simple_ctr=["BinarizedTargetMeanValue","Counter"]` — a different estimator for the same per-value statistic |
+| `e10_ctr_comb` | `combinations_ctr=["Borders","Counter"]` — adds a count-based estimator to the *combination* CTRs that E07 proved carry real signal |
+
+All four configurations were smoke-tested locally for validity before
+this predeclaration; a fifth (`FeatureFreq` in `simple_ctr`) was rejected
+by CatBoost as invalid for this loss and dropped rather than discovered
+mid-run.
+
+**Promotion criteria:** the standing paired gate vs. `e10_base`, majority
+of folds (≥3 of 5 under F1), CI above zero, P(Δ>0) ≥ 0.95. A promoted arm
+takes no submission slot directly — it earns an F2 re-fit.
+
+**Falsifiable predictions, stated before the run:**
+
+1. **All three arms land within ±0.0002 of baseline, and most likely
+   none promotes.** This is a screen of a plausible axis, not a
+   confident bid. The honest prior after E07's saturation result and
+   five null free screens is that the model is estimator-insensitive.
+2. If any arm does promote, `e10_ctr_binarized` is the most likely —
+   it changes the estimator for the value statistic itself, where
+   `e10_onehot10` and `e10_ctr_comb` only change treatment of features
+   that are already well handled.
+3. `e10_onehot10` is **faster** than baseline (one-hot is cheaper than
+   CTR for 3–4 level features) by at least 5%.
+4. Total run under 5 h.
+
+**If all three are null, the search is closed for good** and the
+remaining work is the final submission selection.
+
+*(results pending — notebook v12 kernel run)*
