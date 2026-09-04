@@ -477,3 +477,53 @@ by `register_average`, not `run_cv`), not a notebook defect.
 
 Kernel v11 launched (CPU, 4 CV fits + 3 full-data fits, ~5.2 h predicted
 — budgeted with E07's corrected cost figure).
+
+## 2026-09-04 — E08 results, two failed magnitude predictions, E09 launched
+
+**E08 Part A promoted** (`e08_avg3seeds` 0.94550, public **0.94565**) —
+new champion, submission 5. **Part B won the paired LB comparison**
+(0.94569, submission 6) and was **not promoted**: +0.00004 is below the
+noise floor, and a single LB comparison at that margin is exactly what
+the gate exists to refuse.
+
+**Both magnitude predictions failed.** Part A: +0.00007 against a
+predicted +0.00019, which was *below the falsification threshold I wrote
+into the predeclaration*, so E03's additivity result is recorded as NOT
+generalising across representations. Part B: +0.00004 against a predicted
++0.0001…+0.0003. Directions right both times, magnitudes ~3× too large.
+E09's predictions are deliberately scaled down as a result.
+
+**Two findings worth more than the gains.**
+
+1. **The noise floor collapsed from 0.00013 to 0.00005.** Three seeds
+   span 0.00005 where they spanned 0.00013 pre-E06. Value identities are
+   deterministic, so they replace seed-sensitive tree structure with
+   seed-stable encoding — which explains both the smaller averaging gain
+   and why that gain is still real. Re-checked every prior "below the
+   noise floor" dismissal against the lower bar; none flip.
+2. **I had the LB>OOF explanation wrong and Part B corrected it.** I
+   attributed the +0.00020 gap to test-time value statistics using 668k
+   rows vs ~535k per fold. Isolating that mechanism measures it at
+   **+0.00004** — a fifth of the gap. The larger share is that each OOF
+   row is predicted by *one* model while each test row is predicted by
+   the average of every fold model (15 here). `docs/5_submission_manifest.md`
+   is corrected.
+
+**E09 launched** (kernel v12): 10-fold under a new fold definition F2.
+Better motivated than when planned, since it improves both effects E08B
+separated. The comparability rule is enforced as a **mechanism**:
+`paired_gate` asserts both runs share a fold definition,
+`register_average` refuses members spanning classes, and §9 filters
+promoted candidates to the champion's class — so an F2 run can be
+promoted within F2 yet structurally cannot take the gated submission
+slot. It writes its own `submission_f2.csv`, decided by leaderboard.
+
+**A bug the dry-run caught:** `BASELINE_CHAMPION` had not been repointed
+after E08's promotion — it still named `e06_cat_value_ids_src` with the
+old 0.94542 floor, so v10 would have gated against a superseded champion
+and used a stale submission floor.
+
+Dry-run: **16384/16384** flag combinations clean, 21 scenarios pass, plus
+a direct negative test proving the cross-class gate and average both
+raise (and that a same-class gate still works). Two initial failures were
+stale expectations of mine, not defects.
