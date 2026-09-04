@@ -562,3 +562,29 @@ E09 — so the safeguard existed and I failed to apply it.
 
 Cost: ~10 minutes of Kaggle compute, no submission wasted, no data lost.
 Cheap for the lesson, but it is the third instance of one bug class.
+
+## 2026-09-04 — E09 complete: 10-fold is worth +0.00014 on OOF
+
+Kernel v13 (v12's re-run after the `NameError` fix) finished in 5.2 h.
+`e09_f2_avg3seeds` F2 OOF **0.94564**, promoted within F2 (9/10 folds,
+P 1.000). Cross-class observation, same config and seed with only the
+fold count differing: **+0.00014** (CI +0.000093…+0.000196), recorded as
+an observation because it is biased toward F2 by construction.
+
+**The comparability mechanism was exercised for real and held.** The run
+printed that the F2 candidate was promoted in-class but ineligible to
+displace the F1 champion, wrote no `submission.csv`, and emitted only
+`submission_f2.csv`. Champion unchanged at `e08_avg3seeds`.
+
+Predictions: 1 correct and inside its band (+0.00014 vs +0.00008…+0.00020
+— the first magnitude prediction to land, after deliberately scaling down
+from E08's 3× misses), 1 indistinguishable (averaging gain under F2 vs
+F1: +0.000073 vs +0.000074, so the reasoning that 10-fold leaves less
+seed variance to remove is *not* supported), 1 wrong (runtime 5.2 h
+against 7.7 h predicted — over-corrected after under-estimating E07),
+1 pending on the leaderboard.
+
+Also fixed a cosmetic defect the F2 run exposed: the gate printed
+"fold wins 9/5" because the denominator was hardcoded. It now reads the
+run's fold definition. Re-verified afterwards: `check_frames.py` ok on
+all 12 configurations, 16384/16384 dry-run combinations, 21 scenarios.

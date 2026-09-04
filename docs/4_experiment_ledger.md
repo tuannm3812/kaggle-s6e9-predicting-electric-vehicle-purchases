@@ -1067,4 +1067,67 @@ over-estimated by ~3× twice in E08:**
 4. Runtime ~7.7 h (10 folds × ~602k rows × 3 seeds), padded to a 9 h
    expectation. E07 taught me to pad rather than trim.
 
-*(results pending — notebook v10 kernel run)*
+### Results (Kaggle kernel v13, notebook v10, CPU, fold definition F2)
+
+Kernel v12 errored (`NameError: X_v3s` — see the agent log); v13 is the
+same experiment after the fix.
+
+| Run | F2 OOF AUC | fold std | Wall |
+| --- | --- | --- | --- |
+| `e09_f2_s42` | 0.94556 | 0.00079 | 6,123 s |
+| `e09_f2_s7` | 0.94557 | 0.00079 | 6,128 s |
+| `e09_f2_s2026` | 0.94556 | 0.00082 | 6,141 s |
+| **`e09_f2_avg3seeds`** | **0.94564** | 0.00080 | (sum) |
+
+**In-class gate (F2 vs F2), `e09_f2_avg3seeds` vs `e09_f2_s42`:** 9/10
+fold wins, 95% CI (+0.000050, +0.000095), P(Δ>0) = 1.000 → **promoted
+within F2**.
+
+**The class mechanism did exactly what it was built to do.** The run
+printed *"promoted within their own class but NOT eligible to displace
+the F1 champion"*, wrote **no** `submission.csv`, and emitted only
+`submission_f2.csv`. The champion is untouched by a number that is not
+comparable to it — enforced by code, not by anyone remembering the rule.
+
+### Cross-class observation (labelled; never a promotion)
+
+Same config, same seed, only the fold count differs:
+
+| | OOF |
+| --- | --- |
+| F1 `e08_s42` (5-fold) | 0.94542 |
+| F2 `e09_f2_s42` (10-fold) | **0.94556** |
+
+**Δ = +0.00014**, paired bootstrap CI (+0.000093, +0.000196), P(Δ>0) =
+1.000. **This is biased toward F2 by construction** — more training data
+always flatters OOF — which is why it was predeclared as an observation
+rather than a gate.
+
+### Scoring the predictions — 2 right, 1 indistinguishable, 1 wrong
+
+1. **Correct.** Predicted `e09_f2_s42` would exceed `e08_s42` by
+   +0.00008…+0.00020; delivered **+0.00014**, mid-range. The first
+   magnitude prediction this project has landed inside its stated band —
+   scaling down after E08's 3× over-estimates was the right correction.
+2. *Pending* — the leaderboard comparison (predicted +0.00003…+0.00012
+   over 0.94565).
+3. **Indistinguishable, so not confirmed.** Predicted seed averaging
+   would gain *less* under F2 than F1. Measured +0.000073 (F2) vs
+   +0.000074 (F1) — a difference of 0.000001, far below any resolution
+   this project has. The prediction's reasoning (10-fold already averages
+   twice as many models, leaving less variance) is **not supported**;
+   averaging seeds and averaging folds evidently remove different
+   variance, and the two compose independently.
+4. **Wrong, in the opposite direction to E07.** Predicted ~7.7 h padded
+   to 9 h; actual **5.2 h** of fitting. Having under-estimated E07 by an
+   hour I over-corrected here. 10-fold costs 1.50× 5-fold, not the 2.25×
+   a naive rows-processed model implies — CatBoost's per-fit overhead
+   does not scale with fold count.
+
+**A measurement note:** F2's fold std (0.00080) is *higher* than F1's
+(0.00062), which is not a quality signal — each F2 fold validates on half
+as many rows, so per-fold AUC is simply noisier. Only the pooled OOF is
+comparable across fold definitions.
+
+*(Leaderboard comparison pending — `submission_f2.csv` validated:
+286,571 rows, all unique, in range.)*
