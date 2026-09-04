@@ -687,3 +687,29 @@ combinations, 24 scenarios, `check_frames.py` ok on all 12 configurations.
 
 Recorded in `docs/0_coding_standards.md` as the third instance of
 "a precondition in prose is not a precondition".
+
+## 2026-09-05 — R1: champion reproduces bit-identically from the current notebook
+
+Kernel v14, 3 h 30 m. All three predeclared predictions confirmed:
+
+1. **Bit-identical.** Eight vectors (4 runs × OOF/test) all
+   `np.array_equal` True against kernel v11; OOF AUC matches to 16
+   decimal places (0.9454983185241117).
+2. **Artifact byte-identical.** `sha256(submission.csv)` is
+   `aba17f9fe8e08631…` in both runs, so re-submitting would score exactly
+   0.94565. No submission made — the hash is better evidence than a
+   quota slot.
+3. **Runtime** 3.42 h of fitting against a predicted ~3.5 h.
+
+The point of this run was not a sixth reproducibility data point. It
+proves the champion is reproducible **from the notebook as it stands
+today**, not merely from the historical version that produced it — and it
+is the first exercise on real compute of the repaired §5 path, which
+under notebook v10 would have written an artifact ~0.0034 worse under the
+champion's name. The pinned `requirements.txt` also matches the Kaggle
+worker exactly, and `catboost 1.2.10` now appears in the snapshot.
+
+**Project state: search closed, reproduction verified, one action left** —
+selecting the final two submissions in the Kaggle UI (no API command
+exists) before 2026-09-30 23:59 UTC. Recommendation and reasoning are in
+`docs/5_submission_manifest.md`.

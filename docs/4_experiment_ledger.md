@@ -1271,4 +1271,43 @@ name.
 the identical artifact, and spending a quota slot to re-score the same
 predictions proves nothing the file comparison does not.
 
-*(results pending — notebook v11 kernel run)*
+### Results (Kaggle kernel v14, notebook v11, CPU, F1) — all three predictions confirmed
+
+| Run | OOF AUC (16 dp) | Wall |
+| --- | --- | --- |
+| `e08_avg3seeds_s42` | 0.9454239216882167 | 4,080 s |
+| `e08_avg3seeds_s7` | 0.9454438760720274 | 4,115 s |
+| `e08_avg3seeds_s2026` | 0.9453922360195797 | 4,101 s |
+| **`e08_avg3seeds`** | **0.9454983185241117** | (sum) |
+
+**1. Bit-identical — confirmed.** All eight vectors (four runs × OOF and
+test) return `np.array_equal` True against kernel v11's, and the OOF AUCs
+match to all sixteen decimal places. Note the members were *renamed*
+(`e08_s42` → `e08_avg3seeds_s42`, since §5 derives member names from the
+champion) while the numbers are identical — the rename is cosmetic, the
+model is the same.
+
+**2. Artifact identical — confirmed, byte for byte.**
+`sha256(submission.csv)` is `aba17f9fe8e08631…` for both kernel v14 and
+kernel v11. Re-submitting would score exactly 0.94565, so no submission
+was made; the file comparison is stronger evidence than a quota slot
+would have bought.
+
+**3. Runtime — confirmed.** 12,296 s of fitting (3.42 h), wall ~3 h 30 m,
+against a predicted ~3.5 h.
+
+**What this actually establishes,** beyond a sixth reproducibility data
+point: the champion is reproducible **from the current notebook**, not
+merely from the historical kernel version that produced it. Every earlier
+confirmation was incidental — a baseline that happened to match. This is
+the first run whose purpose was the check, and it is the first exercise
+of the repaired §5 path on real compute. Under notebook v10 this exact
+configuration would have fit a single model on the pre-E06 frame and
+written an artifact ~0.0034 worse under the champion's name.
+
+**Also confirmed by this run:** `catboost 1.2.10` now appears in the
+reproducibility snapshot (it was absent until 2026-09-04 — the one
+library that produces the champion), and the pinned `requirements.txt`
+matches the Kaggle worker exactly: numpy 2.0.2, pandas 2.3.3,
+scikit-learn 1.6.1, lightgbm 4.6.0, catboost 1.2.10, Python 3.12.13.
+
