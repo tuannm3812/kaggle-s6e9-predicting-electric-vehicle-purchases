@@ -843,3 +843,38 @@ Verified after the rename: `check_frames.py` ok on all configurations,
 (pre-refinement markdown, E10 insight placeholder); a push of the
 current notebook would fix the public face and validate the renamed
 pipeline end-to-end, at the cost of one ~3.5 h champion-refit run.
+
+## 2026-09-05 — Kernel v16: renamed pipeline republished, and a wrong claim of mine corrected
+
+Pushed the refined notebook (v13) to fix the public kernel, which was
+still showing pre-refinement markdown with E10's insight as a literal
+placeholder. Two outcomes, one of them a correction.
+
+**The correction: the kernel slug was NOT immutable.** Hours earlier I
+wrote in `docs/0` that changing the title would abandon versions 2–15,
+and kept the historical slug on that basis. Pushing the new title made
+Kaggle **re-slug the kernel to `ev-purchases-modeling` while preserving
+the entire version lineage** — the push landed as v16 immediately after
+v15, and the old slug now 404s on the API. So the rename produced full
+name coherence (file, title, slug) with history intact, which is better
+than what I predicted, but the assumption was wrong and was already
+written into three places. Fixed all three: `kernel-metadata.json` still
+pointed at the dead slug and would have forked a brand-new kernel with
+no history on the next push; `docs/0`'s deviation note now records what
+actually happened rather than the assumption; README's commands use the
+live slug. Manifest rows keep the old slug — they record commands as
+actually run — with a note saying where those versions live now.
+
+**Eighth consecutive bit-identical reproduction.** v16 ran the champion
+re-fit through the *renamed* pipeline and returned all eight vectors
+`np.array_equal` True against R1's (kernel v14), with
+`sha256(submission.csv)` matching at `aba17f9fe8e08631…`. The rename
+touched the notebook filename, kernel directory, metadata, push script
+and `check_frames.py`, and changed nothing about the model — which is
+exactly the evidence a refactor of that surface needs.
+
+**State unchanged:** champion `e08_avg3seeds` (public 0.94565), best
+submission `e09_f2_avg3seeds` (public 0.94570). No submission from this
+run — the artifact is byte-identical to submission 5. The public kernel
+now shows the finished work at
+`kaggle.com/code/tuannm3812/ev-purchases-modeling`.
