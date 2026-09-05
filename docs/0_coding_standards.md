@@ -27,10 +27,16 @@ Notebook-first Kaggle workflow, matching
   not to renumber an existing repo and the names are load-bearing. The
   modeling notebook was renamed from `02_baseline_modeling.ipynb` on
   2026-09-05 because "baseline" no longer described a workflow holding
-  E01–E10; the Kaggle kernel **slug**
-  `ev-purchases-baseline-modeling` keeps the historical name, because a
-  slug change would abandon kernel versions 2–15, which the submission
-  manifest cites.
+  E01–E10. The kernel slug followed: pushing the new title made Kaggle
+  **re-slug the kernel to `ev-purchases-modeling` while preserving the
+  full version lineage** (the push landed as v16 of the same kernel) —
+  contradicting the assumption, written here hours earlier, that the
+  slug was immutable and a title change would abandon versions 2–15.
+  Verified empirically: the old slug 404s on the API, the new one
+  carries all versions. Manifest rows citing
+  `-k tuannm3812/ev-purchases-baseline-modeling -v N` are the commands
+  as actually run and stay as written; every future command uses the
+  new slug.
 - `docs/` — durable findings and decisions, numbered per master standard §2.
 - `scripts/` — small CLI helpers only (`push_kaggle_kernel.sh`,
   `verify_submission.py`, `check_frames.py`, `render_pdf.py`), never

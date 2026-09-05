@@ -8,11 +8,11 @@
 #
 # Usage: scripts/push_kaggle_kernel.sh <eda|modeling>
 #
-# ("baseline" is accepted as an alias for "modeling": the notebook was
-# renamed 2026-09-05 to describe the workflow it grew into, but the
-# Kaggle kernel SLUG ev-purchases-baseline-modeling is immutable --
-# changing it would abandon versions 2-15, which the submission
-# manifest cites -- so the slug keeps the historical name.)
+# ("baseline" is accepted as an alias for "modeling". The notebook was
+# renamed 2026-09-05; pushing the new title made Kaggle re-slug the
+# kernel to ev-purchases-modeling WITH its full version lineage intact
+# (v16 followed v15). The old slug 404s; kernel-metadata.json carries
+# the current id.)
 #
 # Both targets push public kernels. A third "experiments" target once
 # existed for a separate private GPU kernel, but notebooks/kernels/

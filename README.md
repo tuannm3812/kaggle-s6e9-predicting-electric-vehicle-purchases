@@ -46,9 +46,9 @@ kaggle competitions download -c playground-series-s6e9 -p data/
 unzip -o 'data/*.zip' -d data/
 
 # 2. Notebooks are authored locally but EXECUTED ON KAGGLE.
-bash scripts/push_kaggle_kernel.sh baseline
-kaggle kernels status tuannm3812/ev-purchases-baseline-modeling
-kaggle kernels output tuannm3812/ev-purchases-baseline-modeling -p out/
+bash scripts/push_kaggle_kernel.sh modeling
+kaggle kernels status tuannm3812/ev-purchases-modeling
+kaggle kernels output tuannm3812/ev-purchases-modeling -p out/
 
 # 3. Before pushing, run both local checks (they cover different things):
 python3 scripts/check_frames.py        # every experiment's feature frames exist

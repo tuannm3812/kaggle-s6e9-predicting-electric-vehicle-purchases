@@ -15,6 +15,12 @@ Every leaderboard submission, recorded the moment it is scored, per
 
 ## Notes
 
+- **Kernel slug note (2026-09-05):** the kernel was re-slugged to
+  `ev-purchases-modeling` when its title changed (version lineage
+  intact — v16 followed v15). Rows above cite
+  `ev-purchases-baseline-modeling` because that was the slug when those
+  commands ran; the versions they reference live at the new slug.
+
 - Submitted via the kernel-version flow (`-k tuannm3812/ev-purchases-baseline-modeling -v 2`),
   so the score is tied to code Kaggle executed (master standard §11).
   Every artifact is pre-validated with `scripts/verify_submission.py`
