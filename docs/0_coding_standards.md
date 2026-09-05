@@ -139,6 +139,31 @@ itself — CatBoost must also get `task_type="GPU"` (the notebook's
 so GPU adds comparability risk for no gain. GPU quota is mutable; check
 it live.
 
+## Rendered PDFs (2026-09-05)
+
+`scripts/render_pdf.py` renders every doc and notebook to `renders/`
+(gitignored) and, with `--export`, mirrors them to iCloud at
+`05_Projects/<category>/<repo>/` — category derived from the GitHub
+parent folder, so the script works unchanged when copied to a sibling
+repo. Pipeline: pandoc → styled HTML → headless Chrome. **No LaTeX
+dependency by design**; nothing beyond what the machine already had.
+
+- **Fonts are embedded, never named.** Naming a font makes the renderer
+  look it up locally, so an un-installed face is silently substituted
+  and layout shifts. DM Sans variable TTFs live in
+  `assets/fonts/dm-sans/` (SIL-OFL, `OFL.txt` must travel with them) and
+  are inlined as base64.
+- **Heading colours step down the hierarchy** — navy `#1C2333` H1,
+  viridis blue `#31688E` H2, green `#2D7F5E` H3, muted grey `#6E7278`
+  H4. Blue and green match the sibling hackathon repo's chart palette;
+  lightness steps too, so levels survive greyscale printing.
+- **Notebooks render from source.** Neither `kaggle kernels pull` nor
+  `kernels output` returns an executed notebook, so cell outputs are
+  absent unless `--execute-eda` is passed (EDA only — the modeling
+  notebook is never executed locally). Our stylesheet is appended after
+  nbconvert's so fonts and headings win while its syntax highlighting
+  is left alone.
+
 ## Public notebooks carry findings, not forward strategy (2026-09-02)
 
 `notebooks/` is pushed to **public** Kaggle kernels

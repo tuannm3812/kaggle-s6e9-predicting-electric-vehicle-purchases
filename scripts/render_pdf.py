@@ -7,6 +7,14 @@ it deliberately uses only tools already on the machine — pandoc,
 nbconvert, and headless Google Chrome for the HTML-to-PDF step — because
 no LaTeX engine is installed and none should be required for this.
 
+Typography and palette (2026-09-05): DM Sans throughout, embedded as
+base64 so a PDF renders identically on a machine without the font
+installed, and heading colours that step down the hierarchy — navy H1,
+viridis blue H2, green H3, muted-grey uppercase H4. The blue and green
+are the ones the sibling hackathon repo already uses for charts, so
+output across the workspace looks related; the lightness steps as well
+as the hue, so the levels stay distinguishable printed in greyscale.
+
 What it produces, under renders/ (gitignored):
 
     renders/docs/<name>.pdf        one PDF per markdown doc
@@ -29,6 +37,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import base64
 import subprocess
 import sys
 import tempfile
@@ -49,26 +58,78 @@ ICLOUD = (Path.home() / "Library" / "Mobile Documents"
 # Print stylesheet shared by docs and notebooks. Kept small: readable
 # serif body, monospace code that wraps instead of clipping, and tables
 # that survive an A4 page.
-CSS = """
-body { font: 11pt/1.5 Georgia, serif; max-width: 48em; margin: 2em auto;
-       color: #1a1a1a; }
-h1, h2, h3, h4 { font-family: Helvetica, Arial, sans-serif; color: #111;
-                 page-break-after: avoid; }
-h1 { font-size: 1.6em; border-bottom: 2px solid #333; padding-bottom: .2em; }
-h2 { font-size: 1.25em; border-bottom: 1px solid #bbb; padding-bottom: .15em;
-     margin-top: 1.6em; }
-code, pre { font: 8.5pt/1.45 "SF Mono", Menlo, monospace; }
-pre { background: #f6f6f6; border: 1px solid #ddd; padding: .7em;
-      white-space: pre-wrap; word-wrap: break-word; page-break-inside: avoid; }
-table { border-collapse: collapse; font-size: 8.5pt; margin: 1em 0;
-        page-break-inside: avoid; }
-th, td { border: 1px solid #999; padding: .25em .5em; text-align: left; }
-th { background: #eee; font-family: Helvetica, sans-serif; }
-blockquote { border-left: 3px solid #bbb; margin-left: 0; padding-left: 1em;
-             color: #444; }
-img { max-width: 100%; }
-@page { margin: 18mm 15mm; }
+# Heading colours descend in weight through the hierarchy — navy for the
+# document title, then the viridis blue and green the sibling hackathon
+# repo already uses for charts, then muted grey. Continuity across the
+# workspace, and each level is distinguishable in greyscale too because
+# the lightness steps as well as the hue.
+INK, BLUE, GREEN, MUTED = "#1C2333", "#31688E", "#2D7F5E", "#6E7278"
+RULE, CODE_BG, CODE_BORDER = "#D9D6CC", "#F7F7F5", "#E2E0DA"
+
+CSS_TEMPLATE = """
+@font-face {{
+  font-family: "DM Sans"; font-style: normal; font-weight: 100 1000;
+  src: url("data:font/ttf;base64,{dm_regular}") format("truetype");
+}}
+@font-face {{
+  font-family: "DM Sans"; font-style: italic; font-weight: 100 1000;
+  src: url("data:font/ttf;base64,{dm_italic}") format("truetype");
+}}
+body {{ font: 10.5pt/1.6 "DM Sans", Helvetica, Arial, sans-serif;
+       max-width: 48em; margin: 2em auto; color: {ink}; }}
+h1, h2, h3, h4, h5, h6 {{ font-family: "DM Sans", Helvetica, sans-serif;
+                          font-weight: 700; page-break-after: avoid;
+                          letter-spacing: -0.01em; }}
+h1 {{ font-size: 1.75em; color: {ink};
+     border-bottom: 2.5px solid {ink}; padding-bottom: .25em;
+     margin-top: 1.2em; }}
+h2 {{ font-size: 1.3em; color: {blue};
+     border-bottom: 1.5px solid {blue}; padding-bottom: .15em;
+     margin-top: 1.8em; }}
+h3 {{ font-size: 1.08em; color: {green}; margin-top: 1.4em; }}
+h4 {{ font-size: .98em; color: {muted}; margin-top: 1.2em;
+     text-transform: uppercase; letter-spacing: .04em; }}
+h5, h6 {{ font-size: .95em; color: {muted}; margin-top: 1em; }}
+a {{ color: {blue}; }}
+strong {{ color: {ink}; font-weight: 700; }}
+code, pre {{ font: 8.5pt/1.45 "SF Mono", Menlo, Consolas, monospace; }}
+code {{ background: {code_bg}; padding: .08em .3em; border-radius: 3px; }}
+pre {{ background: {code_bg}; border: 1px solid {code_border};
+      border-left: 3px solid {blue}; padding: .7em; border-radius: 3px;
+      white-space: pre-wrap; word-wrap: break-word;
+      page-break-inside: avoid; }}
+pre code {{ background: none; padding: 0; }}
+table {{ border-collapse: collapse; font-size: 8.5pt; margin: 1em 0;
+        page-break-inside: avoid; }}
+th, td {{ border: 1px solid {rule}; padding: .3em .55em; text-align: left; }}
+th {{ background: {blue}; color: #fff; font-weight: 700;
+     border-color: {blue}; }}
+tr:nth-child(even) td {{ background: {code_bg}; }}
+blockquote {{ border-left: 3px solid {green}; margin-left: 0;
+             padding-left: 1em; color: {muted}; }}
+hr {{ border: none; border-top: 1px solid {rule}; margin: 2em 0; }}
+img {{ max-width: 100%; }}
+@page {{ margin: 18mm 15mm; }}
 """
+
+
+def build_css() -> str:
+    """Print stylesheet with the DM Sans variable fonts embedded.
+
+    The fonts are inlined as base64 rather than named, so a rendered PDF
+    reproduces identically on a machine where DM Sans is not installed
+    (a named-but-missing font is silently substituted). See
+    assets/fonts/dm-sans/README.md.
+    """
+    fonts = REPO / "assets" / "fonts" / "dm-sans"
+    def b64(name: str) -> str:
+        return base64.b64encode((fonts / name).read_bytes()).decode()
+    return CSS_TEMPLATE.format(
+        dm_regular=b64("DMSans-Variable.ttf"),
+        dm_italic=b64("DMSans-Italic-Variable.ttf"),
+        ink=INK, blue=BLUE, green=GREEN, muted=MUTED,
+        rule=RULE, code_bg=CODE_BG, code_border=CODE_BORDER,
+    )
 
 DOC_ORDER = [
     "0_coding_standards.md", "1_instructions.md", "2_eda_insights.md",
@@ -94,7 +155,7 @@ def md_to_pdf(sources: list[Path], pdf: Path, title: str) -> None:
     """Markdown (GitHub flavour) -> styled HTML via pandoc -> PDF."""
     with tempfile.TemporaryDirectory() as td:
         css = Path(td) / "print.css"
-        css.write_text(CSS)
+        css.write_text(build_css())
         html = Path(td) / "out.html"
         run([
             "pandoc", *map(str, sources), "-f", "gfm", "-t", "html5",
@@ -115,7 +176,15 @@ def notebook_to_pdf(nb: Path, pdf: Path, execute: bool) -> None:
             # Run from notebooks/ so the notebook's ../data path resolves.
             cmd += ["--execute", "--ExecutePreprocessor.timeout=600"]
         subprocess.run(cmd, check=True, capture_output=True, cwd=nb.parent)
-        html_to_pdf(Path(td) / "nb.html", pdf)
+        # nbconvert ships its own stylesheet; append ours last so DM Sans
+        # and the heading colours win, without fighting its code styling.
+        html_file = Path(td) / "nb.html"
+        html = html_file.read_text()
+        style = f"<style>{build_css()}</style>"
+        html = (html.replace("</head>", style + "</head>", 1)
+                if "</head>" in html else style + html)
+        html_file.write_text(html)
+        html_to_pdf(html_file, pdf)
 
 
 def main() -> None:
