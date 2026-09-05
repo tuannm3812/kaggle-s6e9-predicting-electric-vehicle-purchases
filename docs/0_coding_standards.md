@@ -21,12 +21,16 @@ Notebook-first Kaggle workflow, matching
 
 - `notebooks/` — EDA, baseline modeling, tuning, ensembling. Plus
   `notebooks/kernels/<name>/` holding each notebook's Kaggle
-  `kernel-metadata.json`. **Deliberate deviation from master §2:** the
-  notebooks are zero-padded (`01_eda.ipynb`, `02_baseline_modeling.ipynb`)
-  rather than `1_eda.ipynb`. Declared rather than fixed: the master
-  standard itself says not to renumber an existing repo, and the names
-  are load-bearing (kernel metadata `code_file`, the push script,
-  `check_frames.py`).
+  `kernel-metadata.json`. **Deliberate deviations from master §2:** the
+  notebooks are zero-padded (`01_eda.ipynb`, `02_modeling.ipynb`) rather
+  than `1_eda.ipynb` — declared rather than fixed, since the master says
+  not to renumber an existing repo and the names are load-bearing. The
+  modeling notebook was renamed from `02_baseline_modeling.ipynb` on
+  2026-09-05 because "baseline" no longer described a workflow holding
+  E01–E10; the Kaggle kernel **slug**
+  `ev-purchases-baseline-modeling` keeps the historical name, because a
+  slug change would abandon kernel versions 2–15, which the submission
+  manifest cites.
 - `docs/` — durable findings and decisions, numbered per master standard §2.
 - `scripts/` — small CLI helpers only (`push_kaggle_kernel.sh`,
   `verify_submission.py`, `check_frames.py`, `render_pdf.py`), never

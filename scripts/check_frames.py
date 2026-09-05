@@ -26,7 +26,7 @@ import sys
 import types
 from pathlib import Path
 
-NOTEBOOK = Path(__file__).resolve().parents[1] / "notebooks" / "02_baseline_modeling.ipynb"
+NOTEBOOK = Path(__file__).resolve().parents[1] / "notebooks" / "02_modeling.ipynb"
 EXPERIMENT_FLAGS = [
     "RUN_V1_SANITY", "RUN_V2_STRONG", "RUN_ANX_CATEGORICAL_AB",
     "RUN_E01_TUNING", "RUN_E02", "RUN_E03", "RUN_E04", "RUN_E05",

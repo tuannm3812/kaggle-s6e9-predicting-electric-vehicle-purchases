@@ -6,7 +6,13 @@
 # `kaggle kernels push`. The copied .ipynb is gitignored and regenerated
 # every run, so notebooks/ never has two versions to keep in sync by hand.
 #
-# Usage: scripts/push_kaggle_kernel.sh <eda|baseline>
+# Usage: scripts/push_kaggle_kernel.sh <eda|modeling>
+#
+# ("baseline" is accepted as an alias for "modeling": the notebook was
+# renamed 2026-09-05 to describe the workflow it grew into, but the
+# Kaggle kernel SLUG ev-purchases-baseline-modeling is immutable --
+# changing it would abandon versions 2-15, which the submission
+# manifest cites -- so the slug keeps the historical name.)
 #
 # Both targets push public kernels. A third "experiments" target once
 # existed for a separate private GPU kernel, but notebooks/kernels/
@@ -29,12 +35,12 @@ case "${1:-}" in
     NOTEBOOK="01_eda.ipynb"
     KERNEL_DIR="$NOTEBOOKS_DIR/kernels/eda"
     ;;
-  baseline)
-    NOTEBOOK="02_baseline_modeling.ipynb"
-    KERNEL_DIR="$NOTEBOOKS_DIR/kernels/baseline_modeling"
+  modeling|baseline)
+    NOTEBOOK="02_modeling.ipynb"
+    KERNEL_DIR="$NOTEBOOKS_DIR/kernels/modeling"
     ;;
   *)
-    echo "Usage: $0 <eda|baseline>" >&2
+    echo "Usage: $0 <eda|modeling>" >&2
     exit 1
     ;;
 esac

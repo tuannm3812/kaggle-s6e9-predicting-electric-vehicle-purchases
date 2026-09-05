@@ -34,7 +34,7 @@ interaction (the subsidy gate, `docs/2_eda_insights.md` §5).
 strictly monotone ordinals, the subsidy gate, no missingness/drift/duplicate
 workstreams needed, CV expected to track the leaderboard.
 
-## Phase 2 — Baseline Modeling (`notebooks/02_baseline_modeling.ipynb`) — done 2026-09-01
+## Phase 2 — Baseline Modeling (`notebooks/02_modeling.ipynb`) — done 2026-09-01
 
 Executed end-to-end locally (kernel `s6e8-py39`, ~10 min wall-clock, dominated by CatBoost). Results and decisions: `docs/4_experiment_ledger.md`. Working champion `v2b_catboost_default`, OOF AUC 0.94157 ± 0.00072 on F1. Original step list, followed as written:
 

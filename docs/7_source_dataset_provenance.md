@@ -89,7 +89,7 @@ reintroduced the dataset in a different role — a per-income lookup of the
 `Src_Income_N`), which touches no competition target and so needs no fold
 handling. The champion `e08_avg3seeds` is fit on features v3 **plus this
 lookup**, as were E07 and E09, and the kernel attaches the dataset via
-`notebooks/kernels/baseline_modeling/kernel-metadata.json`.
+`notebooks/kernels/modeling/kernel-metadata.json`.
 
 **The citation obligation in "Usage rules" above is therefore live**, not
 hypothetical: submissions 4, 5, 6 and 7 all depend on this dataset.

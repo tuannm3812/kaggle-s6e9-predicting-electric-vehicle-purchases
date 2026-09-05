@@ -810,3 +810,36 @@ source; `--execute-eda` optionally executes the EDA locally for outputs
 (the modeling notebook is never executed locally). One defect found and
 fixed in review: pandoc's `title` metadata double-titled every page;
 `pagetitle` sets the browser title without the duplicate heading.
+
+## 2026-09-05 — Notebook renamed to what it is; second refinement pass
+
+**`02_baseline_modeling.ipynb` → `02_modeling.ipynb`**, on the user's
+question and against my own earlier "declare, don't rename" lean. The
+distinction that settled it: the master standard's no-churn rule targets
+*renumbering*; here the number stays and only a descriptor that stopped
+being true changes — "baseline" described week one of a notebook that
+came to hold E01–E10, and the standard's operative rule is that names
+describe the workflow performed. What deliberately does **not** change:
+the Kaggle kernel slug `ev-purchases-baseline-modeling`, since changing
+it would abandon versions 2–15, which the submission manifest cites. The
+kernel's *display title* becomes "EV Purchases - Modeling"; the slug is
+declared historical in docs/0. Updated in the same commit: kernel dir
+(`kernels/modeling/`), metadata `code_file`, push script (new target
+`modeling`, `baseline` kept as an alias), `check_frames.py`, and every
+live doc reference — dated log/ledger entries keep the historical name,
+which was accurate when written.
+
+Refinement pass alongside: `predictions/README.md` and `data/README.md`
+grew from one-liners into actual orientation (naming scheme, alignment
+guarantee, provenance rule; what each data file is). Verified the
+`seaborn==0.13.2` pin I had written without checking — it matches both
+the local env and the executed EDA kernel. Noted in passing that the EDA
+kernel ran a newer image (numpy 2.4.6) than the modeling kernel (2.0.2);
+`requirements.txt` correctly pins the modeling environment, the one the
+champion depends on.
+
+Verified after the rename: `check_frames.py` ok on all configurations,
+32768/32768 dry-run combinations. The public kernel still displays v15
+(pre-refinement markdown, E10 insight placeholder); a push of the
+current notebook would fix the public face and validate the renamed
+pipeline end-to-end, at the cost of one ~3.5 h champion-refit run.

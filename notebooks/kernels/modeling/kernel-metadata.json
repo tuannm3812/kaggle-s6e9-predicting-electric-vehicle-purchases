@@ -1,7 +1,7 @@
 {
   "id": "tuannm3812/ev-purchases-baseline-modeling",
-  "title": "EV Purchases - Baseline Modeling",
-  "code_file": "02_baseline_modeling.ipynb",
+  "title": "EV Purchases - Modeling",
+  "code_file": "02_modeling.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": false,
