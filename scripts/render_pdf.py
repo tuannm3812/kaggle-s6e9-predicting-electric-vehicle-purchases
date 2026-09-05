@@ -164,11 +164,19 @@ def main() -> None:
         category = re.sub(r"^\d+\.\s*", "", REPO.parent.name)
         dest = ICLOUD / category / REPO.name
         dest.mkdir(parents=True, exist_ok=True)
+        wanted = {pdf.relative_to(RENDERS) for pdf in RENDERS.rglob("*.pdf")}
+        # Mirror semantics: a rename here must not leave a stale twin in
+        # iCloud, so prune PDFs the source no longer produces -- scoped
+        # strictly to this repo's own export folder.
+        for old_pdf in dest.rglob("*.pdf"):
+            if old_pdf.relative_to(dest) not in wanted:
+                old_pdf.unlink()
+                print(f"  pruned stale {old_pdf.relative_to(dest)}")
         copied = 0
-        for pdf in RENDERS.rglob("*.pdf"):
-            target = dest / pdf.relative_to(RENDERS)
+        for rel in sorted(wanted):
+            target = dest / rel
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(pdf, target)
+            shutil.copy2(RENDERS / rel, target)
             copied += 1
         print(f"\nexported {copied} PDFs -> {dest}")
 
