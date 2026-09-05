@@ -1404,4 +1404,75 @@ takes no submission slot directly — it earns an F2 re-fit.
 **If all three are null, the search is closed for good** and the
 remaining work is the final submission selection.
 
-*(results pending — notebook v12 kernel run)*
+### Results (Kaggle kernel v15, notebook v12, CPU, F1) — and a design flaw worth more than the result
+
+| Run | OOF AUC | Δ vs base | Wall |
+| --- | --- | --- | --- |
+| `e10_base` | 0.94542 | — | 4,983 s |
+| `e10_onehot10` | 0.94536 | **−0.00006** | 3,327 s |
+| `e10_ctr_binarized` | 0.94542 | **+0.00000** | 5,013 s |
+| `e10_ctr_comb` | 0.94542 | **+0.00000** | 5,103 s |
+
+Nothing promoted; champion unchanged. `e10_base` reproduces the
+champion's seed-42 member bit-identically (seventh confirmation).
+
+### Two of the three arms were no-ops — the experiment tested less than it claimed
+
+`e10_ctr_binarized` and `e10_ctr_comb` returned OOF vectors **bit-identical**
+to the baseline (`np.array_equal` True, correlation exactly 1.0000). That
+is not a null result; it is a parameter that changed nothing. Diagnosed
+locally rather than assumed:
+
+- CatBoost **did** accept and record the change —
+  `get_all_params()` reports `simple_ctr` as
+  `BinarizedTargetMeanValue:…:TargetBorderCount=1:…` instead of
+  `Borders:…`. The parameter was not ignored.
+- The predictions are nonetheless identical to the last bit
+  (`maxdiff = 0.00e+00`), while a control (`max_ctr_complexity=1`, known
+  from E07 to matter) and `one_hot_max_size=10` both **do** change them.
+  So the test methodology is sound and the finding is real.
+
+**Why:** with a **binary target and `TargetBorderCount=1`**, "mean of the
+binarized target" and "Borders CTR over one target border" are the *same
+quantity*. The estimator was swapped for an algebraically identical one.
+Separately, `combinations_ctr=["Borders","Counter"]` is CatBoost's
+**default** for combinations, so that arm set a parameter to the value it
+already had.
+
+**What this actually establishes.** The CTR *estimator* sub-axis is not
+merely null — for a binary target it is **degenerate**, with no
+meaningful variation available at `TargetBorderCount=1`. That is a
+stronger and more useful statement than "we tried it and it did nothing",
+and it means no follow-up on this sub-axis is worth running.
+
+**The design flaw is mine.** The pre-run smoke test checked that each
+config *was accepted*, and rejected an invalid one (`FeatureFreq`) — but
+never checked that an accepted config *changed the predictions*. Two of
+three arms therefore consumed ~2.8 h of compute to re-measure the
+baseline. **A validity check is not a variation check**, and the fix is
+one line: fit two tiny models and assert the outputs differ before
+spending a kernel run.
+
+### Scoring the predictions
+
+1. **Correct.** All arms within ±0.0002, none promoted (−0.00006, 0, 0) —
+   though two of the three "nulls" were vacuous.
+2. **Vacuous.** `e10_ctr_binarized` could not have promoted; the
+   prediction was unfalsifiable and should not be counted either way.
+3. **Correct, and by a wide margin.** `e10_onehot10` predicted ≥5%
+   faster; measured **33%** faster (3,327 s vs 4,983 s). One-hot encoding
+   the five low-cardinality categoricals is materially cheaper than
+   CTR-encoding them, at a cost of −0.00006 AUC — a genuine
+   speed/accuracy trade worth knowing if compute ever binds.
+4. **Wrong.** Predicted under 5 h; actual 5.12 h of fitting, 5 h 10 m
+   wall.
+
+### Decisions (2026-09-05, post-E10)
+
+- **Champion unchanged:** `e08_avg3seeds`; best submission remains
+  `e09_f2_avg3seeds` at public 0.94570.
+- **The search is closed.** E10 was the last untested axis, and it
+  returned one small negative and two degenerate no-ops. Every remaining
+  idea on the table costs more than it can plausibly return.
+- **Remaining work is the final submission selection** (UI-only), per
+  `docs/5_submission_manifest.md`.

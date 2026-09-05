@@ -713,3 +713,41 @@ worker exactly, and `catboost 1.2.10` now appears in the snapshot.
 selecting the final two submissions in the Kaggle UI (no API command
 exists) before 2026-09-30 23:59 UTC. Recommendation and reasoning are in
 `docs/5_submission_manifest.md`.
+
+## 2026-09-05 — E10 closes the search, and exposes a flaw in my own screening
+
+Kernel v15, 5 h 10 m. Nothing promoted. `e10_onehot10` −0.00006 (but
+**33% faster**); `e10_ctr_binarized` and `e10_ctr_comb` **bit-identical**
+to the baseline.
+
+**The bit-identity is the story.** Two arms did not produce a null
+result — they produced *no variation at all*. Diagnosed locally instead
+of guessed: CatBoost accepted and recorded the parameter change
+(`get_all_params()` shows `BinarizedTargetMeanValue` replacing `Borders`),
+yet predictions matched to the last bit, while a known-effective control
+(`max_ctr_complexity=1`) changed them. Cause: for a **binary target with
+`TargetBorderCount=1`**, "binarized target mean" and "Borders CTR over
+one border" are algebraically the same quantity; and
+`combinations_ctr=["Borders","Counter"]` is already CatBoost's default,
+so that arm set a parameter to itself.
+
+That makes the CTR-estimator sub-axis **degenerate rather than null** —
+a stronger claim, and one that rules out any follow-up on it.
+
+**My screening was at fault, and the lesson generalises.** The pre-run
+smoke test verified each config was *accepted* (and correctly rejected an
+invalid `FeatureFreq` arm). It never verified an accepted config
+*changed the predictions*. So ~2.8 h of compute re-measured the baseline
+twice. **A validity check is not a variation check** — recorded in
+`docs/0_coding_standards.md`; the fix is to fit two tiny models and
+assert the outputs differ before committing to a kernel run.
+
+Predictions: 1 correct (all within ±0.0002, none promoted), 1 **vacuous**
+and not counted (a no-op arm could not have promoted), 1 correct by a
+wide margin (one-hot ≥5% faster → measured 33%), 1 wrong (5.12 h vs
+"under 5 h").
+
+**The search is now closed.** E10 was the last untested axis. Champion
+`e08_avg3seeds`, best submission `e09_f2_avg3seeds` at public 0.94570.
+The only outstanding action is selecting the final two submissions in the
+Kaggle UI before 2026-09-30 23:59 UTC.

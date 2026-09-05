@@ -190,6 +190,18 @@ it next to the flags, and say in a comment that new flags are added there
 rather than at each use site. More generally: when a bug class recurs,
 change the structure that permits it, not just the instance.
 
+**A validity check is not a variation check (2026-09-05).** E10's
+pre-run smoke test confirmed each CatBoost config was *accepted* and
+caught an invalid one before it could kill a run — good as far as it
+went. Two accepted configs then produced **bit-identical** predictions to
+the baseline, so ~2.8 h of kernel compute re-measured the baseline twice.
+Before spending platform compute on a configuration sweep, fit two tiny
+models and **assert the predictions differ**; an accepted parameter is
+not necessarily an effective one. (Here the cause was real: for a binary
+target at `TargetBorderCount=1`, `BinarizedTargetMeanValue` and `Borders`
+are algebraically the same, and `combinations_ctr=["Borders","Counter"]`
+is already the default.)
+
 **A precondition in a comment is not a precondition (2026-09-04, third
 instance of this pattern).** §5's champion re-fit carried the comment
 *"Only valid when BASELINE_CHAMPION names a single-model config"*. By
