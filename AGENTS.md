@@ -51,36 +51,31 @@ first suggested.
 
 Any claim about model behaviour should trace to a row in the ledger.
 
-## State (2026-09-04)
+## State — one line, then pointers (kept short on purpose)
 
-- **Champion** (paired-OOF gated, class F1): `e08_avg3seeds`, OOF
-  0.94550, public **0.94565**.
-- **Best public score:** `e09_f2_avg3seeds`, **0.94570** — but it lives in
-  class F2 and cannot be gated against an F1 champion, so "champion" and
-  "best submission" deliberately name different artifacts.
-- E01–E09 complete; 7 submissions; standing 186/699, leader 0.94656.
-- **The one big win was E06 (+0.00337):** the "numeric" columns are value
-  identities — `Annual_Income_USD` takes 13,214 distinct values, 97.9% of
-  them drawn from the source dataset, and the exact value carries label
-  information its magnitude does not. Everything before it was ~0.0002 a
-  step; everything after it has been ~0.00005 a step.
-- **Noise floor is 0.00005**, not the 0.00013 quoted in pre-E06 rows —
-  value identities are deterministic, so seed variance collapsed.
+**Search closed 2026-09-05 after E01–E10 plus a bit-identical
+reproduction (R1).** Champion `e08_avg3seeds` (public 0.94565, fold class
+F1); best submission `e09_f2_avg3seeds` (public **0.94570**, class F2 —
+the two names differ deliberately). The one big step was E06's value
+identities; the noise floor on that representation is 0.00005.
+
+This block used to carry a full state summary and went stale twice in two
+days — the same facts were hand-maintained in five files. It now names
+only what is needed to orient: **numbers and model behaviour live in
+`docs/4_experiment_ledger.md`; current state and what is open lives in
+`docs/3_implementation_plan.md`.** Do not widen this section; update
+those two and let this point.
 
 ## Open risks
 
-- **The approach is at its ceiling.** Every enumerated axis is measured
-  and five further free screens (2026-09-04) found nothing. The remaining
-  0.0009 to the leader needs a representational idea like E06's; there is
-  no candidate. Prefer cheap local diagnostics over speculative kernel
-  runs — E06 came from a 30-second column-cardinality check.
-- **The source dataset is identified** (`docs/7_source_dataset_provenance.md`)
-  and, contrary to E05's null, **is used by the champion as a feature**,
-  so its CC0 citation obligation is live.
-- Mutable facts — leaderboard standing, public notebook approaches,
-  quotas — must be re-checked live, never recalled.
-- Model-behaviour claims trace to `docs/4_experiment_ledger.md`. CV↔LB
-  tracking holds across six OOF-backed submissions, but the sign flipped
-  positive at E06: test predictions are an average of every fold model
-  while each OOF row comes from one, so LB > OOF is partly construction,
-  not free accuracy.
+- **The only outstanding action is the final two-submission selection in
+  the Kaggle UI** before 2026-09-30 23:59 UTC — recommendation in
+  `docs/5_submission_manifest.md`. Search is closed; prefer cheap local
+  diagnostics over speculative kernel runs if it ever reopens.
+- The source dataset is identified and **used by the champion as a
+  feature** — its CC0 citation obligation is live
+  (`docs/7_source_dataset_provenance.md`).
+- Mutable facts — leaderboard standing, public notebooks, quotas — must
+  be re-checked live, never recalled.
+- LB has run slightly above OOF since E06 for a mostly mechanical reason
+  measured in E08B — see the ledger; keep gating on OOF.

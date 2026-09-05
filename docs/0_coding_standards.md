@@ -21,10 +21,16 @@ Notebook-first Kaggle workflow, matching
 
 - `notebooks/` — EDA, baseline modeling, tuning, ensembling. Plus
   `notebooks/kernels/<name>/` holding each notebook's Kaggle
-  `kernel-metadata.json`.
+  `kernel-metadata.json`. **Deliberate deviation from master §2:** the
+  notebooks are zero-padded (`01_eda.ipynb`, `02_baseline_modeling.ipynb`)
+  rather than `1_eda.ipynb`. Declared rather than fixed: the master
+  standard itself says not to renumber an existing repo, and the names
+  are load-bearing (kernel metadata `code_file`, the push script,
+  `check_frames.py`).
 - `docs/` — durable findings and decisions, numbered per master standard §2.
 - `scripts/` — small CLI helpers only (`push_kaggle_kernel.sh`,
-  `verify_submission.py`, `check_frames.py`), never core logic.
+  `verify_submission.py`, `check_frames.py`, `render_pdf.py`), never
+  core logic.
 - `data/` — local Kaggle files. **Gitignored.**
 - `predictions/` — OOF and test prediction matrices. **Gitignored.**
 
@@ -107,47 +113,21 @@ fallback, not the primary channel.
 
 ## GPU execution (user directive, 2026-09-02)
 
-GPU is available for Kaggle runs when it pays. CatBoost dominates this
-project's runtime (~3400 s per full-data 5-fold fit on the CPU worker), so
-GPU is the lever that makes wider experiments affordable.
+GPU is allowed for Kaggle runs, but E04 measured it and demoted it:
+**8.9× faster, 0.00070 AUC worse, and not bit-reproducible** (identical
+inputs moved the gate's P(Δ>0) from 0.648 to 0.879). So GPU is a
+**screening tool only** — explore on GPU if a sweep ever needs it, re-fit
+on CPU before anything can be promoted or submitted, and never trust a
+GPU result near a gate boundary. A GPU row never shares a comparability
+class with a CPU row; every ledger row states its device, and the in-run
+champion re-fit keeps gates valid across the boundary. Measurements and
+the two findings behind this rule: `docs/4_experiment_ledger.md`, E04.
 
-**The comparability rule — this is the part that bites.** CatBoost's GPU
-implementation is not numerically identical to its CPU one (notably
-`border_count` defaults to 128 on GPU vs. 254 on CPU, and some split
-algorithms differ). A GPU OOF score therefore **does not share a
-comparability class with a CPU OOF score**, exactly like the subsample /
-full-data rule above:
-
-- A GPU result and a CPU result **never share a ledger row**, and a GPU
-  candidate is never gated against a CPU champion number.
-- Every ledger row states its device.
-- This project's gate design already absorbs this: the champion is
-  **re-fit in-run** before every comparison, so a GPU run gates
-  GPU-vs-GPU and stays valid without re-running history.
-- The first GPU run must include a champion re-fit, giving both the
-  timing gain and the numerical GPU-vs-CPU delta as *measured* facts
-  rather than assumptions.
-
-**Measured 2026-09-02 (E04), replacing the assumption above:** GPU is
-**8.9× faster** (341 s vs. 3018 s per 5-fold fit) and **0.00070 AUC
-worse** on the identical configuration — 5.4× this dataset's single-seed
-noise floor, and more than every gain the whole search has won combined.
-So GPU is a **screening tool only**: explore configurations on GPU,
-re-fit anything promising on CPU before it can become a champion or a
-submission artifact. Never submit a GPU-fit model here.
-
-**GPU runs are also not bit-reproducible** (measured on the E04 re-run,
-2026-09-02): identical code, seeds and folds moved OOF in the 5th decimal
-and swung the gate's P(Δ>0) from 0.648 to 0.879. CPU runs here reproduce
-exactly. So a GPU result near a gate boundary is not trustworthy on its
-own, and any reproducibility claim about a GPU run must be qualified.
-
-**Mechanics:** set `enable_gpu: true` in the kernel metadata and pass
-`task_type="GPU"` in the CatBoost config — metadata alone does nothing,
-the model must select GPU computation. GPU quota is limited and mutable;
-check it live rather than recalling a number. LightGBM/HGB configurations
-here stay CPU: they already fit in 200–300 s, so GPU would add
-comparability risk for no meaningful gain.
+**Mechanics:** `enable_gpu: true` in kernel metadata does nothing by
+itself — CatBoost must also get `task_type="GPU"` (the notebook's
+`USE_GPU` flag does both). LightGBM/HGB stay CPU: they fit in 200–300 s,
+so GPU adds comparability risk for no gain. GPU quota is mutable; check
+it live.
 
 ## Public notebooks carry findings, not forward strategy (2026-09-02)
 
@@ -175,82 +155,37 @@ Config and Submission — a notebook that accretes `8b`, `8c`, … as
 experiments land has lost the map. Renumber when a section is added or
 retired rather than suffixing.
 
-## Derive run-guards, never enumerate them (2026-09-02)
+## Hard-won harness rules (each learned from a real failure)
 
-A notebook that accumulates experiment flags (`RUN_E01`, `RUN_E02`, …)
-must not gate shared sections on an enumerated list like
-`if RUN_CHAMPION and not (RUN_E03 or RUN_E04)`. That list was forgotten
-twice in one day — when E04 was added, and again for E05 — and each time
-the failure was silent and consequential: the generic champion re-fit
-would fit a *single* model under a seed-*average* champion's name, then
-the submission cell would happily write an artifact from it.
+Each rule below is stated in the 2–4 lines an implementer needs; the full
+incident — kernel versions, hours lost, exact tracebacks — lives in the
+`docs/6_agent_log.md` entry of the date given. Do not re-inline the
+stories here.
 
-Derive the condition instead (`EXPERIMENT_ACTIVE = RUN_E02 or …`), define
-it next to the flags, and say in a comment that new flags are added there
-rather than at each use site. More generally: when a bug class recurs,
-change the structure that permits it, not just the instance.
-
-**A validity check is not a variation check (2026-09-05).** E10's
-pre-run smoke test confirmed each CatBoost config was *accepted* and
-caught an invalid one before it could kill a run — good as far as it
-went. Two accepted configs then produced **bit-identical** predictions to
-the baseline, so ~2.8 h of kernel compute re-measured the baseline twice.
-Before spending platform compute on a configuration sweep, fit two tiny
-models and **assert the predictions differ**; an accepted parameter is
-not necessarily an effective one. (Here the cause was real: for a binary
-target at `TargetBorderCount=1`, `BinarizedTargetMeanValue` and `Borders`
-are algebraically the same, and `combinations_ctr=["Borders","Counter"]`
-is already the default.)
-
-**A precondition in a comment is not a precondition (2026-09-04, third
-instance of this pattern).** §5's champion re-fit carried the comment
-*"Only valid when BASELINE_CHAMPION names a single-model config"*. By
-notebook v10 the champion was a **3-seed average on features v3**, so a
-run with `RUN_CHAMPION=True` and no experiment active would fit **one**
-model on the **pre-E06 frame**, register it under the average's name, and
-write `submission.csv` from it — an artifact roughly **0.0034 worse**,
-labelled as the champion. The 16,384-combination sweep passed it, because
-the sweep asserts that nothing *crashes*, not that the right model was
-fit.
-
-The fix makes the champion's composition **data** (`CHAMPION_SEEDS`,
-`CHAMPION_IS_AVERAGE`, `CHAMPION_FOLDS`) and has §5 reproduce it or
-refuse. Two general rules follow, both learned the hard way here:
-
-- **When a section's correctness depends on a fact about a moving
-  pointer, encode the fact next to the pointer.** Every time this project
-  wrote the dependency as prose instead, it broke on the next promotion.
-- **A sweep that only checks for exceptions is not a correctness test.**
-  Add assertions about *what was fit and what was written*, not just that
-  the cell ran. The champion-re-fit scenarios are now permanent cases in
-  the dry-run.
-
-**A stub that supplies what §2 should build cannot test §2 (2026-09-04).**
-The enumerated-flag bug above recurred a *third* time — the guard
-`if (RUN_E06 or RUN_E07 or RUN_E08)` around the value-identity feature
-frames was not updated for E09 — and kernel v12 died on
-`NameError: X_v3s` after reaching the first fit. The 16,384-combination
-dry-run passed it, because the harness pre-defines `X_v3s` and every
-other frame in order to sweep cheaply. **A harness that injects the
-artefact under test is blind to that artefact's absence.**
-
-Two fixes, both structural:
-
-- The guard is derived once (`NEEDS_VALUE_ID_FRAMES`, beside
-  `NEEDS_SOURCE` and `EXPERIMENT_ACTIVE`) rather than repeated.
-- `scripts/check_frames.py` executes the **real** Config and Data cells
-  for each experiment flag and statically resolves every frame name that
-  experiment references, so a missing frame fails locally in seconds.
-  Run it before every push; the fast dry-run covers control flow, this
-  covers frame availability, and neither substitutes for the other.
-
-**Dry-run every branch before spending platform compute.** Stub the
-harness, execute the notebook's control flow with fake numbers, and assert
-on fit counts, which runs receive extra data, which candidate is selected,
-and whether an artifact is written. This practice caught the mislabeled
-re-fit twice, a `StopIteration` on a carried-over champion, and a
-submission that would have been written from predictions the run never
-produced.
+- **Derive run-guards, never enumerate them** (2026-09-02, recurred
+  2026-09-04 ×2). Any condition of the form `if RUN_A or RUN_B` at a use
+  site is forgotten when `RUN_C` arrives. Define it once, named, next to
+  the flags (`EXPERIMENT_ACTIVE`, `NEEDS_SOURCE`,
+  `NEEDS_VALUE_ID_FRAMES`, `CHAMPION_REFIT`), and add new flags there.
+- **Dry-run every branch before spending platform compute** — stub the
+  harness, execute the real control flow, and assert on *what is fit and
+  what is written*, not merely that nothing raises. A sweep that only
+  checks for exceptions passed a notebook that silently fit the wrong
+  model (2026-09-05).
+- **A stub that supplies what §2 should build cannot test §2**
+  (2026-09-04). The dry-run pre-defines feature frames to sweep cheaply,
+  so it is structurally blind to a frame §2 fails to build; that is what
+  `scripts/check_frames.py` exists for. Run both before every push —
+  neither substitutes for the other.
+- **A precondition in a comment is not a precondition** (2026-09-04,
+  third instance of the pattern). When a section's correctness depends on
+  a fact about a moving pointer, encode the fact as data beside the
+  pointer (`CHAMPION_SEEDS`, `CHAMPION_IS_AVERAGE`) and make the code
+  reproduce-or-refuse.
+- **A validity check is not a variation check** (2026-09-05). Before a
+  configuration sweep, fit two tiny models and assert the predictions
+  *differ*; an accepted parameter is not necessarily an effective one.
+  Two E10 arms re-measured the baseline bit-for-bit.
 
 ## A run name is a primary key; a printed warning is not a control (2026-09-02)
 

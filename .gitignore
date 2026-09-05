@@ -36,3 +36,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Rendered PDFs (scripts/render_pdf.py)
+renders/

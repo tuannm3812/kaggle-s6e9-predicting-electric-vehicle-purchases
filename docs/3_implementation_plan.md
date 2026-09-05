@@ -60,9 +60,10 @@ Executed end-to-end locally (kernel `s6e8-py39`, ~10 min wall-clock, dominated b
 
 ## Phase 3 — Optimization & Ensemble (evidence-gated, by ~2026-09-20) *(complete)*
 
-Status 2026-09-04: complete — E01–E09 all recorded in the ledger; the
-ensemble path is closed (every blend measured ≤ +0.00002). Original
-status line kept below for the record. Status 2026-09-01: step 1 done (E01 — `e01_cat_2000x05` promoted via
+Status 2026-09-04: **complete** — E01–E09 recorded in the ledger; the
+ensemble path is closed.
+
+*Original status line, kept for the record:* Status 2026-09-01: step 1 done (E01 — `e01_cat_2000x05` promoted via
 the paired gate, `docs/4_experiment_ledger.md`); step 4 resolved as
 **skip Optuna** (predeclared no-headroom condition met). Steps 2/3/5/6
 remain gated as written; E02 blend is eligible on diversity.
@@ -97,15 +98,13 @@ remain gated as written; E02 blend is eligible on diversity.
   constraint is discipline, not quota.
 - Keep the current champion as a known-good fallback at every step.
 
-## Phase 5 — Final Week (2026-09-24 → 2026-09-30)
+## Phase 5 — Closing out *(subsumes the original "Final Week" plan — items landed three weeks early)*
 
-1. Freeze features by 2026-09-26; stability and promotion checks only.
-2. Re-run the champion notebook end-to-end on Kaggle to confirm
-   reproducibility; pin the versions the trusted run actually used.
-3. Final submission locked by **2026-09-29** — a day of buffer against a
-   failed Kaggle run.
-4. Closing README update: result table, what worked, stop-condition
-   reasoning.
+The original final-week list said: freeze features, re-run the champion
+end-to-end, pin versions, lock the final submission by 2026-09-29, close
+the README. The first three happened by 2026-09-05 (search closed; R1
+reproduced the champion bit-identically; versions pinned); the live
+checklist is below.
 
 ## Subsample rule (restated from `docs/0_coding_standards.md`)
 
@@ -144,7 +143,6 @@ champion; both are candidates for the final two-submission selection.
 | Capacity (iterations, depth, leaves) | E01, E02 | every increase scored worse |
 | Regularization (l2, random_strength, bagging) | E04 | +0.00001…+0.00002, or −0.00030 |
 | Optuna / automated sweep | E01 | no headroom between hand-designed configs |
-| Blending | E02, E03 | OOF correlations 0.9958–0.9999, all above the 0.995 bar |
 | Seed averaging | E03 | plateaus past 3 seeds (+0.00003 for the 4th and 5th) |
 | Subsidy-gate features | E04 | features v2 +0.00003, gate-rejected |
 | GPU for champion fitting | E04 | −0.00070 vs CPU; screening only |
@@ -155,7 +153,8 @@ champion; both are candidates for the final two-submission selection.
 | Seed averaging, **re-tested post-E06** | E08 | +0.00007, below its own predeclared +0.00010 threshold |
 | Full-data refit for test predictions | E08B | +0.00004 on LB; below the noise floor, not promoted |
 | Fold count 5 → 10 | E09 | +0.00005 on LB; adopted as the go-forward default, not a champion |
-| Blending (any partner tried) | E02, E03, free screens | best case +0.00002; partners are ≥0.003 weaker |
+| Blending / stacking (any partner tried) | E02, E03, free screens, stacking screen | best case +0.00005 at the noise floor; partners are ≥0.003 weaker and meta-learners add nothing |
+| CTR estimator type | E10 | degenerate for a binary target (bit-identical), and `one_hot_max_size` −0.00006 (but 33% faster) |
 | A decorrelated non-CatBoost partner | free screen 2026-09-04 | LightGBM stays 0.0033 behind even with leak-free nested TE |
 
 **Noise floor: 0.00005** on the current representation (was 0.00013
@@ -174,30 +173,15 @@ generalise across representations (E08).
 (duplicates, id signal, joint identities, a strong LightGBM partner,
 artifact blending) all returned null. See the ledger.
 
-**Agreed sequence (2026-09-03, user directive "all three, sequenced").**
-Ordered so that no run's work is invalidated by a later one — E03 proved
-seed-averaging additive, so the config is settled *before* it is
-averaged:
-
-| Run | Experiment | Why this order |
-| --- | --- | --- |
-| kernel v10 | **E07** — capacity, full value-ids, CTR complexity (single seed) | Explore first: averaging a config that then changes is wasted compute |
-| kernel v11 | **E08** — seed-average E07's winner | Additive gain (+0.00019 measured in E03), applied once the config is final |
-| kernel v12/13 | **E09** — 10-fold under a new fold definition **F2** | Motivated by E06's +0.00020 LB>OOF gap: test statistics use all 668k rows, each F1 fold only ~535k. Needs F2 because it breaks comparability with every F1 row; gate F2-vs-F2 only |
-
-**Sequence outcome (2026-09-04):** E07 null, E08 +0.00007 OOF plus a
-correction to the LB>OOF explanation, E09 +0.00005 LB. Best submission
-`e09_f2_avg3seeds` at public **0.94570**; gated champion `e08_avg3seeds`
-at 0.94565. Roughly 20 h of compute for a twentieth of the gap to the
-leader — the enumerated axes are exhausted, and the remaining 0.00086
-needs a representational idea like E06's, not another tuning pass.
-**Find evidence cheaply and locally before predeclaring anything
-further.**
+**The 2026-09-03 three-run sequence (E07 explore → E08 average → E09
+ten-fold) is finished**; runs, outcomes and the ~20 h/+0.00005 accounting
+are in the ledger, session narrative in the log. E10 and the R1
+reproduction followed and closed the search on 2026-09-05.
 
 **Closed for good by the free screens (2026-09-03):** blending, source
 tracing, and target-free derived features — see the ledger.
 
-## Phase 4 — Closing out (2026-09-04 onward)
+### Closing-out checklist (2026-09-04 onward)
 
 Search is finished: every enumerated axis is measured and five further
 free screens found nothing. What remains is not modelling.
@@ -206,7 +190,7 @@ free screens found nothing. What remains is not modelling.
 | --- | --- |
 | Pin dependency versions | **done** — `requirements.txt` pinned to the kernel-v13 environment |
 | Record catboost in the reproducibility snapshot | **done** — it produces the champion and was missing |
-| Verify the champion's reproduction path still executes | **done** — `check_frames.py` passes for `RUN_E08`; CPU runs have reproduced bit-identically five times |
+| Verify the champion reproduces end-to-end | **done** — R1 (kernel v14): bit-identical vectors, byte-identical artifact |
 | Choose the final two submissions | **decided** — see `docs/5_submission_manifest.md`; the action itself is UI-only and still outstanding |
 | Select them on Kaggle before 2026-09-30 23:59 UTC | **outstanding — the only hard deadline left** |
 

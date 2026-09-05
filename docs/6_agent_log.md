@@ -751,3 +751,62 @@ wide margin (one-hot ≥5% faster → measured 33%), 1 wrong (5.12 h vs
 `e08_avg3seeds`, best submission `e09_f2_avg3seeds` at public 0.94570.
 The only outstanding action is selecting the final two submissions in the
 Kaggle UI before 2026-09-30 23:59 UTC.
+
+## 2026-09-05 — Overlap audit acted on; the 2026-09-02 audit's open items finally dispositioned
+
+A second subagent audit (overlap and lane discipline, distinct from the
+2026-09-04 staleness audit) found one live contradiction and a structural
+cause for the recurring staleness; both are fixed:
+
+- **The contradiction:** `docs/5` still declared the blend path
+  "no longer closed" while the ledger's free screens had measured every
+  blend as negative and closed it. The manifest now points at the ledger
+  instead of restating model behaviour — that bullet was also a lane
+  violation, which is *why* it rotted.
+- **The structural cause:** the champion/state block was hand-maintained
+  in five files, and `AGENTS.md` had gone stale *again* within one day of
+  being fixed (it still said "E01–E09, 7 submissions" with E10, R1 and
+  the stacking screen missing). AGENTS.md and README now carry one
+  orienting line plus pointers; `docs/3` owns current state, the ledger
+  owns numbers. AGENTS.md says explicitly not to widen it again.
+- Also: `docs/2`'s superseded baseline plan cut to a pointer and its
+  "every number below" claim scoped to §§1–8; `docs/3`'s duplicate
+  blending rows, duplicate Phase-4 headings and stitched status merged
+  (the early "Final Week" plan is subsumed — its items landed three
+  weeks early); `docs/0`'s incident narratives compressed to rules with
+  dated pointers here, and the superseded GPU-framing block replaced by
+  the measured rule; the `01_`/`02_` notebook naming declared in docs/0
+  as a deliberate deviation from master §2 (the master itself says not
+  to renumber, and the names are load-bearing).
+
+**The 2026-09-02 audit items that were never closed, now dispositioned:**
+
+1. **Paired-bootstrap construction — verified, closed.** The gate has
+   since been re-implemented independently twice (the local fast-AUC
+   harness that reproduced all seven historical gate results to the
+   quoted digits on 2026-09-02, and the from-scratch re-gates of E06 and
+   E08 against saved matrices), with matching CIs and P values each
+   time. Two independent implementations agreeing is the verification
+   the audit asked for.
+2. **Family-wise error across many 95% gates — acknowledged as an
+   accepted limitation, not corrected.** No formal multiplicity
+   correction is applied. In mitigation: promotion requires majority
+   folds AND CI>0 AND P≥0.95 jointly; the one near-threshold case
+   (E07's `e07_all_value_ids`, P=0.954) was refused by the CI criterion,
+   which is the mechanism working; and every promotion was subsequently
+   confirmed on the leaderboard. With the search closed, retrofitting a
+   correction would change no decision.
+3. **`fold_std` ddof=0 — closed 2026-09-04** when the code was annotated:
+   it is deliberately the population std of the observed fold scores, a
+   description of the run's spread, never used by the gate.
+4. **Unpinned `requirements.txt` — closed 2026-09-04** (pinned to the
+   kernel-v13 environment, confirmed against kernel v14's snapshot).
+
+Also today: the first render pipeline in any sibling repo —
+`scripts/render_pdf.py` (pandoc → styled HTML → headless Chrome; no
+LaTeX dependency) renders all docs plus both notebooks to `renders/`
+(gitignored), with a combined `all_docs.pdf`. Notebooks render from
+source; `--execute-eda` optionally executes the EDA locally for outputs
+(the modeling notebook is never executed locally). One defect found and
+fixed in review: pandoc's `title` metadata double-titled every page;
+`pagetitle` sets the browser title without the duplicate heading.

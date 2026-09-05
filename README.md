@@ -12,7 +12,7 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 ## Status
 
-**E09 complete (2026-09-04). Nine experiments, seven submissions.**
+**Search closed (2026-09-05): ten experiments, a reproduction run, seven submissions.**
 
 | | Model | OOF AUC | Public LB |
 | --- | --- | --- | --- |
@@ -21,24 +21,20 @@ Public-notebook-first workflow. Notebooks are the executable source of truth;
 
 Progression: 0.94169 → 0.94198 → 0.94210 → 0.94562 → 0.94565 → 0.94570.
 
-**The step that mattered was E06 (+0.00337 OOF), and it came from a
-30-second diagnostic, not a sweep.** The "numeric" columns are *value
-identities*: `Annual_Income_USD` takes 13,214 distinct values, 97.9% of
-them drawn from the source dataset, and the exact value carries label
-information its magnitude does not — signal that tree quantization (254
-borders) cannot reach. Encoding those values as CatBoost categoricals
-was worth five times every other accepted step combined. Full reasoning:
-[`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md), E06.
+**The step that mattered was E06: the "numeric" columns are value
+identities**, and target-encoding the exact values was worth five times
+every other accepted step combined (+0.00337). It came from a 30-second
+diagnostic, not a sweep — the full argument is the ledger's E06 entry.
+Search closed 2026-09-05 after E01–E10 and a bit-identical reproduction.
 
-Every run — kept or rejected — is in the ledger with its gate predeclared
-*before* execution, and the failed predictions are recorded as plainly as
-the successful ones. Two comparability classes are enforced in code
-rather than by convention: CPU/GPU, and fold definition F1/F2.
+Every run — kept or rejected — is in
+[`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md) with its
+gate predeclared *before* execution, and the failed predictions recorded
+as plainly as the successes.
 
 - Task: binary classification — probability that `Will_Buy_EV = "Yes"`.
 - Metric: **ROC AUC** (verified via the Kaggle API, 2026-09-01).
 - Train 668,665 rows x 13 features; test 286,571 rows.
-- Noise floor: **0.00005** on the current representation.
 
 Deadline: **2026-09-30 23:59 UTC** (Kaggle API, re-confirmed 2026-09-01).
 
@@ -71,8 +67,9 @@ python3 scripts/verify_submission.py <artifact.csv> \
   dataset provenance.
 - [`scripts/`](scripts/) — `push_kaggle_kernel.sh` (push a notebook to its
   Kaggle kernel), `verify_submission.py` (pre-submission schema checks),
-  and `check_frames.py` (proves each experiment's feature frames are
-  actually built — added after a missing frame killed a kernel run).
+  `check_frames.py` (proves each experiment's feature frames are actually
+  built — added after a missing frame killed a kernel run), and
+  `render_pdf.py` (docs and notebooks to PDF under `renders/`).
 - `data/`, `predictions/` — local and generated, gitignored.
 
 ## Conventions

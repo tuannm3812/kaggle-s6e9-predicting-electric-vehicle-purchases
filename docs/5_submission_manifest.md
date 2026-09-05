@@ -18,9 +18,8 @@ Every leaderboard submission, recorded the moment it is scored, per
 - Submitted via the kernel-version flow (`-k tuannm3812/ev-purchases-baseline-modeling -v 2`),
   so the score is tied to code Kaggle executed (master standard §11).
   Every artifact is pre-validated with `scripts/verify_submission.py`
-  (columns, row count, id order, finiteness, range) — 286,571 rows each.
-  Ranges have widened as the models sharpened: submission 1 was
-  [0.0000, 0.9893], submission 7 is [0.0000047, 0.99979].
+  (checks listed once, in `docs/0_coding_standards.md`) — 286,571 rows
+  each; submission 7's range is [0.0000047, 0.99979].
 - Quota use: 7 across 4 days. **Five** were backed by a paired-gate
   promotion in the F1 class (1–5). **Two are deliberate exceptions**,
   each predeclared with a falsification threshold before submission:
@@ -36,36 +35,28 @@ Every leaderboard submission, recorded the moment it is scored, per
   designation earned through a paired OOF gate. `e09_f2_avg3seeds`
   (0.94570) is the best public score, but lives in fold definition F2
   and cannot be gated against an F1 champion. Both are candidates for
-  the final two-submission selection. The
-  *rank number* rose while the score improved because the field is
-  growing fast; percentile moved ~37% → ~24% on E06. Rank is not
-  evidence about the model — the OOF/LB deltas are. Leader was 0.94644 at that snapshot;
-  0.94562 sat ~0.0008 back and 95th place was 0.94602, so
-  the field is dense here — small real gains still move rank a lot.
-  *(Superseded — see the standing bullet below for current numbers.)*
+  the final two-submission selection. The *rank number* rises while the
+  score improves because the field grows fast; percentile moved
+  ~37% → ~24% on E06 and holds. Rank is not evidence about the model —
+  the OOF/LB deltas are.
 - **CV↔LB tracking holds across all six OOF-backed submissions**: gaps
   −0.00008, −0.00006, −0.00013, +0.00020, +0.00015, +0.00006 (the last
   being submission 7's F2 OOF 0.94564 → 0.94570, an in-class gap).
   Submission 6 has no OOF and so no gap. The sign flipped at E06 and
   stayed positive.
-- **The explanation of that flip was wrong, and E08B corrected it**
-  (2026-09-04). The original note here blamed value statistics being
-  estimated from 668,665 rows at test time versus ~535k per fold. E08B
-  isolated exactly that mechanism by refitting on all rows and measured
-  it at **+0.00004** — about a fifth of the gap. The larger share is an
-  asymmetry the note missed entirely: **each OOF row is predicted by one
-  model, while each test row is predicted by the average of every fold
-  model** (15 of them for a 3-seed champion). Test predictions receive
-  ensemble variance reduction that OOF never gets, so LB>OOF is mostly
-  an artefact of how the two quantities are built. Keep gating on OOF —
-  it stays directionally right, which is what the gate needs — but do
-  not read the positive gap as free accuracy.
-- Decision: `e08_avg3seeds` is the champion and the current final
-  answer; `e08_fulldata_avg3` scored higher (0.94569) but is unpromoted
-  and stays a candidate for the final two-submission selection. Next submission only after a new paired-gate promotion.
-  The blend path is **no longer closed** — E06's OOF correlates 0.9868
-  with the pre-E06 models, the first pair under the 0.995 diversity bar
-  (`docs/4_experiment_ledger.md`, E06 Finding 6).
+- **The sign flip's cause was corrected by E08B** (2026-09-04): mostly a
+  construction asymmetry (each OOF row is one model's prediction, each
+  test row an average of all fold models), with the data-volume effect
+  measured at only +0.00004. Full analysis: `docs/4_experiment_ledger.md`,
+  E08 results. Keep gating on OOF; do not read the positive gap as free
+  accuracy.
+- Decision: `e08_avg3seeds` is the champion; `e08_fulldata_avg3` scored
+  higher (0.94569) but is unpromoted. Any further submission needs a new
+  paired-gate promotion. *(An earlier bullet here declared the blend path
+  re-opened on E06's 0.9868 correlation; the free screens then measured
+  every blend weight as negative and closed it for good. The ledger is
+  canonical on model behaviour — this doc points there instead of
+  restating it.)*
 
 ## Final submission selection (decided 2026-09-04, act before 2026-09-30)
 

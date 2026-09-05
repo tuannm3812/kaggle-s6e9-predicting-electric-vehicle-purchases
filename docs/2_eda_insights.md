@@ -105,25 +105,13 @@ in **~21 s** locally. The scale override stays in force (measure the first
 full-data *model* fit before any sweep), but the data is lighter than the
 7.7 MB sample-submission size implied.
 
-## 9. Baseline-Phase Plan, As Written on 2026-09-01 *(all items now complete — kept for the record)*
+## 9. Where the EDA-Phase Plan Went
 
-**Superseded.** Every item below was carried out (items 1–3 in v1/v2, item 4 promoted as E02). Forward strategy now lives in `docs/3_implementation_plan.md` and `docs/4_experiment_ledger.md`, per `docs/0_coding_standards.md`. When written, this section was the only home for the EDA's forward plan — the
-notebook itself carries findings only (`docs/0_coding_standards.md`).
-
-1. Fixed folds, defined once: `StratifiedKFold(n_splits=5, shuffle=True,
-   random_state=42)`; recorded in the experiment ledger at first use.
-2. v1 sanity: constant, logistic (one-hot + scaled), default HGB — with
-   wall-clock and memory measured on the first full fit.
-3. v2 strong: LightGBM + CatBoost, native categoricals;
-   `Range_Anxiety_Level` ordinal by default with a categorical A/B.
-4. Explicit interaction crosses (`Subsidy × Environmental_Concern`,
-   `Subsidy × Income`) only as an OOF-gated experiment if baselines plateau.
-5. Expect a tight plateau (three features carry nearly all marginal
-   signal) — the paired-OOF promotion gate is what separates real gains
-   from noise; derive its width from this dataset's own fold std.
-6. Explicitly **not** needed: missingness handling, drift correction,
-   duplicate handling (§§1, 6–7).
-
+A six-item baseline-phase plan lived here until 2026-09-05. Every item
+was executed (folds F1, v1 sanity models, the LightGBM/CatBoost baselines
+and the ANX A/B, the interaction crosses promoted as E02), and forward
+strategy belongs in `docs/3_implementation_plan.md`, not the EDA doc — so
+the list is retired rather than maintained as history it no longer is.
 
 ## 10. Post-hoc: the numeric columns are value identities (2026-09-03)
 
