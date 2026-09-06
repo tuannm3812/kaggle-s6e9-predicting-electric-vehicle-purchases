@@ -878,3 +878,37 @@ submission `e09_f2_avg3seeds` (public 0.94570). No submission from this
 run — the artifact is byte-identical to submission 5. The public kernel
 now shows the finished work at
 `kaggle.com/code/tuannm3812/ev-purchases-modeling`.
+
+## 2026-09-06 — Model-comparison figures; and why the modeling PDF has no outputs
+
+**The outputs question, answered by testing rather than assumption.**
+Kaggle's API genuinely cannot return an executed notebook:
+`kernels_pull` yields source only (verified — 59 cells, 0 with outputs),
+and no API method exposes the rendered `__results__.html`. So the
+modeling notebook's PDF can only carry outputs if it is executed
+locally, which for the current flags is the ~3.5 h champion re-fit and
+against the standing Kaggle-only directive. **Not worth it:** that
+notebook's outputs are AUC print lines that the ledger already records
+in better form, plus the run is provably reproducible (R1, eight
+bit-identical vectors). The EDA notebook is the one where outputs are
+plots, and `--execute-eda` already renders it with them at ~21 s.
+
+**Built the comparison artifacts instead** — `scripts/make_figures.py`
+(following the sibling fire-research repo's `report/figures/` pattern)
+and `docs/8_model_comparison.md`. Four figures, all derived from saved
+OOF matrices and ledger rows, refitting nothing: the experiment
+sequence, a forest plot of every gate's ΔAUC with CI, the OOF
+correlation heatmap, and compute-cost against gain. Plus the
+what-was-run-and-why table the figures annotate. The doc states plainly
+that it adds no facts and the ledger stays canonical, so it cannot
+become a sixth copy of the state block.
+
+**One error caught in my own figure.** The first draft plotted E09's
+10-fold OOF as a continuation of the F1 champion line — a cross-class
+comparison the project forbids *in code* (`paired_gate` asserts matching
+fold definitions). Fixed: the F1 line stays flat after E08, because an
+F2 run cannot displace an F1 champion, and E09's number is drawn as a
+separate marker with the reason on the figure. A chart that quietly
+breaks the project's own comparability rule would be worse than no
+chart. Also spelled out "AUC gain" where a Greek Δ was silently falling
+back to another face — DM Sans has no Δ glyph.

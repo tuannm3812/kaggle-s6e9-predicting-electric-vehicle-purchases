@@ -135,7 +135,7 @@ DOC_ORDER = [
     "0_coding_standards.md", "1_instructions.md", "2_eda_insights.md",
     "3_implementation_plan.md", "4_experiment_ledger.md",
     "5_submission_manifest.md", "6_agent_log.md",
-    "7_source_dataset_provenance.md",
+    "7_source_dataset_provenance.md", "8_model_comparison.md",
 ]
 
 
@@ -157,9 +157,12 @@ def md_to_pdf(sources: list[Path], pdf: Path, title: str) -> None:
         css = Path(td) / "print.css"
         css.write_text(build_css())
         html = Path(td) / "out.html"
+        # --resource-path lets ../assets/figures/... in a doc resolve, and
+        # --embed-resources then inlines the PNGs so the PDF is self-contained.
         run([
             "pandoc", *map(str, sources), "-f", "gfm", "-t", "html5",
             "--standalone", "--embed-resources", f"--css={css}",
+            f"--resource-path={REPO}:{REPO / 'docs'}",
             "--metadata", f"pagetitle={title}", "-o", str(html),
         ])
         html_to_pdf(html, pdf)

@@ -27,6 +27,12 @@ every other accepted step combined (+0.00337). It came from a 30-second
 diagnostic, not a sweep — the full argument is the ledger's E06 entry.
 Search closed 2026-09-05 after E01–E10 and a bit-identical reproduction.
 
+![Experiment journey](assets/figures/01_experiment_journey.png)
+
+Nine steps moved the champion by +0.00066 combined; one moved it by
++0.00337. Figures, and a table of what each experiment tested and
+settled: [`docs/8_model_comparison.md`](docs/8_model_comparison.md).
+
 Every run — kept or rejected — is in
 [`docs/4_experiment_ledger.md`](docs/4_experiment_ledger.md) with its
 gate predeclared *before* execution, and the failed predictions recorded

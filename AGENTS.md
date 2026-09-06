@@ -48,6 +48,7 @@ first suggested.
 - `docs/5_submission_manifest.md` — every submission and its decision
 - `docs/6_agent_log.md` — append-only session log; start here to catch up
 - `docs/7_source_dataset_provenance.md` — the source dataset, its licence, and how it is used
+- `docs/8_model_comparison.md` — figures and the what-was-run-and-why table (draws the ledger; adds no facts)
 
 Any claim about model behaviour should trace to a row in the ledger.
 
