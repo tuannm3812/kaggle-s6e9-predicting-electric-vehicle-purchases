@@ -21,23 +21,33 @@ What it produces, under renders/ (gitignored):
     renders/docs/all_docs.pdf      docs 0-7 concatenated in reading order
     renders/notebooks/<name>.pdf   one PDF per notebook
 
-Notebooks render from SOURCE by default — code and markdown, no cell
-outputs — because the executed runs live on Kaggle and neither
-`kaggle kernels pull` nor `kernels output` returns the executed notebook.
-`--execute-eda` runs the EDA notebook locally into a temp copy first so
-its PDF carries plots and tables; the modeling notebook is never executed
-locally (docs/0: full runs happen on Kaggle only).
+Notebooks render from SOURCE — Kaggle exposes no executed notebook by any
+route (verified 2026-09-06: `kernels pull` returns source only,
+`kernels_list_files` lists just /kaggle/working, and the public page is a
+client-rendered shell; the standing feature request is Kaggle discussion
+83578). Two ways to get real output in anyway:
+
+  --with-kernel-log  fetch the run log from the notebook's Kaggle kernel
+                     and append it as an "Executed output" appendix. This
+                     is the output of the run that produced the ledger
+                     rows, so it is the *trusted* one — better evidence
+                     than a fresh local execution would be.
+  --execute-eda      execute the EDA notebook locally (~21 s) so its PDF
+                     carries plots. EDA only; the modeling notebook is
+                     never executed locally (docs/0).
 
 Usage:
-    python3 scripts/render_pdf.py               # everything, source-only
-    python3 scripts/render_pdf.py --execute-eda # EDA with outputs
-    python3 scripts/render_pdf.py --only docs   # or: notebooks
+    python3 scripts/render_pdf.py --with-kernel-log --export   # the usual
+    python3 scripts/render_pdf.py --execute-eda   # EDA plots as well
+    python3 scripts/render_pdf.py --only docs     # or: notebooks
 """
 
 from __future__ import annotations
 
 import argparse
 import base64
+import html as html_lib
+import json
 import subprocess
 import sys
 import tempfile
@@ -168,7 +178,64 @@ def md_to_pdf(sources: list[Path], pdf: Path, title: str) -> None:
         html_to_pdf(html, pdf)
 
 
-def notebook_to_pdf(nb: Path, pdf: Path, execute: bool) -> None:
+# Log lines every Kaggle run emits that carry no information about the
+# work — debugger notices, nbconvert chatter, CatBoost's CTR warnings.
+LOG_NOISE = (
+    "Debugger warning", "frozen modules", "PYDEVD", "MissingIDField",
+    "validate(nb)", "SyntaxWarning", "re.sub(", "NbConvertApp",
+    "mistune", "filter_links", "make the debugger", "Change of",
+)
+
+
+def kernel_log_html(nb: Path) -> str:
+    """Fetch the notebook's Kaggle run log and render it as an appendix.
+
+    Returns "" (and says why) when the kernel has no metadata or the fetch
+    fails — a missing log should degrade the PDF, never abort the render.
+    """
+    meta = REPO / "notebooks" / "kernels" / nb.stem.lstrip("0123456789_") / "kernel-metadata.json"
+    if not meta.exists():
+        matches = list((REPO / "notebooks" / "kernels").glob("*/kernel-metadata.json"))
+        meta = next((m for m in matches
+                     if json.loads(m.read_text()).get("code_file") == nb.name), None)
+        if meta is None:
+            print(f"    (no kernel metadata for {nb.name}; appendix skipped)")
+            return ""
+    kernel_id = json.loads(meta.read_text())["id"]
+    with tempfile.TemporaryDirectory() as td:
+        try:
+            subprocess.run(["kaggle", "kernels", "output", kernel_id,
+                            "-p", td], check=True, capture_output=True)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            print(f"    (could not fetch {kernel_id} log: {exc}; appendix skipped)")
+            return ""
+        logs = list(Path(td).glob("*.log"))
+        if not logs:
+            print(f"    (no log in {kernel_id} output; appendix skipped)")
+            return ""
+        try:
+            entries = json.loads(logs[0].read_text())
+        except json.JSONDecodeError:
+            entries = [{"data": logs[0].read_text()}]
+    lines = [e.get("data", "").rstrip() for e in entries]
+    lines = [ln for ln in lines
+             if ln.strip() and not any(n in ln for n in LOG_NOISE)]
+    if not lines:
+        return ""
+    body = html_lib.escape("\n".join(lines))
+    return (
+        '<h1 style="page-break-before:always">Executed output</h1>'
+        f'<p>Console output of the Kaggle run behind this notebook '
+        f'(<code>{html_lib.escape(kernel_id)}</code>). Kaggle exposes no '
+        'executed notebook, so this log — the output of the run that '
+        'produced the recorded results — stands in for cell outputs. '
+        'Noise lines (debugger, nbconvert, CTR warnings) are filtered.</p>'
+        f"<pre>{body}</pre>"
+    )
+
+
+def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
+                    with_log: bool = False) -> None:
     """Notebook -> HTML via nbconvert -> PDF. Optionally execute first."""
     with tempfile.TemporaryDirectory() as td:
         cmd = [
@@ -186,6 +253,11 @@ def notebook_to_pdf(nb: Path, pdf: Path, execute: bool) -> None:
         style = f"<style>{build_css()}</style>"
         html = (html.replace("</head>", style + "</head>", 1)
                 if "</head>" in html else style + html)
+        if with_log:
+            appendix = kernel_log_html(nb)
+            if appendix:
+                html = (html.replace("</body>", appendix + "</body>", 1)
+                        if "</body>" in html else html + appendix)
         html_file.write_text(html)
         html_to_pdf(html_file, pdf)
 
@@ -198,6 +270,9 @@ def main() -> None:
                         help="execute the EDA notebook locally so its PDF "
                              "has outputs (the modeling notebook is never "
                              "executed locally; see docs/0)")
+    parser.add_argument("--with-kernel-log", action="store_true",
+                        help="append each notebook's Kaggle run log as an "
+                             "'Executed output' appendix (needs network)")
     parser.add_argument("--export", action="store_true",
                         help="after rendering, copy renders/ to iCloud "
                              "Drive under 05_Projects/<category>/<repo>/")
@@ -226,8 +301,11 @@ def main() -> None:
         out.mkdir(parents=True, exist_ok=True)
         for nb in sorted((REPO / "notebooks").glob("*.ipynb")):
             execute = args.execute_eda and nb.name == "01_eda.ipynb"
-            notebook_to_pdf(nb, out / f"{nb.stem}.pdf", execute)
-            tag = " (executed)" if execute else " (source; runs live on Kaggle)"
+            notebook_to_pdf(nb, out / f"{nb.stem}.pdf", execute,
+                            with_log=args.with_kernel_log)
+            tag = (" (executed locally)" if execute
+                   else " + Kaggle run log" if args.with_kernel_log
+                   else " (source; runs live on Kaggle)")
             print(f"  renders/notebooks/{nb.stem}.pdf{tag}")
 
     if args.export:

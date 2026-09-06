@@ -157,12 +157,19 @@ dependency by design**; nothing beyond what the machine already had.
   viridis blue `#31688E` H2, green `#2D7F5E` H3, muted grey `#6E7278`
   H4. Blue and green match the sibling hackathon repo's chart palette;
   lightness steps too, so levels survive greyscale printing.
-- **Notebooks render from source.** Neither `kaggle kernels pull` nor
-  `kernels output` returns an executed notebook, so cell outputs are
-  absent unless `--execute-eda` is passed (EDA only — the modeling
-  notebook is never executed locally). Our stylesheet is appended after
-  nbconvert's so fonts and headings win while its syntax highlighting
-  is left alone.
+- **Notebooks render from source, with the run log appended.** Kaggle
+  exposes no executed notebook by any route (checked 2026-09-06:
+  `kernels pull` gives source only, `kernels_list_files` lists just
+  `/kaggle/working`, and the public page is a client-rendered shell —
+  the standing feature request is Kaggle discussion 83578). So
+  `--with-kernel-log` fetches the kernel's run log and appends it as an
+  *Executed output* appendix. That log is the output of the run that
+  produced the recorded results, which makes it **better** evidence than
+  a fresh local execution: it is the trusted run, not a re-enactment.
+  `--execute-eda` still executes the EDA notebook locally (~21 s) for
+  its plots; the modeling notebook is never executed locally. Our
+  stylesheet is appended after nbconvert's so fonts and headings win
+  while its syntax highlighting is left alone.
 
 ## Public notebooks carry findings, not forward strategy (2026-09-02)
 

@@ -912,3 +912,34 @@ separate marker with the reason on the figure. A chart that quietly
 breaks the project's own comparability rule would be worse than no
 chart. Also spelled out "AUC gain" where a Greek Δ was silently falling
 back to another face — DM Sans has no Δ glyph.
+
+## 2026-09-06 — Kaggle notebook export: confirmed absent, worked around properly
+
+User pointed at Kaggle discussion 83578, "Export Notebook in PDF or html
+format" — a standing feature request, which is itself the answer: the
+capability does not exist. Checked three routes rather than resting on
+the API claim I made yesterday:
+
+1. `kaggle kernels pull` → source only (59 cells, 0 with outputs), and
+   the CLI has no html/pdf flag.
+2. `kernels_list_files` → lists only `/kaggle/working` artifacts; the
+   rendered `__results__.html` the logs mention is not exposed.
+3. The public kernel page → client-rendered shell; fetching it returns
+   the title and nothing else, as with competition pages.
+
+So there is no programmatic export. Kaggle's own UI can print a notebook
+to PDF by hand, which is what the thread's participants resort to.
+
+**The better fix, now implemented.** Every run's *log* is downloadable
+via `kaggle kernels output`, and it contains exactly what the PDF was
+missing — fold AUCs, gate results, the full reproducibility snapshot.
+`render_pdf.py --with-kernel-log` fetches it and appends an *Executed
+output* appendix (noise lines filtered). This is not a substitute for
+executing the notebook; it is **better evidence than executing it would
+be**, because it is the output of the run that actually produced the
+ledger rows rather than a re-enactment. `02_modeling.pdf` went from 43
+to 46 pages and now carries real numbers.
+
+Degradation is deliberate: no kernel metadata, no network, or no log in
+the output all print a reason and render the PDF without the appendix
+rather than failing.
