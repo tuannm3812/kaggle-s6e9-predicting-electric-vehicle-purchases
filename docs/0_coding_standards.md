@@ -166,10 +166,10 @@ dependency by design**; nothing beyond what the machine already had.
   *Executed output* appendix. That log is the output of the run that
   produced the recorded results, which makes it **better** evidence than
   a fresh local execution: it is the trusted run, not a re-enactment.
-  **A past run's output cannot be fetched by any route** — the CLI, the
-  SDK's `version_number` field and the public page were all checked at
-  source level on 2026-09-07 and every one returns the latest run
-  (evidence table in `assets/kernel_logs/README.md`). So **run
+  **A past run's output cannot be fetched by any route** — now a rule in
+  the master standard (**§12.1**, promoted from this project on
+  2026-09-07 with its evidence table, since it applies to every Kaggle
+  repo). Locally: **run
   `python3 scripts/archive_kernel_log.py <version> <label>` immediately
   after every kernel run**; a log not captured while it is the latest is
   gone, as kernels v1–v8 of this project are. Archived logs replay into

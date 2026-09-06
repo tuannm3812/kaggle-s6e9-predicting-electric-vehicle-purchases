@@ -1006,3 +1006,31 @@ after does not exist anywhere in the API.
 
 The seven archived logs are now readable documents rather than raw JSON
 in a directory. Kernels v1–v8 remain lost and are recorded as such.
+
+## 2026-09-07 — Promoted the Kaggle-artifact finding to the master standard
+
+The version-suffix behaviour is not an S6E9 fact, it is a Kaggle-platform
+fact, so it now lives in the shared standard as **§12.1 "Kaggle keeps
+only the latest run — save artifacts every time"**
+(`~/Documents/GitHub/coding-standards`, commit `6989f59`) with the
+route-by-route evidence table. Added as a subsection of §12 rather than a
+new §13 deliberately: repos across the workspace cite "master standard
+§13" for scaffolding, and renumbering would break those references for
+tidiness.
+
+**Answering "should we save the artifacts after each run": yes, and the
+split matters.** Pushing a new version makes the previous run's outputs
+unreachable — not merely inconvenient. Verified today that
+`kernels_list_files` serves only the newest run's `/kaggle/working`, so
+prediction matrices are as unfetchable as logs.
+
+| Artifact | Size here | Recoverable | Decision |
+| --- | --- | --- | --- |
+| Run log | ~20 KB | **No** | Commit — `assets/kernel_logs/` |
+| OOF/test matrices | 432 MB across 119 files | Unfetchable but regenerable, because CPU runs reproduce bit-identically (proven 8×) | Gitignore; back up if a re-run would be costly |
+| `submission.csv` | ~8 MB | Regenerable from the matrices | Gitignore; the manifest records the artifact hash, which proves identity without the file |
+
+The middle row only holds because determinism was *measured* rather than
+assumed — `np.array_equal` on saved vectors, not a matching summary
+metric. Without that evidence every matrix would be irreplaceable and the
+recommendation would flip to committing them.
