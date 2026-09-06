@@ -1,0 +1,261 @@
+[{"stream_name":"stderr","time":8.28927736,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
+,{"stream_name":"stderr","time":8.289359163,"data":"  validate(nb)\n"}
+,{"stream_name":"stderr","time":9.553893397,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":9.553934543,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":9.553940562,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":9.553945209,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":10.413647805,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":10.413694821,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":10.413701457,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":10.413707176,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":21.551841374,"data":"python 3.12.13\n"}
+,{"stream_name":"stdout","time":21.551903936,"data":"{'numpy': '2.0.2', 'pandas': '2.3.3', 'sklearn': '1.6.1', 'lightgbm': '4.6.0', 'catboost': '1.2.10'}\n"}
+,{"stream_name":"stdout","time":21.751769255,"data":"DATA_DIR = /kaggle/input/competitions/playground-series-s6e9\n"}
+,{"stream_name":"stdout","time":28.539954518000002,"data":"Age                               int64\n"}
+,{"stream_name":"stdout","time":28.539997738,"data":"Annual_Income_USD               float64\n"}
+,{"stream_name":"stdout","time":28.54000626,"data":"Daily_Commute_km                float64\n"}
+,{"stream_name":"stdout","time":28.540012396,"data":"Number_of_Cars_Owned              int64\n"}
+,{"stream_name":"stdout","time":28.540018643,"data":"Charging_Stations_Near_Home       int64\n"}
+,{"stream_name":"stdout","time":28.540024233,"data":"Charging_Stations_Near_Work       int64\n"}
+,{"stream_name":"stdout","time":28.5400298,"data":"Environmental_Concern_Level     float64\n"}
+,{"stream_name":"stdout","time":28.540035346,"data":"Gender                         category\n"}
+,{"stream_name":"stdout","time":28.540041285,"data":"City_Type                      category\n"}
+,{"stream_name":"stdout","time":28.540045053,"data":"Current_Car_Type               category\n"}
+,{"stream_name":"stdout","time":28.540048746,"data":"Home_Charging_Possible         category\n"}
+,{"stream_name":"stdout","time":28.540080133,"data":"Subsidy_Available              category\n"}
+,{"stream_name":"stdout","time":28.540088763,"data":"Range_Anxiety_Level                int8\n"}
+,{"stream_name":"stdout","time":28.540094571,"data":"Subsidy_x_EnvConcern            float64\n"}
+,{"stream_name":"stdout","time":28.540100123,"data":"Subsidy_x_Income                float64\n"}
+,{"stream_name":"stdout","time":28.540105563,"data":"Subsidy_x_HomeCharging             int8\n"}
+,{"stream_name":"stdout","time":28.54011147,"data":"Annual_Income_USD_id             object\n"}
+,{"stream_name":"stdout","time":28.540116926,"data":"Daily_Commute_km_id              object\n"}
+,{"stream_name":"stdout","time":28.540122823,"data":"Annual_Income_USD: 13214 train values; 0.0058 of test rows carry an unseen value\n"}
+,{"stream_name":"stdout","time":28.54015027,"data":"Daily_Commute_km: 805 train values; 0.0001 of test rows carry an unseen value\n"}
+,{"stream_name":"stdout","time":29.64877929,"data":"source lookup: 8915 incomes; train rows with a match 0.9794, test 0.9792\n"}
+,{"stream_name":"stdout","time":5014.176803431,"data":"e10_base                         [F1] OOF AUC 0.94542 ± 0.00062 |  4982.6s | peak RSS 2.54 GB\n"}
+,{"stream_name":"stdout","time":5014.176865724,"data":"                                 folds: [0.94453, 0.94514, 0.94643, 0.94561, 0.94545]\n"}
+,{"stream_name":"stdout","time":8341.495810264,"data":"e10_onehot10                     [F1] OOF AUC 0.94536 ± 0.00062 |  3326.9s | peak RSS 2.62 GB\n"}
+,{"stream_name":"stdout","time":8341.495861756,"data":"                                 folds: [0.94448, 0.94507, 0.94638, 0.94552, 0.94538]\n"}
+,{"stream_name":"stderr","time":8341.894114797,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.89416759,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894175295,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894181308,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894187289,"data":"\n"}
+,{"stream_name":"stderr","time":8341.894192731,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894198343,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894203878,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":8341.894208898,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453535999,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453584984,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453591365,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453596876,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453602315,"data":"\n"}
+,{"stream_name":"stderr","time":9335.453607464,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453612793,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453618071,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":9335.453623574,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014273543,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014347715,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.01435639,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014362232,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014368466,"data":"\n"}
+,{"stream_name":"stderr","time":10331.014374046,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.01438014,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014385706,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":10331.014403461,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030495863,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030533089,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030540298,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030546346,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.03055258,"data":"\n"}
+,{"stream_name":"stderr","time":11337.030558023,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030563552,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030568971,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":11337.030574055,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979075557,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979123226,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979129848,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.97913563,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979141627,"data":"\n"}
+,{"stream_name":"stderr","time":12345.979357187,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979369212,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.979376576,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stderr","time":12345.97938331,"data":"Change of simpleCtr will not affect combinations ctrs.\n"}
+,{"stream_name":"stdout","time":13355.611765368,"data":"e10_ctr_binarized                [F1] OOF AUC 0.94542 ± 0.00062 |  5013.4s | peak RSS 2.62 GB\n"}
+,{"stream_name":"stdout","time":13355.611803114,"data":"                                 folds: [0.94453, 0.94514, 0.94643, 0.94561, 0.94545]\n"}
+,{"stream_name":"stderr","time":13355.798146891,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.798192996,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.798200552,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.798206493,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.7982125,"data":"\n"}
+,{"stream_name":"stderr","time":13355.801303731,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.80136031,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.80136691,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":13355.801372916,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263738896,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263779428,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263785863,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263791438,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263805861,"data":"\n"}
+,{"stream_name":"stderr","time":14381.2638103,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263814674,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263819066,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":14381.263823408,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415234639,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415282079,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415288818,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.4152944,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415300024,"data":"\n"}
+,{"stream_name":"stderr","time":15399.415319789,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415325803,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415331579,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":15399.415337487,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474165299,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.47421323,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.47422122,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474227653,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474233677,"data":"\n"}
+,{"stream_name":"stderr","time":16416.474239322,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474246101,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474252422,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":16416.474258378,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546157221,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546201083,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546208123,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546214095,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546219982,"data":"\n"}
+,{"stream_name":"stderr","time":17441.546226185,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546232052,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546237891,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stderr","time":17441.546243553,"data":"Change of combinations ctrs will not affect simple ctrs\n"}
+,{"stream_name":"stdout","time":18458.39051069,"data":"e10_ctr_comb                     [F1] OOF AUC 0.94542 ± 0.00062 |  5102.7s | peak RSS 2.62 GB\n"}
+,{"stream_name":"stdout","time":18458.390568383,"data":"                                 folds: [0.94453, 0.94514, 0.94643, 0.94561, 0.94545]\n"}
+,{"stream_name":"stdout","time":18458.475499909,"data":"gate baseline e10_base OOF AUC 0.94542; point-estimate challengers: none\n"}
+,{"stream_name":"stdout","time":18458.897751917,"data":"e10_base {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0003, 0.0169, 0.8168], 'test_q05_50_95': [0.0004, 0.0173, 0.8156]}\n"}
+,{"stream_name":"stdout","time":18458.897791881,"data":"e10_onehot10 {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0003, 0.0169, 0.8173], 'test_q05_50_95': [0.0003, 0.0173, 0.8162]}\n"}
+,{"stream_name":"stdout","time":18458.897797866,"data":"e10_ctr_binarized {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0003, 0.0169, 0.8168], 'test_q05_50_95': [0.0004, 0.0173, 0.8156]}\n"}
+,{"stream_name":"stdout","time":18458.897801649,"data":"e10_ctr_comb {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0003, 0.0169, 0.8168], 'test_q05_50_95': [0.0004, 0.0173, 0.8156]}\n"}
+,{"stream_name":"stdout","time":18458.930597336,"data":"\n"}
+,{"stream_name":"stdout","time":18458.930637453,"data":"OOF Pearson correlation (diversity bar: blend only if \u003c= 0.995):\n"}
+,{"stream_name":"stdout","time":18458.930651028,"data":"                   e10_base  e10_onehot10  e10_ctr_binarized  e10_ctr_comb\n"}
+,{"stream_name":"stdout","time":18458.930656432,"data":"e10_base             1.0000        0.9993             1.0000        1.0000\n"}
+,{"stream_name":"stdout","time":18458.930661146,"data":"e10_onehot10         0.9993        1.0000             0.9993        0.9993\n"}
+,{"stream_name":"stdout","time":18458.930665649,"data":"e10_ctr_binarized    1.0000        0.9993             1.0000        1.0000\n"}
+,{"stream_name":"stdout","time":18458.930670268,"data":"e10_ctr_comb         1.0000        0.9993             1.0000        1.0000\n"}
+,{"stream_name":"stdout","time":18459.045361578,"data":"no candidate cleared the gate; champion stays e08_avg3seeds\n"}
+,{"stream_name":"stdout","time":18459.045402708,"data":"champion e08_avg3seeds carries over from an earlier kernel version; no OOF row in this run.\n"}
+,{"stream_name":"stdout","time":18459.045409538,"data":"aligned prediction matrices saved to /kaggle/working\n"}
+,{"stream_name":"stdout","time":18459.109460558,"data":"no submission written: champion e08_avg3seeds was not fit in this run (its predictions live in an earlier kernel version). This run contributes evidence only.\n"}
+,{"stream_name":"stdout","time":18459.169553735,"data":"{\n"}
+,{"stream_name":"stdout","time":18459.169591992,"data":"  \"generated_utc\": \"2026-09-05T02:27:57+00:00\",\n"}
+,{"stream_name":"stdout","time":18459.169598505,"data":"  \"notebook_version\": \"v12\",\n"}
+,{"stream_name":"stdout","time":18459.169603397,"data":"  \"seed\": 42,\n"}
+,{"stream_name":"stdout","time":18459.169608339,"data":"  \"device\": \"CPU\",\n"}
+,{"stream_name":"stdout","time":18459.16961324,"data":"  \"fold_definitions\": {\n"}
+,{"stream_name":"stdout","time":18459.16961793,"data":"    \"F1\": \"StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\",\n"}
+,{"stream_name":"stdout","time":18459.169623752,"data":"    \"F2\": \"StratifiedKFold(n_splits=10, shuffle=True, random_state=42)\"\n"}
+,{"stream_name":"stdout","time":18459.169628765,"data":"  },\n"}
+,{"stream_name":"stdout","time":18459.169633333,"data":"  \"run_folds\": {\n"}
+,{"stream_name":"stdout","time":18459.169637983,"data":"    \"e10_base\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169643234,"data":"    \"e10_onehot10\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.16966583,"data":"    \"e10_ctr_binarized\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169671133,"data":"    \"e10_ctr_comb\": \"F1\"\n"}
+,{"stream_name":"stdout","time":18459.169675943,"data":"  },\n"}
+,{"stream_name":"stdout","time":18459.169680038,"data":"  \"flags\": {\n"}
+,{"stream_name":"stdout","time":18459.169684491,"data":"    \"v1\": false,\n"}
+,{"stream_name":"stdout","time":18459.169689182,"data":"    \"v2\": false,\n"}
+,{"stream_name":"stdout","time":18459.169693495,"data":"    \"anx_ab\": false,\n"}
+,{"stream_name":"stdout","time":18459.169697552,"data":"    \"e01\": false,\n"}
+,{"stream_name":"stdout","time":18459.169701937,"data":"    \"champion\": true,\n"}
+,{"stream_name":"stdout","time":18459.169706862,"data":"    \"e02\": false,\n"}
+,{"stream_name":"stdout","time":18459.169711415,"data":"    \"e03\": false,\n"}
+,{"stream_name":"stdout","time":18459.169715825,"data":"    \"e04\": false,\n"}
+,{"stream_name":"stdout","time":18459.169719669,"data":"    \"e05\": false,\n"}
+,{"stream_name":"stdout","time":18459.169723891,"data":"    \"e06\": false,\n"}
+,{"stream_name":"stdout","time":18459.169728503,"data":"    \"e07\": false,\n"}
+,{"stream_name":"stdout","time":18459.169732638,"data":"    \"e08\": false,\n"}
+,{"stream_name":"stdout","time":18459.169737307,"data":"    \"e09\": false,\n"}
+,{"stream_name":"stdout","time":18459.169741892,"data":"    \"e10\": true\n"}
+,{"stream_name":"stdout","time":18459.169746417,"data":"  },\n"}
+,{"stream_name":"stdout","time":18459.169750724,"data":"  \"champion\": \"e08_avg3seeds\",\n"}
+,{"stream_name":"stdout","time":18459.169755546,"data":"  \"gate_results\": {},\n"}
+,{"stream_name":"stdout","time":18459.169760193,"data":"  \"results\": [\n"}
+,{"stream_name":"stdout","time":18459.169764753,"data":"    {\n"}
+,{"stream_name":"stdout","time":18459.16976902,"data":"      \"run\": \"e10_base\",\n"}
+,{"stream_name":"stdout","time":18459.169774112,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169778919,"data":"      \"oof_auc\": 0.9454239216882167,\n"}
+,{"stream_name":"stdout","time":18459.169783499,"data":"      \"fold_std\": 0.000620838812974295,\n"}
+,{"stream_name":"stdout","time":18459.169788134,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":18459.169792609,"data":"        0.94453,\n"}
+,{"stream_name":"stdout","time":18459.16979714,"data":"        0.94514,\n"}
+,{"stream_name":"stdout","time":18459.169801627,"data":"        0.94643,\n"}
+,{"stream_name":"stdout","time":18459.169806011,"data":"        0.94561,\n"}
+,{"stream_name":"stdout","time":18459.169810397,"data":"        0.94545\n"}
+,{"stream_name":"stdout","time":18459.169814739,"data":"      ],\n"}
+,{"stream_name":"stdout","time":18459.169819163,"data":"      \"wall_s\": 4982.6,\n"}
+,{"stream_name":"stdout","time":18459.169823673,"data":"      \"peak_rss_gb\": 2.54\n"}
+,{"stream_name":"stdout","time":18459.169827952,"data":"    },\n"}
+,{"stream_name":"stdout","time":18459.169831647,"data":"    {\n"}
+,{"stream_name":"stdout","time":18459.169835443,"data":"      \"run\": \"e10_onehot10\",\n"}
+,{"stream_name":"stdout","time":18459.169839443,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169843506,"data":"      \"oof_auc\": 0.9453613497154582,\n"}
+,{"stream_name":"stdout","time":18459.169847552,"data":"      \"fold_std\": 0.0006221332111565321,\n"}
+,{"stream_name":"stdout","time":18459.169864208,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":18459.16986898,"data":"        0.94448,\n"}
+,{"stream_name":"stdout","time":18459.169873396,"data":"        0.94507,\n"}
+,{"stream_name":"stdout","time":18459.16988311,"data":"        0.94638,\n"}
+,{"stream_name":"stdout","time":18459.169887459,"data":"        0.94552,\n"}
+,{"stream_name":"stdout","time":18459.169891685,"data":"        0.94538\n"}
+,{"stream_name":"stdout","time":18459.169896345,"data":"      ],\n"}
+,{"stream_name":"stdout","time":18459.1699008,"data":"      \"wall_s\": 3326.9,\n"}
+,{"stream_name":"stdout","time":18459.169905395,"data":"      \"peak_rss_gb\": 2.62\n"}
+,{"stream_name":"stdout","time":18459.169909973,"data":"    },\n"}
+,{"stream_name":"stdout","time":18459.169914325,"data":"    {\n"}
+,{"stream_name":"stdout","time":18459.169918647,"data":"      \"run\": \"e10_ctr_binarized\",\n"}
+,{"stream_name":"stdout","time":18459.169923327,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169927923,"data":"      \"oof_auc\": 0.9454239216882167,\n"}
+,{"stream_name":"stdout","time":18459.169932735,"data":"      \"fold_std\": 0.000620838812974295,\n"}
+,{"stream_name":"stdout","time":18459.169937485,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":18459.169942045,"data":"        0.94453,\n"}
+,{"stream_name":"stdout","time":18459.169946525,"data":"        0.94514,\n"}
+,{"stream_name":"stdout","time":18459.169950833,"data":"        0.94643,\n"}
+,{"stream_name":"stdout","time":18459.169955519,"data":"        0.94561,\n"}
+,{"stream_name":"stdout","time":18459.169960697,"data":"        0.94545\n"}
+,{"stream_name":"stdout","time":18459.169964979,"data":"      ],\n"}
+,{"stream_name":"stdout","time":18459.16996936,"data":"      \"wall_s\": 5013.4,\n"}
+,{"stream_name":"stdout","time":18459.169973776,"data":"      \"peak_rss_gb\": 2.62\n"}
+,{"stream_name":"stdout","time":18459.169978335,"data":"    },\n"}
+,{"stream_name":"stdout","time":18459.16998263,"data":"    {\n"}
+,{"stream_name":"stdout","time":18459.169987152,"data":"      \"run\": \"e10_ctr_comb\",\n"}
+,{"stream_name":"stdout","time":18459.169991757,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":18459.169996505,"data":"      \"oof_auc\": 0.9454239216882167,\n"}
+,{"stream_name":"stdout","time":18459.170001072,"data":"      \"fold_std\": 0.000620838812974295,\n"}
+,{"stream_name":"stdout","time":18459.170005754,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":18459.170010249,"data":"        0.94453,\n"}
+,{"stream_name":"stdout","time":18459.17001481,"data":"        0.94514,\n"}
+,{"stream_name":"stdout","time":18459.170019211,"data":"        0.94643,\n"}
+,{"stream_name":"stdout","time":18459.170023655,"data":"        0.94561,\n"}
+,{"stream_name":"stdout","time":18459.170028108,"data":"        0.94545\n"}
+,{"stream_name":"stdout","time":18459.170032485,"data":"      ],\n"}
+,{"stream_name":"stdout","time":18459.170036815,"data":"      \"wall_s\": 5102.7,\n"}
+,{"stream_name":"stdout","time":18459.170041331,"data":"      \"peak_rss_gb\": 2.62\n"}
+,{"stream_name":"stdout","time":18459.1700459,"data":"    }\n"}
+,{"stream_name":"stdout","time":18459.170050463,"data":"  ],\n"}
+,{"stream_name":"stdout","time":18459.170085565,"data":"  \"versions\": {\n"}
+,{"stream_name":"stdout","time":18459.170090747,"data":"    \"numpy\": \"2.0.2\",\n"}
+,{"stream_name":"stdout","time":18459.170095131,"data":"    \"pandas\": \"2.3.3\",\n"}
+,{"stream_name":"stdout","time":18459.170101433,"data":"    \"sklearn\": \"1.6.1\",\n"}
+,{"stream_name":"stdout","time":18459.170106013,"data":"    \"lightgbm\": \"4.6.0\",\n"}
+,{"stream_name":"stdout","time":18459.17011104,"data":"    \"catboost\": \"1.2.10\"\n"}
+,{"stream_name":"stdout","time":18459.170115807,"data":"  },\n"}
+,{"stream_name":"stdout","time":18459.1701253,"data":"  \"python\": \"3.12.13\"\n"}
+,{"stream_name":"stdout","time":18459.170130122,"data":"}\n"}
+,{"stream_name":"stderr","time":18464.132145954,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":18464.132192612,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":18464.41563971,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":18464.415678029,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":18465.420966899,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":18465.920592728,"data":"[NbConvertApp] Writing 127400 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":18469.382347227,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":18470.866362916,"data":"[NbConvertApp] Writing 530903 bytes to __results__.html\n"}
+]

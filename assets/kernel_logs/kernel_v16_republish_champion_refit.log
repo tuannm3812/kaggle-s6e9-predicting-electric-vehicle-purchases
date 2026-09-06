@@ -1,0 +1,171 @@
+[{"stream_name":"stderr","time":7.205357118,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
+,{"stream_name":"stderr","time":7.20544256,"data":"  validate(nb)\n"}
+,{"stream_name":"stderr","time":8.236444128,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":8.23648244,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":8.236488408,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":8.236493518,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":8.984127566,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":8.984172517,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":8.984176721,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":8.984179815,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":18.543564761,"data":"python 3.12.13\n"}
+,{"stream_name":"stdout","time":18.543637534,"data":"{'numpy': '2.0.2', 'pandas': '2.3.3', 'sklearn': '1.6.1', 'lightgbm': '4.6.0', 'catboost': '1.2.10'}\n"}
+,{"stream_name":"stdout","time":18.747053376,"data":"DATA_DIR = /kaggle/input/competitions/playground-series-s6e9\n"}
+,{"stream_name":"stdout","time":25.252104334,"data":"Age                               int64\n"}
+,{"stream_name":"stdout","time":25.252157873,"data":"Annual_Income_USD               float64\n"}
+,{"stream_name":"stdout","time":25.252166398,"data":"Daily_Commute_km                float64\n"}
+,{"stream_name":"stdout","time":25.252172762,"data":"Number_of_Cars_Owned              int64\n"}
+,{"stream_name":"stdout","time":25.25217788,"data":"Charging_Stations_Near_Home       int64\n"}
+,{"stream_name":"stdout","time":25.252183044,"data":"Charging_Stations_Near_Work       int64\n"}
+,{"stream_name":"stdout","time":25.252195402,"data":"Environmental_Concern_Level     float64\n"}
+,{"stream_name":"stdout","time":25.252199834,"data":"Gender                         category\n"}
+,{"stream_name":"stdout","time":25.25220331,"data":"City_Type                      category\n"}
+,{"stream_name":"stdout","time":25.252206809,"data":"Current_Car_Type               category\n"}
+,{"stream_name":"stdout","time":25.252210705,"data":"Home_Charging_Possible         category\n"}
+,{"stream_name":"stdout","time":25.252214187,"data":"Subsidy_Available              category\n"}
+,{"stream_name":"stdout","time":25.25221765,"data":"Range_Anxiety_Level                int8\n"}
+,{"stream_name":"stdout","time":25.252221113,"data":"Subsidy_x_EnvConcern            float64\n"}
+,{"stream_name":"stdout","time":25.252224503,"data":"Subsidy_x_Income                float64\n"}
+,{"stream_name":"stdout","time":25.252227899,"data":"Subsidy_x_HomeCharging             int8\n"}
+,{"stream_name":"stdout","time":25.252231364,"data":"Annual_Income_USD_id             object\n"}
+,{"stream_name":"stdout","time":25.252234818,"data":"Daily_Commute_km_id              object\n"}
+,{"stream_name":"stdout","time":25.25223829,"data":"Annual_Income_USD: 13214 train values; 0.0058 of test rows carry an unseen value\n"}
+,{"stream_name":"stdout","time":25.252258799,"data":"Daily_Commute_km: 805 train values; 0.0001 of test rows carry an unseen value\n"}
+,{"stream_name":"stdout","time":26.238669354,"data":"source lookup: 8915 incomes; train rows with a match 0.9794, test 0.9792\n"}
+,{"stream_name":"stdout","time":4091.919982968,"data":"e08_avg3seeds_s42                [F1] OOF AUC 0.94542 ± 0.00062 |  4063.9s | peak RSS 2.49 GB\n"}
+,{"stream_name":"stdout","time":4091.920197713,"data":"                                 folds: [0.94453, 0.94514, 0.94643, 0.94561, 0.94545]\n"}
+,{"stream_name":"stdout","time":8168.841258233,"data":"e08_avg3seeds_s7                 [F1] OOF AUC 0.94544 ± 0.00064 |  4076.5s | peak RSS 2.49 GB\n"}
+,{"stream_name":"stdout","time":8168.841304408,"data":"                                 folds: [0.94454, 0.94519, 0.94651, 0.94558, 0.94543]\n"}
+,{"stream_name":"stdout","time":12243.176457486,"data":"e08_avg3seeds_s2026              [F1] OOF AUC 0.94539 ± 0.00062 |  4074.1s | peak RSS 2.54 GB\n"}
+,{"stream_name":"stdout","time":12243.176548896,"data":"                                 folds: [0.94452, 0.9451, 0.94642, 0.94558, 0.94538]\n"}
+,{"stream_name":"stdout","time":12243.424877155,"data":"e08_avg3seeds                    [F1] OOF AUC 0.94550 ± 0.00063 | 12214.5s | peak RSS 2.54 GB\n"}
+,{"stream_name":"stdout","time":12243.424921456,"data":"                                 folds: [0.94461, 0.94522, 0.94653, 0.94567, 0.94551]\n"}
+,{"stream_name":"stdout","time":12243.482165461,"data":"gate baseline e08_avg3seeds OOF AUC 0.94550; point-estimate challengers: none\n"}
+,{"stream_name":"stdout","time":12243.681907179,"data":"e08_avg3seeds_s42 {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0003, 0.0169, 0.8168], 'test_q05_50_95': [0.0004, 0.0173, 0.8156]}\n"}
+,{"stream_name":"stdout","time":12243.846303052,"data":"e08_avg3seeds_s7 {'finite': True, 'in_range': True, 'oof_unique': 668664, 'test_unique': 286571, 'oof_q05_50_95': [0.0004, 0.0171, 0.8174], 'test_q05_50_95': [0.0004, 0.0175, 0.8162]}\n"}
+,{"stream_name":"stdout","time":12243.846345707,"data":"e08_avg3seeds_s2026 {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0004, 0.0172, 0.8179], 'test_q05_50_95': [0.0004, 0.0176, 0.8168]}\n"}
+,{"stream_name":"stdout","time":12243.846361169,"data":"e08_avg3seeds {'finite': True, 'in_range': True, 'oof_unique': 668665, 'test_unique': 286571, 'oof_q05_50_95': [0.0004, 0.0171, 0.8173], 'test_q05_50_95': [0.0004, 0.0175, 0.8163]}\n"}
+,{"stream_name":"stdout","time":12243.846365666,"data":"\n"}
+,{"stream_name":"stdout","time":12243.846369364,"data":"OOF Pearson correlation (diversity bar: blend only if \u003c= 0.995):\n"}
+,{"stream_name":"stdout","time":12243.846373821,"data":"                     e08_avg3seeds_s42  e08_avg3seeds_s7  e08_avg3seeds_s2026  e08_avg3seeds\n"}
+,{"stream_name":"stdout","time":12243.846377673,"data":"e08_avg3seeds_s42               1.0000            0.9991               0.9991         0.9997\n"}
+,{"stream_name":"stdout","time":12243.846381278,"data":"e08_avg3seeds_s7                0.9991            1.0000               0.9991         0.9997\n"}
+,{"stream_name":"stdout","time":12243.846384945,"data":"e08_avg3seeds_s2026             0.9991            0.9991               1.0000         0.9997\n"}
+,{"stream_name":"stdout","time":12243.846388857,"data":"e08_avg3seeds                   0.9997            0.9997               0.9997         1.0000\n"}
+,{"stream_name":"stdout","time":12243.92007238,"data":"no candidate cleared the gate; champion stays e08_avg3seeds\n"}
+,{"stream_name":"stdout","time":12243.920110521,"data":"champion OOF AUC 0.94550\n"}
+,{"stream_name":"stdout","time":12243.941172592,"data":"aligned prediction matrices saved to /kaggle/working\n"}
+,{"stream_name":"stdout","time":12244.679595636,"data":"submission.csv written from e08_avg3seeds (notebook v13); range [0.0000, 0.9998]\n"}
+,{"stream_name":"stdout","time":12244.728842381,"data":"{\n"}
+,{"stream_name":"stdout","time":12244.72888182,"data":"  \"generated_utc\": \"2026-09-05T11:31:59+00:00\",\n"}
+,{"stream_name":"stdout","time":12244.728888102,"data":"  \"notebook_version\": \"v13\",\n"}
+,{"stream_name":"stdout","time":12244.728892458,"data":"  \"seed\": 42,\n"}
+,{"stream_name":"stdout","time":12244.728896449,"data":"  \"device\": \"CPU\",\n"}
+,{"stream_name":"stdout","time":12244.728900563,"data":"  \"fold_definitions\": {\n"}
+,{"stream_name":"stdout","time":12244.72890466,"data":"    \"F1\": \"StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\",\n"}
+,{"stream_name":"stdout","time":12244.728910769,"data":"    \"F2\": \"StratifiedKFold(n_splits=10, shuffle=True, random_state=42)\"\n"}
+,{"stream_name":"stdout","time":12244.728919498,"data":"  },\n"}
+,{"stream_name":"stdout","time":12244.728922209,"data":"  \"run_folds\": {\n"}
+,{"stream_name":"stdout","time":12244.728925028,"data":"    \"e08_avg3seeds_s42\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.728927855,"data":"    \"e08_avg3seeds_s7\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.728930581,"data":"    \"e08_avg3seeds_s2026\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.72893349,"data":"    \"e08_avg3seeds\": \"F1\"\n"}
+,{"stream_name":"stdout","time":12244.728936209,"data":"  },\n"}
+,{"stream_name":"stdout","time":12244.72893874,"data":"  \"flags\": {\n"}
+,{"stream_name":"stdout","time":12244.728941345,"data":"    \"v1\": false,\n"}
+,{"stream_name":"stdout","time":12244.728944092,"data":"    \"v2\": false,\n"}
+,{"stream_name":"stdout","time":12244.728947115,"data":"    \"anx_ab\": false,\n"}
+,{"stream_name":"stdout","time":12244.728949851,"data":"    \"e01\": false,\n"}
+,{"stream_name":"stdout","time":12244.728952503,"data":"    \"champion\": true,\n"}
+,{"stream_name":"stdout","time":12244.728955521,"data":"    \"e02\": false,\n"}
+,{"stream_name":"stdout","time":12244.728958106,"data":"    \"e03\": false,\n"}
+,{"stream_name":"stdout","time":12244.72896069,"data":"    \"e04\": false,\n"}
+,{"stream_name":"stdout","time":12244.728963255,"data":"    \"e05\": false,\n"}
+,{"stream_name":"stdout","time":12244.728965894,"data":"    \"e06\": false,\n"}
+,{"stream_name":"stdout","time":12244.728968543,"data":"    \"e07\": false,\n"}
+,{"stream_name":"stdout","time":12244.728971093,"data":"    \"e08\": false,\n"}
+,{"stream_name":"stdout","time":12244.72897367,"data":"    \"e09\": false,\n"}
+,{"stream_name":"stdout","time":12244.728976434,"data":"    \"e10\": false\n"}
+,{"stream_name":"stdout","time":12244.728979056,"data":"  },\n"}
+,{"stream_name":"stdout","time":12244.729004069,"data":"  \"champion\": \"e08_avg3seeds\",\n"}
+,{"stream_name":"stdout","time":12244.729009197,"data":"  \"gate_results\": {},\n"}
+,{"stream_name":"stdout","time":12244.729014076,"data":"  \"results\": [\n"}
+,{"stream_name":"stdout","time":12244.729018266,"data":"    {\n"}
+,{"stream_name":"stdout","time":12244.729022467,"data":"      \"run\": \"e08_avg3seeds_s42\",\n"}
+,{"stream_name":"stdout","time":12244.729027239,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.729031971,"data":"      \"oof_auc\": 0.9454239216882167,\n"}
+,{"stream_name":"stdout","time":12244.729037072,"data":"      \"fold_std\": 0.000620838812974295,\n"}
+,{"stream_name":"stdout","time":12244.729041227,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":12244.729065788,"data":"        0.94453,\n"}
+,{"stream_name":"stdout","time":12244.729070297,"data":"        0.94514,\n"}
+,{"stream_name":"stdout","time":12244.729074446,"data":"        0.94643,\n"}
+,{"stream_name":"stdout","time":12244.729078969,"data":"        0.94561,\n"}
+,{"stream_name":"stdout","time":12244.729083413,"data":"        0.94545\n"}
+,{"stream_name":"stdout","time":12244.729088025,"data":"      ],\n"}
+,{"stream_name":"stdout","time":12244.729092328,"data":"      \"wall_s\": 4063.9,\n"}
+,{"stream_name":"stdout","time":12244.729097694,"data":"      \"peak_rss_gb\": 2.49\n"}
+,{"stream_name":"stdout","time":12244.729102418,"data":"    },\n"}
+,{"stream_name":"stdout","time":12244.729107123,"data":"    {\n"}
+,{"stream_name":"stdout","time":12244.729110982,"data":"      \"run\": \"e08_avg3seeds_s7\",\n"}
+,{"stream_name":"stdout","time":12244.729115075,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.729119207,"data":"      \"oof_auc\": 0.9454438760720274,\n"}
+,{"stream_name":"stdout","time":12244.729123247,"data":"      \"fold_std\": 0.0006382067586891468,\n"}
+,{"stream_name":"stdout","time":12244.729127252,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":12244.72913167,"data":"        0.94454,\n"}
+,{"stream_name":"stdout","time":12244.729136097,"data":"        0.94519,\n"}
+,{"stream_name":"stdout","time":12244.729140815,"data":"        0.94651,\n"}
+,{"stream_name":"stdout","time":12244.729145082,"data":"        0.94558,\n"}
+,{"stream_name":"stdout","time":12244.729148672,"data":"        0.94543\n"}
+,{"stream_name":"stdout","time":12244.729152308,"data":"      ],\n"}
+,{"stream_name":"stdout","time":12244.729156112,"data":"      \"wall_s\": 4076.5,\n"}
+,{"stream_name":"stdout","time":12244.729160098,"data":"      \"peak_rss_gb\": 2.49\n"}
+,{"stream_name":"stdout","time":12244.729163935,"data":"    },\n"}
+,{"stream_name":"stdout","time":12244.729167588,"data":"    {\n"}
+,{"stream_name":"stdout","time":12244.729171492,"data":"      \"run\": \"e08_avg3seeds_s2026\",\n"}
+,{"stream_name":"stdout","time":12244.729175551,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.729179529,"data":"      \"oof_auc\": 0.9453922360195797,\n"}
+,{"stream_name":"stdout","time":12244.729183687,"data":"      \"fold_std\": 0.0006236750434725424,\n"}
+,{"stream_name":"stdout","time":12244.729188491,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":12244.729193343,"data":"        0.94452,\n"}
+,{"stream_name":"stdout","time":12244.729197007,"data":"        0.9451,\n"}
+,{"stream_name":"stdout","time":12244.729200858,"data":"        0.94642,\n"}
+,{"stream_name":"stdout","time":12244.729204583,"data":"        0.94558,\n"}
+,{"stream_name":"stdout","time":12244.729208804,"data":"        0.94538\n"}
+,{"stream_name":"stdout","time":12244.72921348,"data":"      ],\n"}
+,{"stream_name":"stdout","time":12244.729217427,"data":"      \"wall_s\": 4074.1,\n"}
+,{"stream_name":"stdout","time":12244.7292213,"data":"      \"peak_rss_gb\": 2.54\n"}
+,{"stream_name":"stdout","time":12244.72922553,"data":"    },\n"}
+,{"stream_name":"stdout","time":12244.729230343,"data":"    {\n"}
+,{"stream_name":"stdout","time":12244.729234989,"data":"      \"run\": \"e08_avg3seeds\",\n"}
+,{"stream_name":"stdout","time":12244.729239237,"data":"      \"folds\": \"F1\",\n"}
+,{"stream_name":"stdout","time":12244.729243421,"data":"      \"oof_auc\": 0.9454983185241117,\n"}
+,{"stream_name":"stdout","time":12244.729247434,"data":"      \"fold_std\": 0.0006269852850399176,\n"}
+,{"stream_name":"stdout","time":12244.729251438,"data":"      \"fold_aucs\": [\n"}
+,{"stream_name":"stdout","time":12244.72926097,"data":"        0.94461,\n"}
+,{"stream_name":"stdout","time":12244.729264927,"data":"        0.94522,\n"}
+,{"stream_name":"stdout","time":12244.729268724,"data":"        0.94653,\n"}
+,{"stream_name":"stdout","time":12244.72927258,"data":"        0.94567,\n"}
+,{"stream_name":"stdout","time":12244.729276403,"data":"        0.94551\n"}
+,{"stream_name":"stdout","time":12244.729280577,"data":"      ],\n"}
+,{"stream_name":"stdout","time":12244.729286152,"data":"      \"wall_s\": 12214.5,\n"}
+,{"stream_name":"stdout","time":12244.729294355,"data":"      \"peak_rss_gb\": 2.54\n"}
+,{"stream_name":"stdout","time":12244.729297373,"data":"    }\n"}
+,{"stream_name":"stdout","time":12244.729299945,"data":"  ],\n"}
+,{"stream_name":"stdout","time":12244.729302466,"data":"  \"versions\": {\n"}
+,{"stream_name":"stdout","time":12244.72930536,"data":"    \"numpy\": \"2.0.2\",\n"}
+,{"stream_name":"stdout","time":12244.729310134,"data":"    \"pandas\": \"2.3.3\",\n"}
+,{"stream_name":"stdout","time":12244.729312893,"data":"    \"sklearn\": \"1.6.1\",\n"}
+,{"stream_name":"stdout","time":12244.729315547,"data":"    \"lightgbm\": \"4.6.0\",\n"}
+,{"stream_name":"stdout","time":12244.729318553,"data":"    \"catboost\": \"1.2.10\"\n"}
+,{"stream_name":"stdout","time":12244.729339769,"data":"  },\n"}
+,{"stream_name":"stdout","time":12244.729344185,"data":"  \"python\": \"3.12.13\"\n"}
+,{"stream_name":"stdout","time":12244.729348823,"data":"}\n"}
+,{"stream_name":"stderr","time":12249.2066862,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":12249.20672674,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":12249.412709967,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":12249.412740813,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":12250.209895427,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":12250.618461752,"data":"[NbConvertApp] Writing 118728 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":12253.687356058,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":12254.952994292,"data":"[NbConvertApp] Writing 522613 bytes to __results__.html\n"}
+]

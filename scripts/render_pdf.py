@@ -187,12 +187,27 @@ LOG_NOISE = (
 )
 
 
-def kernel_log_html(nb: Path) -> str:
-    """Fetch the notebook's Kaggle run log and render it as an appendix.
+def kernel_log_html(nb: Path, archived: Path | None = None) -> str:
+    """Render a Kaggle run log as an appendix.
 
-    Returns "" (and says why) when the kernel has no metadata or the fetch
-    fails — a missing log should degrade the PDF, never abort the render.
+    With `archived`, reads that file. Otherwise fetches the kernel's
+    LATEST run — note that a specific version cannot be fetched:
+    `kernels output <kernel>/<version>` accepts the suffix and silently
+    returns the latest anyway (verified 2026-09-07), so historical runs
+    are archived under assets/kernel_logs/ instead.
+
+    Returns "" (and says why) when no log is reachable — a missing log
+    should degrade the PDF, never abort the render.
     """
+    if archived is not None:
+        if not archived.exists():
+            print(f"    (no such log {archived}; appendix skipped)")
+            return ""
+        try:
+            entries = json.loads(archived.read_text())
+        except json.JSONDecodeError:
+            entries = [{"data": archived.read_text()}]
+        return _log_appendix(entries, f"archived log {archived.name}")
     meta = REPO / "notebooks" / "kernels" / nb.stem.lstrip("0123456789_") / "kernel-metadata.json"
     if not meta.exists():
         matches = list((REPO / "notebooks" / "kernels").glob("*/kernel-metadata.json"))
@@ -217,6 +232,11 @@ def kernel_log_html(nb: Path) -> str:
             entries = json.loads(logs[0].read_text())
         except json.JSONDecodeError:
             entries = [{"data": logs[0].read_text()}]
+    return _log_appendix(entries, kernel_id)
+
+
+def _log_appendix(entries: list, source: str) -> str:
+    """Filtered log entries as an HTML appendix."""
     lines = [e.get("data", "").rstrip() for e in entries]
     lines = [ln for ln in lines
              if ln.strip() and not any(n in ln for n in LOG_NOISE)]
@@ -226,7 +246,7 @@ def kernel_log_html(nb: Path) -> str:
     return (
         '<h1 style="page-break-before:always">Executed output</h1>'
         f'<p>Console output of the Kaggle run behind this notebook '
-        f'(<code>{html_lib.escape(kernel_id)}</code>). Kaggle exposes no '
+        f'(<code>{html_lib.escape(source)}</code>). Kaggle exposes no '
         'executed notebook, so this log — the output of the run that '
         'produced the recorded results — stands in for cell outputs. '
         'Noise lines (debugger, nbconvert, CTR warnings) are filtered.</p>'
@@ -235,7 +255,8 @@ def kernel_log_html(nb: Path) -> str:
 
 
 def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
-                    with_log: bool = False) -> None:
+                    with_log: bool = False,
+                    archived_log: Path | None = None) -> None:
     """Notebook -> HTML via nbconvert -> PDF. Optionally execute first."""
     with tempfile.TemporaryDirectory() as td:
         cmd = [
@@ -253,8 +274,8 @@ def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
         style = f"<style>{build_css()}</style>"
         html = (html.replace("</head>", style + "</head>", 1)
                 if "</head>" in html else style + html)
-        if with_log:
-            appendix = kernel_log_html(nb)
+        if with_log or archived_log is not None:
+            appendix = kernel_log_html(nb, archived_log)
             if appendix:
                 html = (html.replace("</body>", appendix + "</body>", 1)
                         if "</body>" in html else html + appendix)
@@ -272,7 +293,13 @@ def main() -> None:
                              "executed locally; see docs/0)")
     parser.add_argument("--with-kernel-log", action="store_true",
                         help="append each notebook's Kaggle run log as an "
-                             "'Executed output' appendix (needs network)")
+                             "'Executed output' appendix (fetches the "
+                             "kernel's LATEST run; needs network)")
+    parser.add_argument("--kernel-log", type=Path, metavar="LOG",
+                        help="use this archived log instead of fetching "
+                             "(see assets/kernel_logs/ — a specific run's "
+                             "log CANNOT be fetched, the API ignores the "
+                             "version suffix)")
     parser.add_argument("--export", action="store_true",
                         help="after rendering, copy renders/ to iCloud "
                              "Drive under 05_Projects/<category>/<repo>/")
@@ -301,10 +328,17 @@ def main() -> None:
         out.mkdir(parents=True, exist_ok=True)
         for nb in sorted((REPO / "notebooks").glob("*.ipynb")):
             execute = args.execute_eda and nb.name == "01_eda.ipynb"
+            # An archived log names one specific run, so it only applies
+            # to the modeling notebook it came from.
+            archived = (args.kernel_log
+                        if args.kernel_log and nb.stem.endswith("modeling")
+                        else None)
             notebook_to_pdf(nb, out / f"{nb.stem}.pdf", execute,
-                            with_log=args.with_kernel_log)
+                            with_log=args.with_kernel_log,
+                            archived_log=archived)
             tag = (" (executed locally)" if execute
-                   else " + Kaggle run log" if args.with_kernel_log
+                   else f" + {archived.name}" if archived
+                   else " + Kaggle run log (latest)" if args.with_kernel_log
                    else " (source; runs live on Kaggle)")
             print(f"  renders/notebooks/{nb.stem}.pdf{tag}")
 

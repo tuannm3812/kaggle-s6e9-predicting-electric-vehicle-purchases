@@ -943,3 +943,29 @@ to 46 pages and now carries real numbers.
 Degradation is deliberate: no kernel metadata, no network, or no log in
 the output all print a reason and render the PDF without the appendix
 rather than failing.
+
+## 2026-09-07 — Version-pinned logs are impossible; archived them instead
+
+Set out to add the per-version log pinning discussed yesterday. It cannot
+be built: **`kaggle kernels output <owner>/<kernel>/<version>` accepts the
+version suffix and silently returns the latest run.** Verified by
+requesting versions 9, 11 and 13 — all three returned kernel v16's log,
+reporting `notebook_version v13` and champion-refit runs. The CLI's own
+help documents the suffix, so this fails in the worst available way: no
+error, just another run's numbers under a historical label. Had I shipped
+the feature on the assumption it worked, every "E06 output" appendix
+would have shown the champion re-fit instead.
+
+**What was built instead, and it is more useful.** Each run's log is the
+primary evidence behind its ledger row — fold AUCs, gate verdicts,
+wall-clocks, the reproducibility snapshot — and mine existed only in a
+session scratch directory awaiting deletion. Seven are now committed
+under `assets/kernel_logs/` (152 KB total), unmodified as returned,
+named by kernel version and experiment, with a README recording the
+version-suffix trap. `render_pdf.py --kernel-log PATH` replays any of
+them as the Executed-output appendix.
+
+**Recorded loss, not papered over:** logs for kernels v1–v8 — the v1/v2
+baselines and E01–E05 — were already unreachable when this was noticed.
+Those results survive in the ledger; their raw logs are gone. Archiving
+should have started at the first run.
