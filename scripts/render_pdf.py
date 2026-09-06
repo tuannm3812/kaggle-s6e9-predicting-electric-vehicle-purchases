@@ -283,6 +283,42 @@ def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
         html_to_pdf(html_file, pdf)
 
 
+def run_logs_pdf(out_dir: Path) -> None:
+    """One PDF holding every archived Kaggle run log, in version order.
+
+    Generated from assets/kernel_logs/ rather than hand-written, so it
+    cannot drift from the logs it presents. These are the primary evidence
+    behind the ledger's rows and are unfetchable once a newer run exists.
+    """
+    logs = sorted((REPO / "assets" / "kernel_logs").glob("*.log"))
+    if not logs:
+        return
+    parts = [
+        "<h1>Archived Kaggle run logs</h1>",
+        "<p>The console output of every archived run, exactly as Kaggle "
+        "returned it, with noise lines filtered. This is the primary "
+        "evidence behind <code>docs/4_experiment_ledger.md</code>. Kaggle "
+        "cannot serve a past run's log, so each was captured while it was "
+        "the latest — see <code>assets/kernel_logs/README.md</code>.</p>",
+    ]
+    for log in logs:
+        try:
+            entries = json.loads(log.read_text())
+        except json.JSONDecodeError:
+            entries = [{"data": log.read_text()}]
+        lines = [e.get("data", "").rstrip() for e in entries]
+        lines = [ln for ln in lines
+                 if ln.strip() and not any(n in ln for n in LOG_NOISE)]
+        parts.append(f'<h2 style="page-break-before:always">{html_lib.escape(log.stem)}</h2>')
+        parts.append(f"<pre>{html_lib.escape(chr(10).join(lines))}</pre>")
+    with tempfile.TemporaryDirectory() as td:
+        html = Path(td) / "logs.html"
+        html.write_text(f"<html><head><meta charset='utf-8'><style>{build_css()}"
+                        f"</style></head><body>{''.join(parts)}</body></html>")
+        html_to_pdf(html, out_dir / "9_run_logs.pdf")
+    print(f"  renders/docs/9_run_logs.pdf ({len(logs)} runs)")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--only", choices=["docs", "notebooks"],
@@ -322,6 +358,7 @@ def main() -> None:
         md_to_pdf([REPO / "docs" / n for n in DOC_ORDER],
                   out / "all_docs.pdf", "S6E9 — Project Documentation")
         print("  renders/docs/all_docs.pdf")
+        run_logs_pdf(out)
 
     if args.only != "docs":
         out = RENDERS / "notebooks"

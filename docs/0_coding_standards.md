@@ -166,14 +166,15 @@ dependency by design**; nothing beyond what the machine already had.
   *Executed output* appendix. That log is the output of the run that
   produced the recorded results, which makes it **better** evidence than
   a fresh local execution: it is the trusted run, not a re-enactment.
-  **A specific run's log cannot be fetched:**
-  `kernels output <kernel>/<version>` accepts the version suffix its own
-  help advertises and silently returns the **latest** run (verified
-  2026-09-07 — requests for v9, v11 and v13 all returned v16's log). A
-  log is therefore only obtainable while its run is the latest, so each
-  run's log is archived under `assets/kernel_logs/` at the time and
-  replayed with `--kernel-log PATH`. Runs before kernel v9 were lost to
-  this before it was noticed.
+  **A past run's output cannot be fetched by any route** — the CLI, the
+  SDK's `version_number` field and the public page were all checked at
+  source level on 2026-09-07 and every one returns the latest run
+  (evidence table in `assets/kernel_logs/README.md`). So **run
+  `python3 scripts/archive_kernel_log.py <version> <label>` immediately
+  after every kernel run**; a log not captured while it is the latest is
+  gone, as kernels v1–v8 of this project are. Archived logs replay into
+  a PDF with `--kernel-log PATH`, and all of them render together as
+  `renders/docs/9_run_logs.pdf`.
   `--execute-eda` still executes the EDA notebook locally (~21 s) for
   its plots; the modeling notebook is never executed locally. Our
   stylesheet is appended after nbconvert's so fonts and headings win

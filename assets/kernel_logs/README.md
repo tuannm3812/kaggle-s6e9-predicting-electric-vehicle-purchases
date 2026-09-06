@@ -19,13 +19,22 @@ renders one as an "Executed output" appendix.
 
 ## Why these are archived rather than re-fetched
 
-**`kaggle kernels output <owner>/<kernel>/<version>` silently ignores the
-version and returns the latest run** (verified 2026-09-07: requests for
-versions 9, 11 and 13 all returned kernel v16's log). The CLI's own help
-advertises the `<version>` suffix, so this fails in the worst way — no
-error, just the wrong run's numbers under a historical label. A run's log
-is therefore only obtainable while it is the latest, which is why these
-were captured at the time and committed here.
+**No Kaggle route serves a past run's output.** Checked exhaustively on
+2026-09-07, at the source level rather than by trial:
+
+| Route | Result |
+| --- | --- |
+| `kernels output <kernel>/<version>` | Version silently dropped. The implementation splits the string and reads only `[0]`/`[1]`; `ApiListKernelSessionOutputRequest` has no version field. Requests for v9/v11/v13 all returned v16's log |
+| `kernels pull <kernel>/<version>` | Same — the version element is never read |
+| `ApiGetKernelRequest.version_number` | The field **exists**, and is ignored server-side: v9 and v15 returned byte-identical source, both stamped `v13`, with zero cell outputs |
+| `kernels_list_files` | Only `/kaggle/working` of the latest run |
+| The public kernel page | Client-rendered shell; no notebook content in the HTML |
+
+The CLI's own help advertises the `<version>` suffix, so this fails in the
+worst way — no error, just the wrong run's numbers under a historical
+label. A log is therefore only obtainable **while its run is the latest**,
+which is why these were captured at the time and committed here. Use
+`scripts/archive_kernel_log.py` immediately after every run.
 
 Runs before kernel v9 (v1–v8, covering v1/v2 baselines and E01–E05) were
 not archived before their logs became unreachable. Their results are

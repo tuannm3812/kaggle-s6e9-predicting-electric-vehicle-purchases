@@ -969,3 +969,40 @@ them as the Executed-output appendix.
 baselines and E01–E05 — were already unreachable when this was noticed.
 Those results survive in the ledger; their raw logs are gone. Archiving
 should have started at the first run.
+
+## 2026-09-07 — Exhausted every documented route; archiving is now the mechanism
+
+User pointed at Kaggle's notebooks and API docs. Both pages are
+client-rendered and unfetchable, so I read the **installed SDK source**
+instead, which is authoritative for what the client actually does. The
+answer is now settled at implementation level, not by trial:
+
+- `kernels_output` splits the kernel string and reads only `[0]` and
+  `[1]`; a third element is never touched. `ApiListKernelSessionOutputRequest`
+  exposes only `kernel_slug`, `page_size`, `page_token`, `user_name` —
+  **there is no version field to send.**
+- `kernels_pull` drops the version the same way.
+- `ApiGetKernelRequest` **does** carry `version_number` — the one place a
+  version can be expressed. It is ignored server-side: requests for v9 and
+  v15 returned byte-identical source, both stamped `NOTEBOOK_VERSION v13`,
+  with zero cell outputs.
+
+So no past run's output is retrievable, and the capability the user asked
+after does not exist anywhere in the API.
+
+**Acting on "record them to docs is ok":**
+
+- `scripts/archive_kernel_log.py <version> <label>` fetches the current
+  log and archives it under `assets/kernel_logs/`, refusing to overwrite
+  an existing file and warning when the fetched log's stamped
+  `notebook_version` does not match the version being claimed — which is
+  precisely the silent-mislabel this whole investigation was about.
+- `render_pdf.py` now emits `renders/docs/9_run_logs.pdf`, every archived
+  run's console output in version order, **generated from the log files**
+  so it cannot drift from them. E06's page shows the full run: fold AUCs,
+  both gate verdicts, the correlation matrix, the promotion.
+- The evidence table lives in `assets/kernel_logs/README.md`; docs/0
+  carries the operational rule (archive immediately, every run).
+
+The seven archived logs are now readable documents rather than raw JSON
+in a directory. Kernels v1–v8 remain lost and are recorded as such.
