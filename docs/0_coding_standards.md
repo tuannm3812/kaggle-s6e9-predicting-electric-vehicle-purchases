@@ -159,8 +159,13 @@ That project imports its template from a `uts-mdsi` repo not present on
 this machine, so `scripts/templates/project-doc.typ` is a fresh template
 carrying this project's own palette rather than a copy.
 
-**Notebooks stay on the Chrome path**, because nbconvert's HTML carries
-syntax highlighting that no HTML→Typst conversion preserves.
+**Notebooks go through the same Typst path**, converted with nbconvert's
+**markdown** export rather than its HTML. The HTML wraps every cell in an
+`In [ ]:` prompt gutter that indents the entire document and wastes the
+left margin; the markdown export drops the prompts and emits plain
+` ```python ` blocks, which **Typst highlights natively** — so the
+highlighting that motivated the HTML route is not lost by leaving it.
+Only the assembled run-logs PDF still uses Chrome.
 
 - **Fonts travel with the repo.** DM Sans variable TTFs live in
   `assets/fonts/dm-sans/` (SIL-OFL, `OFL.txt` must travel with them);

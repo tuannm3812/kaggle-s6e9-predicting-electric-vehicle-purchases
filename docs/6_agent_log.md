@@ -1081,3 +1081,39 @@ pages rather than trusting a clean exit code:
 Also replaced the build-step error handling: a failing pandoc or Typst
 now surfaces its own diagnosis instead of a bare `CalledProcessError`,
 which is what made defects 3 and 4 quick to find.
+
+## 2026-09-07 — Notebooks onto the Typst path; the prompt gutter is gone
+
+User flagged an indent in the notebook PDFs. Cause: nbconvert's **HTML**
+export wraps every cell in an `In [ ]:` prompt gutter, so the whole
+document sat indented with the left margin wasted. Compared against the
+fire-research notebook PDFs, which have no such gutter — because they
+convert with nbconvert's **markdown** export, not HTML.
+
+Adopted the same. The markdown export drops the prompts and emits plain
+` ```python ` blocks, and **Typst highlights those natively**, so the
+syntax highlighting that had justified keeping notebooks on the Chrome
+path is not lost by leaving it — I had assumed otherwise when the docs
+moved to Typst yesterday, and that assumption was wrong. Notebooks and
+docs now share one pipeline and one look: running header, provenance
+stamp, page numbers, full-width code.
+
+The Kaggle run-log appendix moved from an HTML block to a markdown
+section and still renders (`02_modeling.pdf`, 29 pages, appendix at 26).
+Chrome now serves only the assembled run-logs PDF, which is built as HTML
+directly rather than from markdown.
+
+Also cleaned the iCloud export: it held `01_eda 2.pdf` and
+`02_modeling 2.pdf`, iCloud's **sync conflict copies** — created when
+files are overwritten while a sync is in flight, not stale renders. The
+export's mirror-prune removes them; they had simply appeared after the
+last run.
+
+Follow-up the same day: with notebooks on Typst too, `build_css`,
+`html_to_pdf` and the CSS palette constants were dead code, and the
+startup check still required Google Chrome for a pipeline that no longer
+uses it. All removed — `render_pdf.py` is 437 lines from 520, checks for
+`pandoc` and `typst` instead, and the palette lives in one place (the
+Typst template) rather than being duplicated in CSS. A local
+`import shutil` inside `main()` was shadowing the module-level import and
+raised at the new tool check; removed.
