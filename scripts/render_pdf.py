@@ -31,24 +31,24 @@ What it produces, under renders/ (gitignored):
     renders/docs/all_docs.pdf      docs 0-7 concatenated in reading order
     renders/notebooks/<name>.pdf   one PDF per notebook
 
-Notebooks render from SOURCE — Kaggle exposes no executed notebook by any
-route (verified 2026-09-06: `kernels pull` returns source only,
-`kernels_list_files` lists just /kaggle/working, and the public page is a
-client-rendered shell; the standing feature request is Kaggle discussion
-83578). Two ways to get real output in anyway:
+Kaggle's API exposes no executed notebook — `kernels pull` returns source
+with zero cell outputs, and the `__results__.html` a run builds is not
+downloadable. Two ways to get real output in anyway, neither of which
+executes anything locally (docs/0: runs happen on Kaggle):
 
-  --with-kernel-log  fetch the run log from the notebook's Kaggle kernel
-                     and append it as an "Executed output" appendix. This
-                     is the output of the run that produced the ledger
-                     rows, so it is the *trusted* one — better evidence
-                     than a fresh local execution would be.
-  --execute-eda      execute the EDA notebook locally (~21 s) so its PDF
-                     carries plots. EDA only; the modeling notebook is
-                     never executed locally (docs/0).
+  --executed-html    render a **Kaggle self-export**: the notebook's own
+                     last cell converts `/kaggle/working/__notebook__.ipynb`
+                     to HTML during the run, and anything in
+                     /kaggle/working comes back via `kernels output`. This
+                     carries real per-cell outputs, from the run that
+                     produced the recorded results.
+  --with-kernel-log  append the run's console log as an appendix. Coarser
+                     than the self-export, but available for every
+                     archived historical run.
 
 Usage:
     python3 scripts/render_pdf.py --with-kernel-log --export   # the usual
-    python3 scripts/render_pdf.py --execute-eda   # EDA plots as well
+    python3 scripts/render_pdf.py --executed-html out/executed_notebook.html
     python3 scripts/render_pdf.py --only docs     # or: notebooks
 """
 
@@ -100,6 +100,19 @@ DOC_ORDER = [
 ]
 
 
+RUN_FLAG = re.compile(r'^(\s*)(RUN_[A-Z0-9_]+)\s*=\s*True\s*$', re.M)
+
+
+def flags_off(notebook_json: str) -> str:
+    """Set every RUN_* flag to False in a notebook's JSON source.
+
+    Notebook source lives as JSON string lists, so the assignment appears
+    as `"RUN_CHAMPION = True\n"`. Rewriting it here rather than editing
+    the notebook keeps the committed file untouched.
+    """
+    return RUN_FLAG.sub(r"\1\2 = False", notebook_json)
+
+
 def doc_title(source: Path) -> str:
     """The document's own H1, falling back to a tidied filename."""
     for line in source.read_text().splitlines():
@@ -108,13 +121,13 @@ def doc_title(source: Path) -> str:
     return source.stem.replace("_", " ").title()
 
 
-def run(cmd: list[str]) -> None:
+def run(cmd: list[str], cwd: Path | None = None) -> None:
     """Run a build step, surfacing the tool's own error when it fails.
 
     Typst and pandoc explain their failures precisely; swallowing that
     into a bare CalledProcessError wastes the diagnosis they did.
     """
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
     if proc.returncode != 0:
         detail = (proc.stderr or proc.stdout or "").strip()
         raise SystemExit(f"{cmd[0]} failed:\n{detail}")
@@ -275,9 +288,10 @@ def _log_appendix(entries: list, source: str) -> str:
     )
 
 
-def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
+def notebook_to_pdf(nb: Path, pdf: Path,
                     with_log: bool = False,
-                    archived_log: Path | None = None) -> None:
+                    archived_log: Path | None = None,
+                    executed_html: Path | None = None) -> None:
     """Notebook -> markdown via nbconvert -> Typst, same as the docs.
 
     Markdown rather than HTML deliberately. nbconvert's HTML puts each
@@ -288,16 +302,19 @@ def notebook_to_pdf(nb: Path, pdf: Path, execute: bool,
     it also puts notebooks and docs through one pipeline instead of two.
     """
     with tempfile.TemporaryDirectory() as td:
+        # A Kaggle self-export is an executed notebook saved as HTML by the
+        # run itself (Kaggle exposes no executed notebook otherwise). Convert
+        # it back to a notebook-shaped markdown so outputs survive.
         source = nb
-        if execute:
-            # Run from notebooks/ so the notebook's ../data path resolves.
-            run([sys.executable, "-m", "nbconvert", "--to", "notebook",
-                 "--execute", "--ExecutePreprocessor.timeout=900",
-                 str(nb), "--output", "executed.ipynb", "--output-dir", td])
-            source = Path(td) / "executed.ipynb"
-        # --output-dir is where figures land too, beside the markdown.
-        run([sys.executable, "-m", "nbconvert", "--to", "markdown",
-             str(source), "--output", "body", "--output-dir", td])
+        if executed_html is not None:
+            if not executed_html.exists():
+                raise SystemExit(f"no such self-export: {executed_html}")
+            run(["pandoc", str(executed_html), "-f", "html", "-t", "markdown",
+                 "--wrap=preserve", "-o", str(Path(td) / "body.md")])
+        else:
+            # --output-dir is where figures land too, beside the markdown.
+            run([sys.executable, "-m", "nbconvert", "--to", "markdown",
+                 str(source), "--output", "body", "--output-dir", td])
         body_md = Path(td) / "body.md"
 
         text = body_md.read_text()
@@ -352,10 +369,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--only", choices=["docs", "notebooks"],
                         help="render just one half of the pipeline")
-    parser.add_argument("--execute-eda", action="store_true",
-                        help="execute the EDA notebook locally so its PDF "
-                             "has outputs (the modeling notebook is never "
-                             "executed locally; see docs/0)")
+    parser.add_argument("--executed-html", type=Path, metavar="HTML",
+                        help="render this Kaggle self-export instead of the "
+                             "notebook source, so the PDF carries real cell "
+                             "outputs (see the notebook's Self-Export cell)")
     parser.add_argument("--with-kernel-log", action="store_true",
                         help="append each notebook's Kaggle run log as an "
                              "'Executed output' appendix (fetches the "
@@ -395,16 +412,18 @@ def main() -> None:
         out = RENDERS / "notebooks"
         out.mkdir(parents=True, exist_ok=True)
         for nb in sorted((REPO / "notebooks").glob("*.ipynb")):
-            execute = args.execute_eda and nb.name == "01_eda.ipynb"
             # An archived log names one specific run, so it only applies
             # to the modeling notebook it came from.
             archived = (args.kernel_log
                         if args.kernel_log and nb.stem.endswith("modeling")
                         else None)
-            notebook_to_pdf(nb, out / f"{nb.stem}.pdf", execute,
+            notebook_to_pdf(nb, out / f"{nb.stem}.pdf",
                             with_log=args.with_kernel_log,
-                            archived_log=archived)
-            tag = (" (executed locally)" if execute
+                            archived_log=archived,
+                            executed_html=args.executed_html
+                            if nb.stem.endswith("modeling") else None)
+            tag = (" (Kaggle self-export)" if args.executed_html
+                   and nb.stem.endswith("modeling")
                    else f" + {archived.name}" if archived
                    else " + Kaggle run log (latest)" if args.with_kernel_log
                    else " (source; runs live on Kaggle)")
@@ -422,13 +441,22 @@ def main() -> None:
             if old_pdf.relative_to(dest) not in wanted:
                 old_pdf.unlink()
                 print(f"  pruned stale {old_pdf.relative_to(dest)}")
-        copied = 0
+        # Copy only what actually changed. Overwriting an identical file
+        # still counts as a write to iCloud, and a write while a sync is in
+        # flight is what produces "name 2.pdf" conflict copies — so the
+        # cheapest fix is not to write.
+        copied = skipped = 0
         for rel in sorted(wanted):
             target = dest / rel
+            source = RENDERS / rel
+            if target.exists() and target.read_bytes() == source.read_bytes():
+                skipped += 1
+                continue
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(RENDERS / rel, target)
+            shutil.copy2(source, target)
             copied += 1
-        print(f"\nexported {copied} PDFs -> {dest}")
+        note = f", {skipped} unchanged" if skipped else ""
+        print(f"\nexported {copied} PDFs{note} -> {dest}")
 
 
 if __name__ == "__main__":

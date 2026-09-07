@@ -188,6 +188,16 @@ Only the assembled run-logs PDF still uses Chrome.
   *Executed output* appendix. That log is the output of the run that
   produced the recorded results, which makes it **better** evidence than
   a fresh local execution: it is the trusted run, not a re-enactment.
+  **A notebook can export itself, and that is the only way to get real
+  cell outputs.** Kaggle exposes no executed notebook, but
+  `/kaggle/working/__notebook__.ipynb` exists *during* a run with the
+  outputs produced so far, and `/kaggle/working` is returned by
+  `kernels output`. So the notebook's **last** cell converts itself to
+  HTML (§10 of the modeling notebook) — last, because the file only holds
+  what has already executed, and that cell's own output is never in it.
+  Render with `--executed-html`. **This does not relax the Kaggle-only
+  rule**: the export runs on Kaggle, not here.
+
   **A past run's output cannot be fetched by any route** — now a rule in
   the master standard (**§12.1**, promoted from this project on
   2026-09-07 with its evidence table, since it applies to every Kaggle

@@ -30,12 +30,35 @@ renders one as an "Executed output" appendix.
 | `kernels_list_files` | Only `/kaggle/working` of the latest run |
 | The public kernel page | Client-rendered shell; no notebook content in the HTML |
 
-The CLI's own help advertises the `<version>` suffix, so this fails in the
-worst way — no error, just the wrong run's numbers under a historical
-label. A log is therefore only obtainable **while its run is the latest**,
+`kernels pull` is worse than the table suggests: the **official docs
+document** `owner/slug/version`, and the installed client (1.7.4.5)
+accepts it, validates it, then builds `ApiGetKernelRequest` **without
+ever setting `version_number`** — a documented flag the implementation
+drops. Asking for a version can also 403 outright.
+
+So the CLI advertises a suffix it does not honour: no error, just the
+wrong run's numbers under a historical label. A log is therefore only obtainable **while its run is the latest**,
 which is why these were captured at the time and committed here. Use
 `scripts/archive_kernel_log.py` immediately after every run.
 
 Runs before kernel v9 (v1–v8, covering v1/v2 baselines and E01–E05) were
 not archived before their logs became unreachable. Their results are
 recorded in the ledger, but the raw logs are gone.
+
+## The one thing that *does* work: self-export
+
+Kaggle will not hand over an executed notebook, but a running notebook
+can export **itself**. Verified 2026-09-07 with a throwaway probe kernel:
+
+- `/kaggle/working/__notebook__.ipynb` **exists during the run** and holds
+  the outputs of every cell executed **so far**.
+- `jupyter nbconvert --to html` on it succeeds inside the kernel, and
+  anything written to `/kaggle/working` is returned by
+  `kaggle kernels output`.
+- The probe's HTML came back at 569 KB carrying printed stdout *and*
+  rendered DataFrame tables.
+
+The constraint follows from "so far": the export cell must be the
+notebook's **last**, and its own output is never in the file. This is now
+§10 of `notebooks/02_modeling.ipynb`; render it with
+`scripts/render_pdf.py --executed-html <file>`.
