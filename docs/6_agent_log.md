@@ -1185,3 +1185,27 @@ now, the table itself is kept), and `mdls` reports stale page counts, so
 the render was verified by reading pages rather than trusting it.
 
 Kernel v18 pushed to produce the real executed notebook.
+
+## 2026-09-07 — Self-export lands: the PDF finally carries real outputs
+
+Kernel v18 (notebook v15) returned `executed_notebook.ipynb` — a valid
+notebook, 62 cells, **9 carrying outputs**: the version banner, the data
+frames and source lookup, the champion re-fit's three seeds and their
+average, the gate line, sanity checks, the OOF correlation matrix,
+champion selection, the submission line, and the full reproducibility
+snapshot. `renders/notebooks/02_modeling.pdf` renders them inline as
+output blocks — 30 pages, and the first time this project's modeling PDF
+has shown what the code actually produced.
+
+**Ninth consecutive bit-identical reproduction**: all eight vectors match
+R1 (kernel v14) under `np.array_equal`, and `submission.csv` hashes to
+`aba17f9fe8e08631…` as it has since v9. Worth noting the run is *slower*
+each time (15,070 s here against 12,296 s for R1) while the numbers are
+identical to the last bit — Kaggle worker contention moves wall-clock,
+never results.
+
+Log archived as `kernel_v18_selfexport_champion_refit.log`. The archiving
+helper's version-mismatch warning fired as designed — it reported the log
+stamping notebook `v15` against a claimed kernel v18, which is correct
+here (kernel version and notebook version are different counters) and
+exactly the check that would catch a fetch returning a later run.

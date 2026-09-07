@@ -16,6 +16,7 @@ renders one as an "Executed output" appendix.
 | `kernel_v14_R1_champion_reproduction.log` | v14 | v11 | R1 — bit-identical champion reproduction |
 | `kernel_v15_E10_ctr_type.log` | v15 | v12 | E10 — two arms degenerate, search closed |
 | `kernel_v16_republish_champion_refit.log` | v16 | v13 | Republish after the rename; eighth bit-identical reproduction |
+| `kernel_v18_selfexport_champion_refit.log` | v18 | v15 | First run carrying a working self-export; ninth bit-identical reproduction |
 
 ## Why these are archived rather than re-fetched
 
