@@ -411,7 +411,10 @@ def main() -> None:
     if args.only != "docs":
         out = RENDERS / "notebooks"
         out.mkdir(parents=True, exist_ok=True)
-        for nb in sorted((REPO / "notebooks").glob("*.ipynb")):
+        # Skip dotfiles: a staged copy left behind by an interrupted run
+        # would otherwise be rendered as if it were a notebook.
+        for nb in sorted(p for p in (REPO / "notebooks").glob("*.ipynb")
+                         if not p.name.startswith(".")):
             # An archived log names one specific run, so it only applies
             # to the modeling notebook it came from.
             archived = (args.kernel_log

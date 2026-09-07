@@ -175,6 +175,11 @@ Only the assembled run-logs PDF still uses Chrome.
   Typst names a variable font from its optical-size axis, and getting it
   wrong is near-silent: it warns but still compiles, falling back to
   Libertinus Serif.
+- **Code blocks use `scripts/templates/code-theme.tmTheme`**, the same
+  four colours as the headings mapped onto token classes — keywords
+  blue, strings green, comments muted-grey italic. Typst's built-in
+  theme is a generic light scheme whose reds and purples match nothing
+  else on the page.
 - **Heading colours step down the hierarchy** — navy `#1C2333` H1,
   viridis blue `#31688E` H2, green `#2D7F5E` H3, muted grey `#6E7278`
   H4. Blue and green match the sibling hackathon repo's chart palette;

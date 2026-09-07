@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Syntax colours for rendered code blocks, in this project's palette.
+
+  Typst's built-in theme is a generic light scheme whose reds and purples
+  belong to no other part of the document. This maps the same four colours
+  the headings use (navy ink, viridis blue, green, muted grey) onto the
+  token classes, so a code block reads as part of the page rather than a
+  pasted screenshot. Comments deliberately sit at the muted grey the H4
+  headings use: they are the least load-bearing text on the page.
+-->
+<plist version="1.0">
+<dict>
+  <key>name</key><string>S6E9 Project</string>
+  <key>settings</key>
+  <array>
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key><string>#F7F7F5</string>
+        <key>foreground</key><string>#1C2333</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Comment</string>
+      <key>scope</key><string>comment, punctuation.definition.comment</string>
+      <key>settings</key><dict>
+        <key>foreground</key><string>#6E7278</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>String</string>
+      <key>scope</key><string>string, string.quoted, constant.character</string>
+      <key>settings</key><dict><key>foreground</key><string>#2D7F5E</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Number and constant</string>
+      <key>scope</key><string>constant.numeric, constant.language, constant.other</string>
+      <key>settings</key><dict><key>foreground</key><string>#8A5A2B</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Keyword</string>
+      <key>scope</key><string>keyword, keyword.control, keyword.operator.logical, storage, storage.type</string>
+      <key>settings</key><dict>
+        <key>foreground</key><string>#31688E</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Function and class name</string>
+      <key>scope</key><string>entity.name.function, support.function, meta.function-call</string>
+      <key>settings</key><dict><key>foreground</key><string>#1C2333</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Class and type</string>
+      <key>scope</key><string>entity.name.class, entity.name.type, support.class, support.type</string>
+      <key>settings</key><dict>
+        <key>foreground</key><string>#31688E</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Variable and parameter</string>
+      <key>scope</key><string>variable, variable.parameter, meta.definition.variable</string>
+      <key>settings</key><dict><key>foreground</key><string>#1C2333</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Punctuation and operators</string>
+      <key>scope</key><string>punctuation, keyword.operator</string>
+      <key>settings</key><dict><key>foreground</key><string>#6E7278</string></dict>
+    </dict>
+  </array>
+  <key>uuid</key><string>7b3a1c92-4f8e-4a51-9c2d-8e6f1a2b3c4d</string>
+</dict>
+</plist>

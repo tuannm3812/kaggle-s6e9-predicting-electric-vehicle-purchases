@@ -18,6 +18,11 @@
 #let RULE = rgb("#D9D6CC")
 #let CODE_BG = rgb("#F7F7F5")
 
+// Syntax colours for code blocks, in the same palette as the headings.
+// Typst's built-in theme is a generic light scheme whose reds and purples
+// match nothing else on the page.
+#let CODE_THEME = "code-theme.tmTheme"
+
 #let conf(
   project: "",
   kind: "",
@@ -75,6 +80,7 @@
     set text(size: 9.5pt, weight: 700, fill: MUTED)
     block(above: 1em, below: 0.4em, it)
   }
+  set raw(theme: CODE_THEME)
   show raw.where(block: true): it => block(
     width: 100%, fill: CODE_BG, inset: 7pt, radius: 2pt,
     stroke: (left: 2pt + BLUE, rest: 0.5pt + RULE),

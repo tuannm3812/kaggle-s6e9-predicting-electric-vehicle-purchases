@@ -39,3 +39,4 @@ __pycache__/
 
 # Rendered PDFs (scripts/render_pdf.py)
 renders/
+notebooks/.render_*
