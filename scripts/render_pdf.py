@@ -7,13 +7,20 @@ it deliberately uses only tools already on the machine — pandoc,
 nbconvert, and headless Google Chrome for the HTML-to-PDF step — because
 no LaTeX engine is installed and none should be required for this.
 
-Typography and palette (2026-09-05): DM Sans throughout, embedded as
-base64 so a PDF renders identically on a machine without the font
-installed, and heading colours that step down the hierarchy — navy H1,
-viridis blue H2, green H3, muted-grey uppercase H4. The blue and green
-are the ones the sibling hackathon repo already uses for charts, so
-output across the workspace looks related; the lightness steps as well
-as the hue, so the levels stay distinguishable printed in greyscale.
+Pipeline (2026-09-07): markdown --pandoc--> Typst --typst--> PDF, adopted
+from the sibling 36126-active-fire-research renderer. Typst buys three
+things headless Chrome could not: a running header, page numbers, and
+tables that paginate instead of being pushed whole to the next page.
+Notebooks still go through Chrome, because nbconvert's HTML carries its
+own syntax highlighting that survives no HTML-to-Typst conversion.
+
+That project imports its template from a `uts-mdsi` repo which is not on
+this machine, so `scripts/templates/project-doc.typ` is a fresh template
+carrying THIS project's palette: DM Sans, and heading colours stepping
+navy → viridis blue → green → muted grey, with lightness stepping too so
+the levels survive greyscale. Also adopted: the `path @ commit (date)`
+provenance stamp, which suits a project whose whole claim is that results
+trace to a recorded source.
 
 What it produces, under renders/ (gitignored):
 
@@ -48,6 +55,7 @@ import argparse
 import base64
 import html as html_lib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -141,6 +149,18 @@ def build_css() -> str:
         rule=RULE, code_bg=CODE_BG, code_border=CODE_BORDER,
     )
 
+PROJECT = "S6E9 | Predicting Electric Vehicle Purchases"
+# Markdown images whose source is a URL, optionally wrapped in a link.
+REMOTE_IMAGE = re.compile(r"\[?!\[[^\]]*\]\(https?://[^)]*\)\]?(\([^)]*\))?")
+LOCAL_IMAGE = re.compile(r"(!\[[^\]]*\])\(((?!https?://)[^)]+)\)")
+LEADING_H1 = re.compile(r"\A\s*#\s+[^\n]*\n+")
+
+
+def _typ_str(value: str) -> str:
+    """Quote a Python string as a Typst string literal."""
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
 DOC_ORDER = [
     "0_coding_standards.md", "1_instructions.md", "2_eda_insights.md",
     "3_implementation_plan.md", "4_experiment_ledger.md",
@@ -149,8 +169,24 @@ DOC_ORDER = [
 ]
 
 
+def doc_title(source: Path) -> str:
+    """The document's own H1, falling back to a tidied filename."""
+    for line in source.read_text().splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return source.stem.replace("_", " ").title()
+
+
 def run(cmd: list[str]) -> None:
-    subprocess.run(cmd, check=True, capture_output=True)
+    """Run a build step, surfacing the tool's own error when it fails.
+
+    Typst and pandoc explain their failures precisely; swallowing that
+    into a bare CalledProcessError wastes the diagnosis they did.
+    """
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "").strip()
+        raise SystemExit(f"{cmd[0]} failed:\n{detail}")
 
 
 def html_to_pdf(html: Path, pdf: Path) -> None:
@@ -161,21 +197,71 @@ def html_to_pdf(html: Path, pdf: Path) -> None:
     ])
 
 
-def md_to_pdf(sources: list[Path], pdf: Path, title: str) -> None:
-    """Markdown (GitHub flavour) -> styled HTML via pandoc -> PDF."""
+def git_provenance(source: Path) -> str:
+    """`path @ commit (date)` for one file — what this PDF was rendered from."""
+    rel = source.relative_to(REPO)
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%h|%ad", "--date=short", "--", str(rel)],
+            cwd=REPO, capture_output=True, text=True, check=True).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain", "--", str(rel)],
+            cwd=REPO, capture_output=True, text=True).stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return str(rel)
+    if not out:
+        return f"{rel} (uncommitted)"
+    commit, date = out.split("|", 1)
+    return f"{rel} @ {commit}{'+dirty' if dirty else ''} ({date})"
+
+
+def md_to_pdf(sources: list[Path], pdf: Path, title: str,
+              kind: str = "Doc") -> None:
+    """Markdown (GitHub flavour) -> Typst via pandoc -> PDF."""
+    template = REPO / "scripts" / "templates" / "project-doc.typ"
+    fonts = REPO / "assets" / "fonts" / "dm-sans"
     with tempfile.TemporaryDirectory() as td:
-        css = Path(td) / "print.css"
-        css.write_text(build_css())
-        html = Path(td) / "out.html"
-        # --resource-path lets ../assets/figures/... in a doc resolve, and
-        # --embed-resources then inlines the PNGs so the PDF is self-contained.
+        # Typst has no network access, so a remote image (the README's
+        # shields.io badges) is a hard error. They are decorative status
+        # chips that carry nothing in a PDF, so drop them rather than
+        # vendoring PNGs of them.
+        staged = []
+        for i, src in enumerate(sources):
+            text = REMOTE_IMAGE.sub("", src.read_text())
+            # Local image paths are relative to the doc; Typst compiles
+            # from a temp dir, so resolve them against the doc's own
+            # directory and write them absolute.
+            def absolutise(m, base=src.parent):
+                target = (base / m.group(2)).resolve()
+                return f"{m.group(1)}(<{target}>)" if target.exists() else m.group(0)
+            text = LOCAL_IMAGE.sub(absolutise, text)
+            # The template prints the title, so a leading H1 would show
+            # it twice. Only the first doc of a concatenation loses its
+            # H1 -- later ones are section titles within a collection.
+            if i == 0:
+                text = LEADING_H1.sub("", text, count=1)
+            copy = Path(td) / f"{i:02d}_{src.name}"
+            copy.write_text(text)
+            staged.append(copy)
+        body = Path(td) / "body.typ"
+        # --resource-path lets ../assets/figures/... resolve from docs/.
         run([
-            "pandoc", *map(str, sources), "-f", "gfm", "-t", "html5",
-            "--standalone", "--embed-resources", f"--css={css}",
-            f"--resource-path={REPO}:{REPO / 'docs'}",
-            "--metadata", f"pagetitle={title}", "-o", str(html),
+            "pandoc", *map(str, staged), "-f", "gfm", "-t", "typst",
+            "--wrap=preserve", f"--resource-path={REPO}:{REPO / 'docs'}",
+            "-o", str(body),
         ])
-        html_to_pdf(html, pdf)
+        prov = git_provenance(sources[0]) if len(sources) == 1 else ""
+        main = Path(td) / "main.typ"
+        main.write_text(
+            f'#import "{template}": *\n'
+            f"#show: doc => conf(project: {_typ_str(PROJECT)}, "
+            f"kind: {_typ_str(kind)}, title: {_typ_str(title)}, "
+            f"provenance: {_typ_str(prov)}, doc)\n\n"
+            + body.read_text()
+        )
+        # --root / so the absolute template and image paths resolve.
+        run(["typst", "compile", "--root", "/",
+             "--font-path", str(fonts), str(main), str(pdf)])
 
 
 # Log lines every Kaggle run emits that carry no information about the
@@ -348,15 +434,16 @@ def main() -> None:
         out = RENDERS / "docs"
         out.mkdir(parents=True, exist_ok=True)
         for name in ["README.md", "AGENTS.md"]:
-            md_to_pdf([REPO / name], out / f"{Path(name).stem}.pdf",
-                      Path(name).stem)
-            print(f"  renders/docs/{Path(name).stem}.pdf")
+            src = REPO / name
+            md_to_pdf([src], out / f"{src.stem}.pdf", doc_title(src))
+            print(f"  renders/docs/{src.stem}.pdf")
         for name in DOC_ORDER:
             src = REPO / "docs" / name
-            md_to_pdf([src], out / f"{src.stem}.pdf", src.stem)
+            md_to_pdf([src], out / f"{src.stem}.pdf", doc_title(src))
             print(f"  renders/docs/{src.stem}.pdf")
         md_to_pdf([REPO / "docs" / n for n in DOC_ORDER],
-                  out / "all_docs.pdf", "S6E9 — Project Documentation")
+                  out / "all_docs.pdf", "Project Documentation",
+                  kind="Collected")
         print("  renders/docs/all_docs.pdf")
         run_logs_pdf(out)
 

@@ -1034,3 +1034,50 @@ The middle row only holds because determinism was *measured* rather than
 assumed — `np.array_equal` on saved vectors, not a matching summary
 metric. Without that evidence every matrix would be irreplaceable and the
 recommendation would flip to committing them.
+
+## 2026-09-07 — Adopted the fire-research render format (Typst)
+
+Compared this project's renderer with `36126-active-fire-research`'s.
+Theirs runs markdown → pandoc → **Typst** → PDF against a shared template;
+ours ran markdown → pandoc → HTML → headless Chrome. Reading their output
+side by side, three things they had and we did not: a **running header**,
+**page numbers**, and **tables that paginate** rather than jumping whole
+to the next page. They also stamp `path @ commit (date)` above each
+title — a good fit here, where the entire claim is that results trace to
+a recorded source.
+
+**How they get notebook outputs:** `nbconvert --to notebook --execute`,
+i.e. they execute locally. Not available for our modeling notebook (3.5 h
+and against the Kaggle-only directive), so notebooks keep the archived
+kernel log appendix, and `--execute-eda` remains for the cheap EDA one.
+
+Docs now render through Typst; notebooks stay on Chrome, because
+nbconvert's HTML carries syntax highlighting that no HTML→Typst
+conversion preserves. Their template lives in a `uts-mdsi` repo absent
+from this machine, so `scripts/templates/project-doc.typ` is a fresh
+template in this project's palette rather than a copy.
+
+Four defects found and fixed while migrating, all by looking at rendered
+pages rather than trusting a clean exit code:
+
+1. **Wrong font, silently.** An earlier edit had targeted
+   `#set text(...)`, but inside a Typst function the line has no `#`, so
+   the body font never changed. Typst *warns* about an unknown family and
+   compiles anyway — the whole document came out in Libertinus Serif
+   while the header, which had been edited correctly, was DM Sans. Now
+   recorded in docs/0: the Typst family is `"DM Sans 9pt"`, because Typst
+   names a variable font from its optical-size axis.
+2. **Titles printed twice** — the template renders the title and the
+   document's own H1 followed it. The leading H1 is now stripped, and
+   only from the first file of a concatenation, since later ones are
+   section titles within a collection.
+3. **Figures rendered as literal markdown.** Absolutising image paths
+   produced paths containing a space (`2. Kaggle`), which is not valid
+   markdown image syntax; they are angle-bracketed now.
+4. **Remote images are a hard error** in Typst (no network). The README's
+   shields.io badges are stripped — decorative chips that carry nothing
+   in a PDF.
+
+Also replaced the build-step error handling: a failing pandoc or Typst
+now surfaces its own diagnosis instead of a bare `CalledProcessError`,
+which is what made defects 3 and 4 quick to find.

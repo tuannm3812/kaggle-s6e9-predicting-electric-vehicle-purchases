@@ -145,14 +145,31 @@ it live.
 (gitignored) and, with `--export`, mirrors them to iCloud at
 `05_Projects/<category>/<repo>/` — category derived from the GitHub
 parent folder, so the script works unchanged when copied to a sibling
-repo. Pipeline: pandoc → styled HTML → headless Chrome. **No LaTeX
-dependency by design**; nothing beyond what the machine already had.
+repo. Pipeline (since 2026-09-07): markdown → **pandoc → Typst → PDF**,
+adopted from the sibling `36126-active-fire-research` renderer after
+comparing formats. Typst buys three things headless Chrome could not: a
+**running header**, **page numbers**, and **tables that paginate**
+instead of being pushed whole to the next page (this project's ledger
+tables are long enough for that to matter). Also adopted from there: the
+`path @ commit (date)` **provenance stamp** above each title, which suits
+a project whose whole claim is that results trace to a recorded source.
+Still no LaTeX dependency — Typst is a single binary.
 
-- **Fonts are embedded, never named.** Naming a font makes the renderer
-  look it up locally, so an un-installed face is silently substituted
-  and layout shifts. DM Sans variable TTFs live in
-  `assets/fonts/dm-sans/` (SIL-OFL, `OFL.txt` must travel with them) and
-  are inlined as base64.
+That project imports its template from a `uts-mdsi` repo not present on
+this machine, so `scripts/templates/project-doc.typ` is a fresh template
+carrying this project's own palette rather than a copy.
+
+**Notebooks stay on the Chrome path**, because nbconvert's HTML carries
+syntax highlighting that no HTML→Typst conversion preserves.
+
+- **Fonts travel with the repo.** DM Sans variable TTFs live in
+  `assets/fonts/dm-sans/` (SIL-OFL, `OFL.txt` must travel with them);
+  the Chrome path inlines them as base64, the Typst path takes
+  `--font-path`. Either way the PDF does not depend on the font being
+  installed. **In Typst the family is `"DM Sans 9pt"`, not `"DM Sans"`** —
+  Typst names a variable font from its optical-size axis, and getting it
+  wrong is near-silent: it warns but still compiles, falling back to
+  Libertinus Serif.
 - **Heading colours step down the hierarchy** — navy `#1C2333` H1,
   viridis blue `#31688E` H2, green `#2D7F5E` H3, muted grey `#6E7278`
   H4. Blue and green match the sibling hackathon repo's chart palette;
