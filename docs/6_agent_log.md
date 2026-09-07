@@ -1156,3 +1156,32 @@ accepts and validates the version, then builds its request without ever
 setting `version_number`. A documented flag the implementation drops.
 Either way pull returns source with **zero** cell outputs, so it could
 never have solved this.
+
+## 2026-09-07 — Self-export proven on the real notebook, then corrected
+
+Kernel v17 ran with the self-export cell and `executed_notebook.html`
+came back (842 KB) carrying every fold AUC, the champion's 0.94550, run
+names and resource lines. The mechanism works, and its documented
+constraint held exactly: the export cell's own output is absent from the
+file — the one occurrence of its print string is inside the cell's
+*source*, not an output.
+
+**But HTML was the wrong artifact.** Rendering it produced garbage:
+nbconvert's HTML wraps code in JupyterLab CodeMirror markup, and pandoc's
+HTML→markdown step turns that into CSS class names (`{.jp-Cell
+.jp-CodeCell ...}`) where the Python should be. Caught by looking at a
+rendered page, not at the exit code — the pipeline reported success.
+
+**Fixed by exporting the `.ipynb` instead**, verified on the throwaway
+probe kernel first rather than by spending another 3.5 h: the copied
+notebook comes back as valid JSON with real outputs (`stream` stdout and
+`execute_result` with `text/html`), and the local pipeline converts it
+through the same nbconvert-markdown path as source. Lossless, and cheaper
+on Kaggle — a file copy instead of an nbconvert run.
+
+Two smaller fixes while proving the path: pandas' `<style scoped>` block
+was printing as a literal CSS text block beside each DataFrame (stripped
+now, the table itself is kept), and `mdls` reports stale page counts, so
+the render was verified by reading pages rather than trusting it.
+
+Kernel v18 pushed to produce the real executed notebook.

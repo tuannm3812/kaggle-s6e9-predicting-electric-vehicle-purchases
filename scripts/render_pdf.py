@@ -36,19 +36,19 @@ with zero cell outputs, and the `__results__.html` a run builds is not
 downloadable. Two ways to get real output in anyway, neither of which
 executes anything locally (docs/0: runs happen on Kaggle):
 
-  --executed-html    render a **Kaggle self-export**: the notebook's own
-                     last cell converts `/kaggle/working/__notebook__.ipynb`
-                     to HTML during the run, and anything in
-                     /kaggle/working comes back via `kernels output`. This
-                     carries real per-cell outputs, from the run that
-                     produced the recorded results.
+  --executed-notebook  render a **Kaggle self-export**: the notebook's
+                     last cell copies `/kaggle/working/__notebook__.ipynb`
+                     out during the run, and anything in /kaggle/working
+                     comes back via `kernels output`. Real per-cell
+                     outputs, from the run that produced the recorded
+                     results.
   --with-kernel-log  append the run's console log as an appendix. Coarser
                      than the self-export, but available for every
                      archived historical run.
 
 Usage:
     python3 scripts/render_pdf.py --with-kernel-log --export   # the usual
-    python3 scripts/render_pdf.py --executed-html out/executed_notebook.html
+    python3 scripts/render_pdf.py --executed-notebook out/executed_notebook.ipynb
     python3 scripts/render_pdf.py --only docs     # or: notebooks
 """
 
@@ -85,6 +85,9 @@ PROJECT = "S6E9 | Predicting Electric Vehicle Purchases"
 REMOTE_IMAGE = re.compile(r"\[?!\[[^\]]*\]\(https?://[^)]*\)\]?(\([^)]*\))?")
 LOCAL_IMAGE = re.compile(r"(!\[[^\]]*\])\(((?!https?://)[^)]+)\)")
 LEADING_H1 = re.compile(r"\A\s*#\s+[^\n]*\n+")
+# nbconvert's per-heading permalink: <a class="anchor-link">¶</a>
+SCOPED_STYLE = re.compile(r"<style[^>]*>.*?</style>", re.S)
+ANCHOR_LINK = re.compile(r'<a[^>]*class="anchor-link"[^>]*>.*?</a>', re.S)
 
 
 def _typ_str(value: str) -> str:
@@ -291,7 +294,7 @@ def _log_appendix(entries: list, source: str) -> str:
 def notebook_to_pdf(nb: Path, pdf: Path,
                     with_log: bool = False,
                     archived_log: Path | None = None,
-                    executed_html: Path | None = None) -> None:
+                    executed_notebook: Path | None = None) -> None:
     """Notebook -> markdown via nbconvert -> Typst, same as the docs.
 
     Markdown rather than HTML deliberately. nbconvert's HTML puts each
@@ -302,22 +305,24 @@ def notebook_to_pdf(nb: Path, pdf: Path,
     it also puts notebooks and docs through one pipeline instead of two.
     """
     with tempfile.TemporaryDirectory() as td:
-        # A Kaggle self-export is an executed notebook saved as HTML by the
-        # run itself (Kaggle exposes no executed notebook otherwise). Convert
-        # it back to a notebook-shaped markdown so outputs survive.
-        source = nb
-        if executed_html is not None:
-            if not executed_html.exists():
-                raise SystemExit(f"no such self-export: {executed_html}")
-            run(["pandoc", str(executed_html), "-f", "html", "-t", "markdown",
-                 "--wrap=preserve", "-o", str(Path(td) / "body.md")])
-        else:
-            # --output-dir is where figures land too, beside the markdown.
-            run([sys.executable, "-m", "nbconvert", "--to", "markdown",
-                 str(source), "--output", "body", "--output-dir", td])
+        # A self-export is the executed .ipynb the run copied out of
+        # /kaggle/working. Converting it here rather than on Kaggle keeps
+        # the conversion lossless: it goes through the same nbconvert
+        # markdown path as the source notebook, so outputs render as
+        # output blocks instead of JupyterLab's CodeMirror markup.
+        source = executed_notebook if executed_notebook is not None else nb
+        if executed_notebook is not None and not executed_notebook.exists():
+            raise SystemExit(f"no such self-export: {executed_notebook}")
+        # --output-dir is where figures land too, beside the markdown.
+        run([sys.executable, "-m", "nbconvert", "--to", "markdown",
+             str(source), "--output", "body", "--output-dir", td])
         body_md = Path(td) / "body.md"
 
-        text = body_md.read_text()
+        # A DataFrame output exports as <style scoped>…</style> plus an
+        # HTML <table>. Pandoc renders the table fine but prints the CSS
+        # as a literal text block, so strip the style tags and keep the
+        # table.
+        text = SCOPED_STYLE.sub("", body_md.read_text())
         if with_log or archived_log is not None:
             appendix = kernel_log_markdown(nb, archived_log)
             if appendix:
@@ -369,10 +374,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--only", choices=["docs", "notebooks"],
                         help="render just one half of the pipeline")
-    parser.add_argument("--executed-html", type=Path, metavar="HTML",
-                        help="render this Kaggle self-export instead of the "
-                             "notebook source, so the PDF carries real cell "
-                             "outputs (see the notebook's Self-Export cell)")
+    parser.add_argument("--executed-notebook", type=Path, metavar="IPYNB",
+                        help="render this Kaggle self-export (an executed "
+                             ".ipynb fetched with `kernels output`) instead "
+                             "of the notebook source, so the PDF carries "
+                             "real cell outputs")
     parser.add_argument("--with-kernel-log", action="store_true",
                         help="append each notebook's Kaggle run log as an "
                              "'Executed output' appendix (fetches the "
@@ -423,9 +429,9 @@ def main() -> None:
             notebook_to_pdf(nb, out / f"{nb.stem}.pdf",
                             with_log=args.with_kernel_log,
                             archived_log=archived,
-                            executed_html=args.executed_html
+                            executed_notebook=args.executed_notebook
                             if nb.stem.endswith("modeling") else None)
-            tag = (" (Kaggle self-export)" if args.executed_html
+            tag = (" (Kaggle self-export)" if args.executed_notebook
                    and nb.stem.endswith("modeling")
                    else f" + {archived.name}" if archived
                    else " + Kaggle run log (latest)" if args.with_kernel_log

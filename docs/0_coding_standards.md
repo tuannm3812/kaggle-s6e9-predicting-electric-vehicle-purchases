@@ -197,10 +197,12 @@ Only the assembled run-logs PDF still uses Chrome.
   cell outputs.** Kaggle exposes no executed notebook, but
   `/kaggle/working/__notebook__.ipynb` exists *during* a run with the
   outputs produced so far, and `/kaggle/working` is returned by
-  `kernels output`. So the notebook's **last** cell converts itself to
-  HTML (§10 of the modeling notebook) — last, because the file only holds
+  `kernels output`. So the notebook's **last** cell copies that
+  file out (§10.2 of the modeling notebook) — last, because it holds only
   what has already executed, and that cell's own output is never in it.
-  Render with `--executed-html`. **This does not relax the Kaggle-only
+  **Copy the `.ipynb`; do not convert to HTML on Kaggle** — nbconvert's
+  HTML wraps code in CodeMirror markup that no HTML→markdown step can
+  turn back into readable Python. Render with `--executed-notebook`. **This does not relax the Kaggle-only
   rule**: the export runs on Kaggle, not here.
 
   **A past run's output cannot be fetched by any route** — now a rule in

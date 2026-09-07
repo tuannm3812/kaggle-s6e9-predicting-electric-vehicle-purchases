@@ -58,7 +58,14 @@ can export **itself**. Verified 2026-09-07 with a throwaway probe kernel:
 - The probe's HTML came back at 569 KB carrying printed stdout *and*
   rendered DataFrame tables.
 
+**Copy the `.ipynb`, do not convert to HTML on Kaggle.** The first
+attempt ran `nbconvert --to html` inside the kernel; the HTML came back
+fine but is unusable downstream — it wraps code in JupyterLab's
+CodeMirror markup, and converting that to markdown yields CSS class names
+where the Python should be. Copying `__notebook__.ipynb` out is lossless
+and lets the local pipeline convert it exactly as it converts source.
+
 The constraint follows from "so far": the export cell must be the
-notebook's **last**, and its own output is never in the file. This is now
-§10 of `notebooks/02_modeling.ipynb`; render it with
-`scripts/render_pdf.py --executed-html <file>`.
+notebook's **last**, and its own output is never in the file. This is
+§10.2 of `notebooks/02_modeling.ipynb`; render with
+`scripts/render_pdf.py --executed-notebook <file>`.
